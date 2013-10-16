@@ -4,9 +4,18 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>Insert title here</title>
+<title>Login Confirmation</title>
 </head>
 <body>
-
+	Username:
+	<%
+		String sName = 	request.getParameter("USERNAME");
+		out.print(sName);
+	%>
+	Password:
+	<%
+		String sdName = 	request.getParameter("PASSWD");
+		out.print(sdName);
+	%>
 </body>
 </html>
