@@ -1,63 +1,85 @@
-<%@ page import="java.sql.*, java.util.*" %>
+<%@ page import="java.sql.*" %>
+<%@ page import="java.util.*"%>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
-  <head>
-  <meta http-equiv="content-type" content="text/html; charset=windows-1250">
-  <title>Inverted Index example</title>
-  </head>
+	<head>
+	<meta http-equiv="content-type" content="text/html; charset=windows-1250">
+	<title>Search Results</title>
+	</head>
+	<H1><CENTER>Search</CENTER></H1>
   <body>
-    <p> Suppose we have the following table <br> 
-    <table border=1>
-      <tr>
-        <th>Column Name</th>
-        <th>Column Type</th>
-      </tr>
-      <tr>
-        <td>ItemId</td>
-        <td>Integer</td>
-      </tr>
-      <tr>
-        <td>ItemName</td>
-        <td>Varchar</td>
-      </tr>
-      <tr>
-        <td>Description</td>
-        <td>Varchar</td>
-      </tr>
-    </table>
-    
-    <p>The <a href=item.sql>sql</a> for the above table</p>
-    <br>
+	<FORM NAME="SearchForm" ACTION="search.jsp" METHOD="post" >
+		<P>Search for images.</P>
+		<TABLE>
+		<TR VALIGN=TOP ALIGN=LEFT>
+		<TD><B><I>Keywords:</I></B></TD>
+		<TD><INPUT TYPE="text" NAME="TEXT"><BR></TD>
+		</TR>
+		<TR VALIGN=TOP ALIGN=LEFT>
+		<TD><B><I>Time Periods:</I></B></TD>
+		<TD><I>From:</I><INPUT TYPE="date" NAME="DATE_START"></TD>
+		<TD><I>To:</I><INPUT TYPE="date" NAME="DATE_END"></TD>
+		</TR>
+		</TABLE>
+
+		<INPUT TYPE="submit" NAME="Submit" VALUE="SEARCH">
+	</FORM>
+
+	<p>Structure of Photos Table<br> 
+	<table border=1>
+		<tr>
+			<th>photo_id</th>
+			<th>owner_name</th>
+			<th>subject</th>
+			<th>place</th>
+			<th>when</th>
+			<th>description</th>
+			<th>thumbnail</th>
+			<th>photo</th>
+		</tr>
+		<tr>
+			<td> </td>
+			<td> </td>
+			<td> </td>
+			<td> </td>
+			<td> </td>
+			<td> </td>
+			<td> </td>
+			<td> </td>
+		</tr>
+	</table>
+
+	<br>
     
     <%
-      String m_url = "jdbc:oracle:thin:@gwynne.cs.ualberta.ca:1521:CRS";
-      String m_driverName = "oracle.jdbc.driver.OracleDriver";
+		String m_url = "jdbc:oracle:thin:@gwynne.cs.ualberta.ca:1521:CRS";
+		String m_driverName = "oracle.jdbc.driver.OracleDriver";
+
+		String m_userName = ""; //supply username
+		String m_password = ""; //supply password
+
+		String addItemError = "";
+
+		Connection m_con;
+		String createString;
+		String selectString = "select itemName, description from item";
+		Statement stmt;
       
-      String m_userName = ""; //supply username
-      String m_password = ""; //supply password
-      
-      String addItemError = "";
-      
-      Connection m_con;
-      String createString;
-      String selectString = "select itemName, description from item";
-      Statement stmt;
-      
-      try
-      {
-      
-        Class drvClass = Class.forName(m_driverName);
-        DriverManager.registerDriver((Driver)
-        drvClass.newInstance());
-        m_con = DriverManager.getConnection(m_url, m_userName, m_password);
-        
-      } 
-      catch(Exception e)
-      {      
-        out.print("Error displaying data: ");
-        out.println(e.getMessage());
-        return;
-      }
+		try
+		{
+			out.println("ok1");
+			Class drvClass = Class.forName(m_driverName);
+			out.println("ok2");
+			DriverManager.registerDriver((Driver)drvClass.newInstance());
+			out.println("ok3");
+			m_con = DriverManager.getConnection(m_url, m_userName, m_password);
+		} 
+		catch(Exception e)
+		{      
+			out.print("Error displaying data: ");
+			out.println(e.getMessage());
+			return;
+		}
 
       try
       {
