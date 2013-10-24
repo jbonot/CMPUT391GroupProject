@@ -44,5 +44,8 @@
 		String phonenumber = 	request.getParameter("PHONENUMBER");
 		out.print(phonenumber);
 	%>
+	<%
+		SQLAdapter db = new SQLAdapter();//Create a new instance of the SQL Adapter to use 
+	%>
 </body>
 </html>
