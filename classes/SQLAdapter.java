@@ -1,5 +1,3 @@
-package SQLAdapter;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -14,9 +12,9 @@ public class SQLAdapter {
 	public String m_userName;
 	public String m_password;
 	private static final String m_url = "jdbc:oracle:thin:@gwynne.cs.ualberta.ca:1521:CRS";
-    private static final String m_driverName = "oracle.jdbc.driver.OracleDriver";
+    	private static final String m_driverName = "oracle.jdbc.driver.OracleDriver";
 	
-    private Connection m_con = null;
+	private Connection m_con = null;
 	private Statement statement = null;
 	private PreparedStatement preparedStatement = null;
 	private ResultSet resultSet = null;
