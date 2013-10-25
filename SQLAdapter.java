@@ -21,7 +21,7 @@ public class SQLAdapter {
 	private PreparedStatement preparedStatement = null;
 	private ResultSet resultSet = null;
 
-	private void registerDriver(){
+	public void registerDriver(){
 		try
 	       {
 	              @SuppressWarnings("rawtypes")
@@ -44,7 +44,6 @@ public class SQLAdapter {
 
 	              statement = m_con.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
 	              ResultSet rset = statement.executeQuery(SQLquery);
-	              closeStatementandConnection();
 	              return rset;
 	              
 
@@ -61,7 +60,6 @@ public class SQLAdapter {
 		registerDriver();
 		try
 	       {
-
 	              resultSet = preparedStatement.executeQuery();
 	              closeStatementandConnection();
 	              return resultSet;

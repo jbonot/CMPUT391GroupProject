@@ -9,6 +9,7 @@
 </head>
 <body>
 	<%@ page import="SQLAdapter.*" %>
+	<%@ page import="java.sql.*" %>
 	Username:
 	<%
 		String newName = 	request.getParameter("NEWUSERNAME");
@@ -46,6 +47,26 @@
 	%>
 	<%
 		SQLAdapter db = new SQLAdapter();//Create a new instance of the SQL Adapter to use 
+		db.m_userName = "";//Need to get username and password from cookie and/or input
+		db.m_password = "";//**************
+		db.registerDriver();//Try and register the oracle driver with the supplied username and password
+		ResultSet rset;
+		rset = db.executeStatement("Select * from groups");//Execute the statement and get results in rset
+		out.print("<br>");
+		if (rset != null){
+			while (rset.next()) {
+			      // It is possible to get the columns via name
+			      // also possible to get the columns via the column number
+			      // which starts at 1
+			      String group_id = rset.getString("group_id");
+			      String group_name = rset.getString("group_name");
+			      String user_name = rset.getString("user_name");
+			      out.print(" Group ID: " + group_id);
+			      out.print(" Group Name: " + group_name);
+			      out.print(" Username: " + user_name);
+			      out.print("<br>");
+			 }
+		}
 	%>
 </body>
 </html>
