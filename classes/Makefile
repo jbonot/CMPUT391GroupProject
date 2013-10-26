@@ -1,19 +1,16 @@
 OBJECTS = GetBigPic.java GetOnePic.java PictureBrowse.java SQLAdapter.java
+PACKAGE = proj1
+LIBRARY = $(PACKAGE)/SQLAdapter.class
 
-GetBigPic : GetBigPic.java
+proj1 : $(LIBRARY)
+	jar cf ../lib/proj1.jar $(PACKAGE)/*.class
+
+display : GetBigPic.java GetOnePic.java PictureBrowse.java
 	javac $^
 
-GetOnePic : GetOnePic.java
+$(PACKAGE)/%.class : $(PACKAGE)/%.java
 	javac $^
-
-PictureBrowse : PictureBrowse.java
-	javac $^
-
-SQLAdapter : SQLAdapter.java
-	javac $^
-
-all: $(OBJECTS)
-	javac $^
-
+	
 clean :
 	rm -rf *.class
+	rm -rf $(PACKAGE)/*.class

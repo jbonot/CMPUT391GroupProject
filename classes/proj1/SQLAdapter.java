@@ -1,3 +1,5 @@
+package proj1;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -11,6 +13,7 @@ public class SQLAdapter {
 	public String host;
 	public String m_userName;
 	public String m_password;
+
 	private static final String m_url = "jdbc:oracle:thin:@gwynne.cs.ualberta.ca:1521:CRS";
     	private static final String m_driverName = "oracle.jdbc.driver.OracleDriver";
 	
