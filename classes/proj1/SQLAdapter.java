@@ -83,6 +83,10 @@ public class SQLAdapter {
 	public void preparePreparedStatement(String SQLquery) throws SQLException{
 		preparedStatement = m_con.prepareStatement(SQLquery);
 	}
+
+	public PreparedStatment prepareStatement(String sqlQuery) throws SQLException {
+		return m_con.prepareStatement(sqlQuery);
+	}
 	
 	
 	private void closeStatementandConnection(){
