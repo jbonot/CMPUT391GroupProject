@@ -27,13 +27,13 @@
 		    pic  BLOB,
 		        primary key(pic_id)
       );
-      *
-      *  One may also need to create a sequence using the following 
-      *  SQL statement to automatically generate a unique pic_id:
-      *
-      *   CREATE SEQUENCE pic_id_sequence;
-      *
-      ***/
+ *
+ *  One may also need to create a sequence using the following 
+ *  SQL statement to automatically generate a unique pic_id:
+ *
+ *   CREATE SEQUENCE pic_id_sequence;
+ *
+ ***/
 
 import java.io.*;
 import javax.servlet.*;
@@ -55,120 +55,144 @@ import javax.imageio.ImageIO;
 import org.apache.commons.fileupload.DiskFileUpload;
 import org.apache.commons.fileupload.FileItem;
 
-public class UploadImage extends HttpServlet {
+public class UploadImage extends HttpServlet
+{
     public String response_message;
-    public void doPost(HttpServletRequest request,HttpServletResponse response)
-	throws ServletException, IOException {
-	//  change the following parameters to connect to the oracle database
-	String username = "******";
-	String password = "******";
-	String drivername = "oracle.jdbc.driver.OracleDriver";
-	String dbstring ="jdbc:oracle:thin:@gwynne.cs.ualberta.ca:1521:CRS";
-	int pic_id;
 
-	try {
-	    //Parse the HTTP request to get the image stream
-	    DiskFileUpload fu = new DiskFileUpload();
-	    List FileItems = fu.parseRequest(request);
-	        
-	    // Process the uploaded items, assuming only 1 image file uploaded
-	    Iterator i = FileItems.iterator();
-	    FileItem item = (FileItem) i.next();
-	    while (i.hasNext() && item.isFormField()) {
-		item = (FileItem) i.next();
-	    }
+    public void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException
+    {
+        //TODO add SQL adapter functionality
+        // change the following parameters to connect to the oracle database
+        String username = "******";
+        String password = "******";
+        String drivername = "oracle.jdbc.driver.OracleDriver";
+        String dbstring = "jdbc:oracle:thin:@gwynne.cs.ualberta.ca:1521:CRS";
+        
+        //Uploaded picture and associated values
+        int pic_id;
+        String subject, place, when, description;
+        int security;
 
-	    //Get the image stream
-	    InputStream instream = item.getInputStream();
+        try
+        {
+            //TODO add error handling for blank strings
+            //parse string data
+            subject = request.getParameter("subject");
+            place = request.getParameter("place");
+            when = request.getParameter("when");
+            description = request.getParameter("description");
+            security = Integer.parseInt(request.getParameter("security"));
+            
+            // Parse the HTTP request to get the image stream
+            DiskFileUpload fu = new DiskFileUpload();
+            List FileItems = fu.parseRequest(request);
 
-	    BufferedImage img = ImageIO.read(instream);
-	    BufferedImage thumbNail = shrink(img, 10);
+            // Process the uploaded items, assuming only 1 image file uploaded
+            Iterator i = FileItems.iterator();
+            FileItem item = (FileItem) i.next();
+            while (i.hasNext() && item.isFormField())
+            {
+                item = (FileItem) i.next();
+            }
+
+            // Get the image stream
+            InputStream instream = item.getInputStream();
+
+            BufferedImage img = ImageIO.read(instream);
+            BufferedImage thumbNail = shrink(img, 10);
 
             // Connect to the database and create a statement
-            Connection conn = getConnected(drivername,dbstring, username,password);
-	    Statement stmt = conn.createStatement();
-	    
-	    /*
-	     *  First, to generate a unique pic_id using an SQL sequence
-	     */
-	    ResultSet rset1 = stmt.executeQuery("SELECT pic_id_sequence.nextval from dual");
-	    rset1.next();
-	    pic_id = rset1.getInt(1);
+            Connection conn = getConnected(drivername, dbstring, username,
+                    password);
+            Statement stmt = conn.createStatement();
 
-	    //Insert an empty blob into the table first. Note that you have to 
-	    //use the Oracle specific function empty_blob() to create an empty blob
-	    stmt.execute("INSERT INTO pictures VALUES("+pic_id+",'test',empty_blob())");
- 
-	    // to retrieve the lob_locator 
-	    // Note that you must use "FOR UPDATE" in the select statement
-	    String cmd = "SELECT * FROM pictures WHERE pic_id = "+pic_id+" FOR UPDATE";
-	    ResultSet rset = stmt.executeQuery(cmd);
-	    rset.next();
-	    BLOB myblob = ((OracleResultSet)rset).getBLOB(3);
+            /*
+             * First, to generate a unique pic_id using an SQL sequence
+             */
+            ResultSet rset1 = stmt
+                    .executeQuery("SELECT pic_id_sequence.nextval from dual");
+            rset1.next();
+            pic_id = rset1.getInt(1);
+
+            // Insert an empty blob into the table first. Note that you have to
+            // use the Oracle specific function empty_blob() to create an empty
+            // blob
+            //TODO username and date must be passed somehow to this function for storage of picture.
+            stmt.execute("INSERT INTO images VALUES(" + pic_id /*TODO + user_name*/
+                    + "," + security + ",'" + subject + "','" + place + "','"
+                    /*TODO + date*/ + description + "',empty_blob(), empty_blob())");
+
+            // to retrieve the lob_locator
+            // Note that you must use "FOR UPDATE" in the select statement
+            String cmd = "SELECT * FROM pictures WHERE pic_id = " + pic_id
+                    + " FOR UPDATE";
+            ResultSet rset = stmt.executeQuery(cmd);
+            rset.next();
+            BLOB myblob = ((OracleResultSet) rset).getBLOB(8);
+
+            // Write the thumbnail to the blob object
+            OutputStream outstream = myblob.getBinaryOutputStream();
+            ImageIO.write(thumbNail, "jpg", outstream);
+            
+            //write bigger image
+            myblob = ((OracleResultSet) rset).getBLOB(9);
+            outstream = myblob.getBinaryOutputStream();
+            ImageIO.write(img, "jpg", outstream);
+            
 
 
-	    //Write the image to the blob object
-	    OutputStream outstream = myblob.getBinaryOutputStream();
-	    ImageIO.write(thumbNail, "jpg", outstream);
-	    
-	    /*
-	    int size = myblob.getBufferSize();
-	    byte[] buffer = new byte[size];
-	    int length = -1;
-	    while ((length = instream.read(buffer)) != -1)
-		outstream.write(buffer, 0, length);
-	    */
-	    instream.close();
-	    outstream.close();
+            /*
+             * int size = myblob.getBufferSize(); byte[] buffer = new
+             * byte[size]; int length = -1; while ((length =
+             * instream.read(buffer)) != -1) outstream.write(buffer, 0, length);
+             */
+            instream.close();
+            outstream.close();
 
             stmt.executeUpdate("commit");
-	    response_message = " Upload OK!  ";
+            response_message = " Upload OK!  ";
             conn.close();
 
-	} catch( Exception ex ) {
-	    //System.out.println( ex.getMessage());
-	    response_message = ex.getMessage();
-	}
+        }
+        catch (Exception ex)
+        {
+            // System.out.println( ex.getMessage());
+            response_message = ex.getMessage();
+        }
 
-	//Output response to the client
-	response.setContentType("text/html");
-	PrintWriter out = response.getWriter();
-	out.println("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0 " +
-		    "Transitional//EN\">\n" +
-		    "<HTML>\n" +
-		    "<HEAD><TITLE>Upload Message</TITLE></HEAD>\n" +
-		    "<BODY>\n" +
-		    "<H1>" +
-		            response_message +
-		    "</H1>\n" +
-		    "</BODY></HTML>");
+        // Output response to the client
+        response.setContentType("text/html");
+        PrintWriter out = response.getWriter();
+        out.println("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0 "
+                + "Transitional//EN\">\n" + "<HTML>\n"
+                + "<HEAD><TITLE>Upload Message</TITLE></HEAD>\n" + "<BODY>\n"
+                + "<H1>" + response_message + "</H1>\n" + "</BODY></HTML>");
     }
 
     /*
-      /*   To connect to the specified database
-    */
-    private static Connection getConnected( String drivername,
-					    String dbstring,
-					    String username, 
-					    String password  ) 
-	throws Exception {
-	Class drvClass = Class.forName(drivername); 
-	DriverManager.registerDriver((Driver) drvClass.newInstance());
-	return( DriverManager.getConnection(dbstring,username,password));
-    } 
+     * /* To connect to the specified database
+     */
+    private static Connection getConnected(String drivername, String dbstring,
+            String username, String password) throws Exception
+    {
+        Class drvClass = Class.forName(drivername);
+        DriverManager.registerDriver((Driver) drvClass.newInstance());
+        return (DriverManager.getConnection(dbstring, username, password));
+    }
 
-    //shrink image by a factor of n, and return the shrinked image
-    public static BufferedImage shrink(BufferedImage image, int n) {
+    // shrink image by a factor of n, and return the shrinked image
+    public static BufferedImage shrink(BufferedImage image, int n)
+    {
 
         int w = image.getWidth() / n;
         int h = image.getHeight() / n;
 
-        BufferedImage shrunkImage =
-            new BufferedImage(w, h, image.getType());
+        BufferedImage shrunkImage = new BufferedImage(w, h, image.getType());
 
-        for (int y=0; y < h; ++y)
-            for (int x=0; x < w; ++x)
-                shrunkImage.setRGB(x, y, image.getRGB(x*n, y*n));
+        for (int y = 0; y < h; ++y)
+            for (int x = 0; x < w; ++x)
+                shrunkImage.setRGB(x, y, image.getRGB(x * n, y * n));
 
         return shrunkImage;
     }
