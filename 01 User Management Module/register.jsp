@@ -8,7 +8,7 @@
 <title>Login Confirmation</title>
 </head>
 <body>
-	<%@ page import="SQLAdapter.*" %>
+	<%@ page import="proj1.*" %>
 	<%@ page import="java.sql.*" %>
 	Username:
 	<%
