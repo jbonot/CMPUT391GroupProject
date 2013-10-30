@@ -4,11 +4,28 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Login Confirmation</title>
 </head>
-<body>
-	<%
-		String sName = 	request.getParameter("USERNAME");
-		out.print(sName);
-	%>
+<body>	
+	<%@ page language="java" import="java.util.*"%>
+<%
+	String username = 	request.getParameter("USERNAME");
+	String password = 	request.getParameter("PASSWD");
+
+	Date now = new Date();
+	String timestamp = now.toString();
+	
+	Cookie UsernameCookie = new Cookie ("OracleUsername",username);
+	UsernameCookie.setMaxAge(365 * 24 * 60 * 60);
+	response.addCookie(UsernameCookie);
+
+	
+	Cookie PasswordCookie = new Cookie ("OraclePassword",password);
+	PasswordCookie.setMaxAge(365 * 24 * 60 * 60);
+	response.addCookie(PasswordCookie);
+	
+%>
+
+<p><a href=LoginAndRegistration.html>Click here to continue.</a></p>
 </body>
 </html>
