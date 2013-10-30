@@ -68,3 +68,19 @@ CREATE TABLE images (
    FOREIGN KEY(owner_name) REFERENCES users,
    FOREIGN KEY(permitted) REFERENCES groups
 );
+
+/* End of original code. */
+
+CREATE INDEX descriptionindex
+ON images(description)
+INDEXTYPE IS CTXSYS.CONTEXT;
+
+CREATE INDEX subjectindex
+ON images(subject)
+INDEXTYPE IS CTXSYS.CONTEXT;
+
+CREATE INDEX placeindex
+ON images(place)
+INDEXTYPE IS CTXSYS.CONTEXT;
+
+

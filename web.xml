@@ -6,12 +6,12 @@
  version="2.4">
 
     <servlet>
-        <servlet-name>PictureBrowse</servlet-name>
-        <servlet-class>PictureBrowse</servlet-class>
+        <servlet-name>SessionInfo</servlet-name>
+        <servlet-class>SessionInfo</servlet-class>
     </servlet>
     <servlet-mapping>
-        <servlet-name>PictureBrowse</servlet-name>
-        <url-pattern>/PictureBrowse</url-pattern>
+        <servlet-name>SessionInfo</servlet-name>
+        <url-pattern>/SessionInfo</url-pattern>
     </servlet-mapping>
 
 </web-app>
