@@ -8,106 +8,163 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.*;
 
+/*
+ * An adapter for SQL Oracle.
+ */
 public class SQLAdapter {
-
-	public String host;
-	public String m_userName;
-	public String m_password;
 
 	private static final String m_url = "jdbc:oracle:thin:@gwynne.cs.ualberta.ca:1521:CRS";
     	private static final String m_driverName = "oracle.jdbc.driver.OracleDriver";
 	
 	private Connection m_con = null;
-	private Statement statement = null;
-	private PreparedStatement preparedStatement = null;
-	private ResultSet resultSet = null;
+	private String m_userName;
+	private String m_password;
 
-	public void registerDriver(){
+	/*
+	 * Initializes a new instance of the SQLAdapter class.
+	 */
+	public SQLAdapter(String username, String password)
+	{
+		m_userName = username;
+		m_password = password;
+	}
+	
+	/*
+	 * Executes a fetch statement.
+	 */
+	public ResultSet executeFetch(String SQLquery)
+	{
+		try
+		{
+			if (m_con == null) {
+				this.registerDriver();
+			}
+
+			Statement statement = m_con.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+			return statement.executeQuery(SQLquery);
+		}
+		catch (SQLException se)
+		{
+	              System.err.println("SQLException: " +
+	              se.getMessage());
+	              return null;
+		}
+		catch (Exception e)
+		{
+	              System.err.println("Exception: " +
+	              e.getMessage());
+	              return null;
+		}
+  
+	}
+
+	/*
+	 * Executes an update statement.
+	 */
+	public int executeUpdate(PreparedStatement statement)
+	{
+		try
+		{
+			return statement.executeUpdate();
+		}
+		catch (SQLException se)
+		{
+	              System.err.println("SQLException: " +
+	              se.getMessage());
+	              return -1;
+		}
+		catch (Exception e)
+		{
+	              System.err.println("Exception: " +
+	              e.getMessage());
+	              return -1;
+		}
+	}
+
+	/*
+	 * Executes a prepared statement.
+	 */
+	public ResultSet executeQuery(PreparedStatement statement)
+	{
+		try
+		{
+			return statement.executeQuery();
+		}
+		catch (SQLException se)
+		{
+	              System.err.println("SQLException: " +
+	              se.getMessage());
+	              return null;
+		}
+		catch (Exception e)
+		{
+	              System.err.println("Exception: " +
+	              e.getMessage());
+	              return null;
+		}
+	}
+
+	/*
+	 * Returns a prepared statement.
+	 */
+	public PreparedStatement prepareStatement(String sqlQuery) {
+		try
+		{
+			if (m_con == null) {
+				this.registerDriver();
+			}
+
+			return m_con.prepareStatement(sqlQuery);
+		}
+		catch (SQLException se)
+		{
+	              System.err.println("SQLException: " +
+	              se.getMessage());
+	              return null;
+		}
+		catch (Exception e)
+		{
+	              System.err.println("Exception: " +
+	              e.getMessage());
+	              return null;
+		}
+	}
+	
+	
+	/*
+	 * Closes the existing connection.
+	 */
+	public void closeConnection()
+	{
+		try
+		{
+			if (this.m_con != null)
+			{
+				this.m_con.close();
+			}
+
+		} catch (Exception e) {
+	              System.err.println("Exception: " +
+	              e.getMessage());
+		}
+	}
+
+	/*
+	 * Register the driver and set up the connection.
+	 */
+	private void registerDriver(){
 		try
 	       {
-	              @SuppressWarnings("rawtypes")
+			@SuppressWarnings("rawtypes")
 				  Class drvClass = Class.forName(m_driverName);
-	              DriverManager.registerDriver((Driver)
-	              drvClass.newInstance());
-	              m_con = DriverManager.getConnection(m_url, m_userName,m_password);
+			DriverManager.registerDriver((Driver)
+			drvClass.newInstance());
+			m_con = DriverManager.getConnection(m_url, m_userName,m_password);
 	              
 	       } catch(Exception e)
 	       {
 	              System.err.print("ClassNotFoundException: ");
 	              System.err.println(e.getMessage());
 	       }
-	}
-	
-	public ResultSet executeStatement(String SQLquery) throws Exception {
-		registerDriver();
-		try
-	       {
-
-	              statement = m_con.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-	              ResultSet rset = statement.executeQuery(SQLquery);
-	              return rset;
-	              
-
-	       } catch(SQLException ex) {
-
-	              System.err.println("SQLException: " +
-	              ex.getMessage());
-	              return null;
-	       }
-  
-	}
-	
-	public ResultSet executePreparedStatementFetch() throws Exception {
-		registerDriver();
-		try
-	       {
-
-	              resultSet = preparedStatement.executeQuery();
-	              closeStatementandConnection();
-	              return resultSet;
-	              
-
-	       } catch(SQLException ex) {
-
-	              System.err.println("SQLException: " +
-	              ex.getMessage());
-	              return null;
-	       }
-  
-	}
-	
-	public void executePreparedStatementUpdate() throws SQLException{
-		preparedStatement.executeUpdate();
-	}
-	
-	public void preparePreparedStatement(String SQLquery) throws SQLException{
-		preparedStatement = m_con.prepareStatement(SQLquery);
-	}
-	
-	
-	private void closeStatementandConnection(){
-		try {
-	
-		      if (statement != null) {
-		        statement.close();
-		      }
-	
-		      if (m_con != null) {
-		        m_con.close();
-		      }
-		    } catch (Exception e) {
-	
-		    }
-	}
-	
-	private void closeResultSet(){
-		try {
-			if (resultSet != null) {
-				resultSet.close();
-			}
-
-		} catch (Exception e) {
-			
-	    }
 	}
 }

@@ -8,9 +8,10 @@ proj1 : $(LIBRARY)
 display : GetBigPic.java GetOnePic.java PictureBrowse.java
 	javac $^
 
-$(PACKAGE)/%.class : $(PACKAGE)/%.java
+%.class : %.java
 	javac $^
 	
 clean :
 	rm -rf *.class
 	rm -rf $(PACKAGE)/*.class
+	rm -rf ../lib/proj1.jar
