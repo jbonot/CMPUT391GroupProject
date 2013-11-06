@@ -65,7 +65,7 @@ public class SQLAdapter {
 	{
 		try
 		{
-			return statement.executeUpdate();
+			return statement.executeUpdate(); //Returns the number of updated/inserted rows
 		}
 		catch (SQLException se)
 		{
