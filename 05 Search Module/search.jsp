@@ -23,7 +23,7 @@
 		</TR>
 		</TABLE>
 
-		<INPUT TYPE="submit" NAME="SEARCH" VALUE="SEARCH">
+		<INPUT TYPE="submit" NAME="SEARCH" VALUE="Search">
 	</FORM>
 
 	<p>Structure of Photos Table<br> 
@@ -43,8 +43,8 @@
 	<br>
     
     <%
-	
-	SQLAdapter adapter = new SQLAdapter("username", "password");
+
+	SQLAdapter adapter = new SQLAdapter("jbonot", "knowy0urneen");
 	String addItemError = "";
 
 	String selectString = "select subject, place, description from images";

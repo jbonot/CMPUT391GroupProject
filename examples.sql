@@ -14,6 +14,8 @@ insert into images values(1, 'bob123', 1, 'fruit', 'the orchard', sysdate, 'a bu
 insert into images values(2, 'bob123', 2, 'animals', 'my house', sysdate, 'all my 27 kitty cats', null, null);
 insert into images values(3, 'alice456', 1, 'vacation', 'hawaii', sysdate, 'vacation in hawaii', null, null);
 insert into images values(4, 'alice456', 2, 'drinks', 'cafe', sysdate, 'cup of tea', null, null);
-insert into images values(5, 'matwood', 3, 'books', 'library', sysdate, 'sample book covers', null, null);
-insert into images values(6, 'matwood', 3, 'books', 'book store', sysdate, 'look at all these books', null, null);
-insert into images values(7, 'matwood', 3, 'books books', 'book store', sysdate, 'books look at all these books', null, null);
+insert into images values(5, 'matwood', 3, 'books', 'library', sysdate, 'sample cover for books', null, null);
+insert into images values(6, 'matwood', 3, 'books', 'store of books', sysdate, 'look at all these books', null, null);
+insert into images values(7, 'matwood', 3, 'books books', 'store of books', sysdate, 'books look at all these books', null, null);
+insert into images values(8, 'matwood', 3, 'where the wild books are', 'the store of books', sysdate, 'books look at all these books', null, null);
+insert into images values(9, 'bob123', 1, 'furniture', 'my room', sysdate, 'I placed my books on the shelf', null, null);
