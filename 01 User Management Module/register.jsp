@@ -10,6 +10,7 @@
 <body>
 	<%@ page import="proj1.*" %>
 	<%@ page import="java.sql.*" %>
+	<%@ page import="java.util.Date" %>
 	Username:
 	<%
 		String newName = 	request.getParameter("NEWUSERNAME");
@@ -68,28 +69,26 @@
 			}
 		}
 		
-		
+		java.util.Date today = new java.util.Date();
 		String username = OracleUsernameCookie.getValue();//Need to get username and password from cookie and/or input
 		String password = OraclePasswordCookie.getValue();//**************
 		SQLAdapter db = new SQLAdapter(username, password);//Create a new instance of the SQL Adapter to use 
+		Integer rows_updated = 0;		
+		PreparedStatement registerUser = db.prepareStatement("INSERT INTO users(user_name,password,date_registered) VALUES(?,?,?)");	
+		registerUser.setString(1, newName);
+		registerUser.setString(2, newPassword);
+		registerUser.setDate(3, new java.sql.Date(today.getTime()));
+		rows_updated = db.executeUpdate(registerUser);
 		
-		ResultSet rset;
-		rset = db.executeFetch("Select * from groups");//Execute the statement and get results in rset
+								
 		out.print("<br>");
-		if (rset != null){
-			while (rset.next()) {
-			      // It is possible to get the columns via name
-			      // also possible to get the columns via the column number
-			      // which starts at 1
-			      String group_id = rset.getString("group_id");
-			      String group_name = rset.getString("group_name");
-			      String user_name = rset.getString("user_name");
-			      out.print(" Group ID: " + group_id);
-			      out.print(" Group Name: " + group_name);
-			      out.print(" Username: " + user_name);
-			      out.print("<br>");
-			 }
-		}
+		if (rows_updated == 1){
+			out.print("Registration Successfull!");}
+			else{
+				out.print("Registration Failed !"+ rows_updated);}
+		
+		db.closeConnection();
+
 	%>
 </body>
 </html>
