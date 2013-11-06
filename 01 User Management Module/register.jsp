@@ -95,6 +95,9 @@
 			if (rows_updated_person == 1){
 				out.print("Registration Successfull!");
 			}
+			else{
+				out.print("Registration Failed!");
+			}
 		
 		}
 			else{
