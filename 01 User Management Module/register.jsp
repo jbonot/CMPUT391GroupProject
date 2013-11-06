@@ -73,7 +73,8 @@
 		String username = OracleUsernameCookie.getValue();//Need to get username and password from cookie and/or input
 		String password = OraclePasswordCookie.getValue();//**************
 		SQLAdapter db = new SQLAdapter(username, password);//Create a new instance of the SQL Adapter to use 
-		Integer rows_updated = 0;		
+		Integer rows_updated = 0;
+		Integer rows_updated_person = 0;
 		PreparedStatement registerUser = db.prepareStatement("INSERT INTO users(user_name,password,date_registered) VALUES(?,?,?)");	
 		registerUser.setString(1, newName);
 		registerUser.setString(2, newPassword);
@@ -83,9 +84,21 @@
 								
 		out.print("<br>");
 		if (rows_updated == 1){
-			out.print("Registration Successfull!");}
+			PreparedStatement registerPerson = db.prepareStatement("INSERT INTO persons(user_name,first_name,last_name,address,email,phone) VALUES(?,?,?,?,?,?)");
+			registerPerson.setString(1,newName);
+			registerPerson.setString(2,firstName);
+			registerPerson.setString(3,lastName);
+			registerPerson.setString(4,address);
+			registerPerson.setString(5,email);
+			registerPerson.setString(6,phonenumber);
+			rows_updated_person = db.executeUpdate(registerPerson);
+			if (rows_updated_person == 1){
+				out.print("Registration Successfull!");
+			}
+		
+		}
 			else{
-				out.print("Registration Failed !"+ rows_updated);}
+				out.print("Registration Failed ! "+ rows_updated);}
 		
 		db.closeConnection();
 

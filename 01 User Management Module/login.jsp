@@ -7,15 +7,61 @@
 <title>Login Confirmation</title>
 </head>
 <body>
-	Username:
+	<%@ page import="proj1.*" %>
+	<%@ page import="java.sql.*" %>
 	<%
-		String sName = 	request.getParameter("USERNAME");
-		out.print(sName);
+		String fUsername = 	request.getParameter("USERNAME");
 	%>
-	Password:
 	<%
-		String sdName = 	request.getParameter("PASSWD");
-		out.print(sdName);
+		String fPassword = 	request.getParameter("PASSWD");
+	%>
+	
+	<%
+		String cookieUsername = "OracleUsername";
+		String cookiePassword = "OraclePassword";
+		Cookie cookies [] = request.getCookies ();
+		Cookie OracleUsernameCookie = null;
+		Cookie OraclePasswordCookie = null;
+		if (cookies != null){
+			for (int i = 0; i < cookies.length; i++) {
+				if (cookies [i].getName().equals (cookieUsername)){
+					OracleUsernameCookie = cookies[i];
+				break;
+				}
+			}
+		}
+		if (cookies != null){
+			for (int i = 0; i < cookies.length; i++) {
+				if (cookies [i].getName().equals (cookiePassword)){
+					OraclePasswordCookie = cookies[i];
+				break;
+				}
+			}
+		}
+		
+		java.util.Date today = new java.util.Date();
+		String username = OracleUsernameCookie.getValue();//Need to get username and password from cookie and/or input
+		String password = OraclePasswordCookie.getValue();//**************
+		SQLAdapter db = new SQLAdapter(username, password);//Create a new instance of the SQL Adapter to use 	
+			
+				
+		PreparedStatement loginUser = db.prepareStatement("SELECT * FROM users where user_name = ? and password = ?");	
+		loginUser.setString(1, fUsername);
+		loginUser.setString(2, fPassword);
+		ResultSet rset = db.executeQuery(loginUser);
+		
+		out.print("<br>");
+		boolean empty = true;
+		while(rset.next()){
+			out.println("Login Successfull!");
+			empty = false;
+		}
+		if (empty){
+			out.println("Login Failed!");
+		}
+		
+		db.closeConnection();
+
 	%>
 </body>
 </html>
