@@ -23,8 +23,8 @@
 	Cookie PasswordCookie = new Cookie ("OraclePassword",password);
 	PasswordCookie.setMaxAge(365 * 24 * 60 * 60);
 	response.addCookie(PasswordCookie);
-	
 %>
+<jsp:forward page="LoginAndRegistration.html" />
 
 <p><a href=LoginAndRegistration.html>Click here to continue.</a></p>
 </body>

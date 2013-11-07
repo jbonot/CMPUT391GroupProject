@@ -58,7 +58,14 @@
 		}
 		if (empty){
 			out.println("Login Failed!");
-		}
+			Cookie UsernameCookie = new Cookie ("Username",fUsername);
+			UsernameCookie.setMaxAge(365 * 24 * 60 * 60);
+			response.addCookie(UsernameCookie);%>
+			<jsp:forward page="LoginAndRegistration.html" />
+			<%
+		}else{//FORWARD UPON SUCCESSFULL LOGIN%>
+			<jsp:forward page="LoginAndRegistration.html" />
+		<%}
 		
 		db.closeConnection();
 

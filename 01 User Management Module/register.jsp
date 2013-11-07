@@ -11,42 +11,18 @@
 	<%@ page import="proj1.*" %>
 	<%@ page import="java.sql.*" %>
 	<%@ page import="java.util.Date" %>
-	Username:
 	<%
+		//Get the values from the login and registration page
 		String newName = 	request.getParameter("NEWUSERNAME");
-		out.print(newName);
-	%>
-	Password:
-	<%
 		String newPassword = 	request.getParameter("NEWPASSWD");
-		out.print(newPassword);
-	%>
-	First Name:
-	<%
 		String firstName = 	request.getParameter("FRSTNAME");
-		out.print(firstName);
-	%>
-	Last Name:
-	<%
 		String lastName = 	request.getParameter("FRSTNAME");
-		out.print(lastName);
-	%>
-	Address:
-	<%
 		String address = 	request.getParameter("ADDRESS");
-		out.print(address);
-	%>
-	Email:
-	<%
 		String email = 	request.getParameter("EMAIL");
-		out.print(email);
-	%>
-	Phone Number:
-	<%
 		String phonenumber = 	request.getParameter("PHONENUMBER");
-		out.print(phonenumber);
-	%>
-	<%
+		java.util.Date today = new java.util.Date();
+		
+		//Get the oracle username and password from the cookies
 		String cookieUsername = "OracleUsername";
 		String cookiePassword = "OraclePassword";
 		Cookie cookies [] = request.getCookies ();
@@ -69,20 +45,23 @@
 			}
 		}
 		
-		java.util.Date today = new java.util.Date();
-		String username = OracleUsernameCookie.getValue();//Need to get username and password from cookie and/or input
-		String password = OraclePasswordCookie.getValue();//**************
+		//Create the adapter using the oracle username and password from the cookies
+		String username = OracleUsernameCookie.getValue();
+		String password = OraclePasswordCookie.getValue();
 		SQLAdapter db = new SQLAdapter(username, password);//Create a new instance of the SQL Adapter to use 
+		
+		//Some variables for counting the rows updated
 		Integer rows_updated = 0;
 		Integer rows_updated_person = 0;
+		
+		//Setting up and executing the prepared statement
 		PreparedStatement registerUser = db.prepareStatement("INSERT INTO users(user_name,password,date_registered) VALUES(?,?,?)");	
 		registerUser.setString(1, newName);
 		registerUser.setString(2, newPassword);
 		registerUser.setDate(3, new java.sql.Date(today.getTime()));
 		rows_updated = db.executeUpdate(registerUser);
 		
-								
-		out.print("<br>");
+		//If the username & password creation worked then insert their personal information						
 		if (rows_updated == 1){
 			PreparedStatement registerPerson = db.prepareStatement("INSERT INTO persons(user_name,first_name,last_name,address,email,phone) VALUES(?,?,?,?,?,?)");
 			registerPerson.setString(1,newName);
@@ -94,6 +73,10 @@
 			rows_updated_person = db.executeUpdate(registerPerson);
 			if (rows_updated_person == 1){
 				out.print("Registration Successfull!");
+				//Create two new cookie for the logged in username
+				Cookie UsernameCookie = new Cookie ("Username",newName);
+				PasswordCookie.setMaxAge(365 * 24 * 60 * 60);
+				response.addCookie(PasswordCookie);
 			}
 			else{
 				out.print("Registration Failed!");
