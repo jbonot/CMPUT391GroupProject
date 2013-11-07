@@ -72,11 +72,15 @@
 			registerPerson.setString(6,phonenumber);
 			rows_updated_person = db.executeUpdate(registerPerson);
 			if (rows_updated_person == 1){
-				out.print("Registration Successfull!");
+				out.print("Registration Successfull! Please log in with new username and password. You will be redirected in 5 seconds...");
 				//Create two new cookie for the logged in username
 				Cookie UsernameCookie = new Cookie ("Username",newName);
-				PasswordCookie.setMaxAge(365 * 24 * 60 * 60);
-				response.addCookie(PasswordCookie);
+				UsernameCookie.setMaxAge(365 * 24 * 60 * 60);
+				response.addCookie(UsernameCookie);
+				
+				//Wait for user to see successfull registration
+				response.setHeader("Refresh", "5; URL=LoginAndRegistration.html");
+
 			}
 			else{
 				out.print("Registration Failed!");

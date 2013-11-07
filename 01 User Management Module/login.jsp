@@ -57,13 +57,16 @@
 			empty = false;
 		}
 		if (empty){
-			out.println("Login Failed!");
+			out.println("Login Failed! You will be redirected in 5 seconds...");
+			out.print("<br>");
+			out.print("<p><a href=LoginAndRegistration.html>Click here to be redirected now.</a></p>");
+			
+			response.setHeader("Refresh", "5; URL=LoginAndRegistration.html");
+		}else{//FORWARD UPON SUCCESSFULL LOGIN
 			Cookie UsernameCookie = new Cookie ("Username",fUsername);
 			UsernameCookie.setMaxAge(365 * 24 * 60 * 60);
-			response.addCookie(UsernameCookie);%>
-			<jsp:forward page="LoginAndRegistration.html" />
-			<%
-		}else{//FORWARD UPON SUCCESSFULL LOGIN%>
+			response.addCookie(UsernameCookie);
+		%>
 			<jsp:forward page="LoginAndRegistration.html" />
 		<%}
 		
