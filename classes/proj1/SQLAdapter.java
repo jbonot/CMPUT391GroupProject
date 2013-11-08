@@ -157,8 +157,7 @@ public class SQLAdapter {
 	       {
 			@SuppressWarnings("rawtypes")
 				  Class drvClass = Class.forName(m_driverName);
-			DriverManager.registerDriver((Driver)
-			drvClass.newInstance());
+			DriverManager.registerDriver((Driver)drvClass.newInstance());
 			m_con = DriverManager.getConnection(m_url, m_userName,m_password);
 	              
 	       } catch(Exception e)

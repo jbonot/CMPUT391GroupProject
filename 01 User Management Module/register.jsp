@@ -60,7 +60,7 @@
 		registerUser.setString(2, newPassword);
 		registerUser.setDate(3, new java.sql.Date(today.getTime()));
 		rows_updated = db.executeUpdate(registerUser);
-		
+		registerUser.close();
 		//If the username & password creation worked then insert their personal information						
 		if (rows_updated == 1){
 			PreparedStatement registerPerson = db.prepareStatement("INSERT INTO persons(user_name,first_name,last_name,address,email,phone) VALUES(?,?,?,?,?,?)");
@@ -71,25 +71,27 @@
 			registerPerson.setString(5,email);
 			registerPerson.setString(6,phonenumber);
 			rows_updated_person = db.executeUpdate(registerPerson);
+			registerPerson.close();
 			if (rows_updated_person == 1){
 				out.print("Registration Successfull! Please log in with new username and password. You will be redirected in 5 seconds...");
 				//Create two new cookie for the logged in username
 				Cookie UsernameCookie = new Cookie ("Username",newName);
 				UsernameCookie.setMaxAge(365 * 24 * 60 * 60);
 				response.addCookie(UsernameCookie);
-				
+				db.closeConnection();
 				//Wait for user to see successfull registration
 				response.setHeader("Refresh", "5; URL=LoginAndRegistration.html");
 
 			}
 			else{
-				out.print("Registration Failed!");
+				out.print("Registration Failed! Please try again.");
+				db.closeConnection();
+				response.setHeader("Refresh", "5; URL=LoginAndRegistration.html");
 			}
 		
 		}
 			else{
 				out.print("Registration Failed ! "+ rows_updated);}
-		
 		db.closeConnection();
 
 	%>
