@@ -1,7 +1,43 @@
 <%@ page import="java.sql.*" %>
 <%@ page import="java.util.*"%>
 <%@ page import="proj1.*"%>
+
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<%
+		String dateFormat = "yyyy-mm-dd";
+		StringBuilder queryString = new StringBuilder("SELECT subject, place, description, timing FROM images ");
+		java.sql.Date dateStart = null;
+		java.sql.Date dateEnd = null;
+		String query = request.getParameter("query");
+
+		try {
+			dateStart = java.sql.Date.valueOf(request.getParameter("DATE_START"));
+			Calendar c = Calendar.getInstance();
+			c.setTime(dateStart);
+			c.set(Calendar.HOUR_OF_DAY, 0);
+			c.set(Calendar.MINUTE, 0);
+			c.set(Calendar.SECOND, 0);
+			c.set(Calendar.MILLISECOND, 0);
+			dateStart = new java.sql.Date(c.getTimeInMillis());
+		} catch (IllegalArgumentException e) {
+		}
+
+		try {
+			dateEnd = java.sql.Date.valueOf(request.getParameter("DATE_END"));
+			Calendar c = Calendar.getInstance();
+			c.setTime(dateEnd);
+			c.set(Calendar.HOUR_OF_DAY, 23);
+			c.set(Calendar.MINUTE, 59);
+			c.set(Calendar.SECOND, 59);
+			c.set(Calendar.MILLISECOND, 999);
+			dateEnd = new java.sql.Date(c.getTimeInMillis());
+			out.println(new java.util.Date(c.getTimeInMillis()));
+		} catch (IllegalArgumentException e) {
+			out.println(e.getMessage());
+		}
+
+		query = query == null || query.equals("") ? null : query;
+%>
 <html>
 	<head>
 	<meta http-equiv="content-type" content="text/html; charset=windows-1250">
@@ -14,37 +50,23 @@
 		<TABLE>
 		<TR VALIGN=TOP ALIGN=LEFT>
 		<TD><B><I>Keywords:</I></B></TD>
-		<TD><INPUT TYPE="text" NAME="query"><BR></TD>
+		<TD><INPUT TYPE="text" NAME="query" value="<%=query != null ? query : new String()%>"><BR></TD>
 		</TR>
 		<TR VALIGN=TOP ALIGN=LEFT>
 		<TD><B><I>Time Periods:</I></B></TD>
-		<TD><I>From:</I><INPUT TYPE="date" NAME="DATE_START"></TD>
-		<TD><I>To:</I><INPUT TYPE="date" NAME="DATE_END"></TD>
+		<TD><I>From:</I><INPUT TYPE="date" NAME="DATE_START" value="<%=dateStart != null ? dateStart : dateFormat%>"></TD>
+		<TD><I>To:</I><INPUT TYPE="date" NAME="DATE_END" value="<%=dateEnd != null ? dateEnd : dateFormat%>"></TD>
 		</TR>
 		</TABLE>
 
 		<INPUT TYPE="submit" NAME="SEARCH" VALUE="Search">
 	</FORM>
 
-	<p>Structure of Photos Table<br> 
-	<table border=1>
-		<tr>
-			<th>photo_id</th>
-			<th>owner_name</th>
-			<th>subject</th>
-			<th>place</th>
-			<th>when</th>
-			<th>description</th>
-			<th>thumbnail</th>
-			<th>photo</th>
-		</tr>
-	</table>
-
 	<br>
     
     <%
 
-	SQLAdapter adapter = new SQLAdapter("jbonot", "knowy0urneen");
+	SQLAdapter adapter = new SQLAdapter("", "");
 	String addItemError = "";
 
 	String selectString = "select subject, place, description from images";
@@ -85,45 +107,74 @@
     
     <br>
     <b><%=addItemError%></b><br>
-    <form name=SearchData method=post action=search.jsp> 
-    
-      Query the database to see relevant items
-      <table>
-        <tr>
-          <td>
-            <input type=text name=query>
-          </td>
-          <td>
-            <input type=submit value="Search" name="SEARCH">
-          </td>
-        </tr>
-      </table>
 	<%
-        
 	if (request.getParameter("SEARCH") != null)
 	{
-          
+
+		boolean firstCondition = true;
+
 		out.println("<br>");
 		out.println("Query is \"" + request.getParameter("query") + "\"");
 		out.println("<br>");
           
-		if(!(request.getParameter("query").equals("")))
+		if (dateStart != null)
 		{
-			String query = request.getParameter("query");
-			PreparedStatement doSearch = adapter.prepareStatement("SELECT subject, place, description FROM images WHERE contains(subject, ?, 6) > 0 or contains(place, ?, 3) > 0  or contains(description, ?, 1) > 0 order by score(6) desc, score(3) desc, score(1) desc");	
+			queryString.append("where timing >= ? ");
+			firstCondition = false;
+		}
+          
+		if (dateEnd != null)
+		{
+			queryString.append(firstCondition ? "where " : "and ");
+			queryString.append("timing <= ? ");
+			firstCondition = false;
+		}
 
-			doSearch.setString(1, query);
-			doSearch.setString(2, query);
-			doSearch.setString(3, query);
-			ResultSet rset2 = adapter.executeQuery(doSearch);
+		if(query != null)
+		{
+			queryString.append(firstCondition ? "where " : "and ");
+			queryString.append("(contains(subject, ?, 6) > 0 or contains(place, ?, 3) > 0 or contains(description, ?, 1) > 0) order by score(6) * 6 + score(3) * 3 + score(1) desc");
+			firstCondition = false;
+		}
+		else
+		{
+			out.println("<br><b>Please enter text for quering</b>");
+			queryString.append("order by timing desc");
+		}
+
+		if (!firstCondition)
+		{
+			PreparedStatement doSearch = adapter.prepareStatement(queryString.toString());	
 		
+			int i = 1;
+		
+			if (dateStart != null)
+			{
+				doSearch.setDate(i++, dateStart);
+			}
+
+			if (dateEnd != null)
+			{
+				doSearch.setDate(i++, dateEnd);
+			}
+
+			if (query != null)
+			{
+				doSearch.setString(i++, query);
+				doSearch.setString(i++, query);
+				doSearch.setString(i++, query);
+			}
+
+			ResultSet rset2 = adapter.executeQuery(doSearch);
+	
 			out.println("<table border=1>");
 			out.println("<tr>");
 			out.println("<th>Subject</th>");
 			out.println("<th>Place</th>");
 			out.println("<th>Description</th>");
+			out.println("<th>Date</th>");
 			out.println("</tr>");
-		
+	
 			while(rset2.next())
 			{
 				out.println("<tr>");
@@ -136,23 +187,18 @@
 				out.println("<td>");
 				out.println(rset2.getObject(3));
 				out.println("</td>");
+				out.println("<td>");
+				out.println(rset2.getObject(4));
+				out.println("</td>");
 				out.println("</tr>");
 			} 
 
 			out.println("</table>");
-		}
-		else
-		{
-			out.println("<br><b>Please enter text for quering</b>");
-		}            
+			out.println("<br><b>" + queryString + "</b>");
+   		}
 	}
-	else
-	{
-		out.println("<br>");
-		out.println("SEARCH parameter not found.");
-		out.println("<br>");
-	}
+
+	adapter.closeConnection();
 	%>
-    </form>
   </body>
 </html>
