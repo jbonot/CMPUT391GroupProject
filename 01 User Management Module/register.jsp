@@ -46,12 +46,35 @@
 		out.print(phonenumber);
 	%>
 	<%
-		SQLAdapter db = new SQLAdapter();//Create a new instance of the SQL Adapter to use 
-		db.m_userName = "";//Need to get username and password from cookie and/or input
-		db.m_password = "";//**************
-		db.registerDriver();//Try and register the oracle driver with the supplied username and password
+		String cookieUsername = "OracleUsername";
+		String cookiePassword = "OraclePassword";
+		Cookie cookies [] = request.getCookies ();
+		Cookie OracleUsernameCookie = null;
+		Cookie OraclePasswordCookie = null;
+		if (cookies != null){
+			for (int i = 0; i < cookies.length; i++) {
+				if (cookies [i].getName().equals (cookieUsername)){
+					OracleUsernameCookie = cookies[i];
+				break;
+				}
+			}
+		}
+		if (cookies != null){
+			for (int i = 0; i < cookies.length; i++) {
+				if (cookies [i].getName().equals (cookiePassword)){
+					OraclePasswordCookie = cookies[i];
+				break;
+				}
+			}
+		}
+		
+		
+		String username = OracleUsernameCookie.getValue();//Need to get username and password from cookie and/or input
+		String password = OraclePasswordCookie.getValue();//**************
+		SQLAdapter db = new SQLAdapter(username, password);//Create a new instance of the SQL Adapter to use 
+		
 		ResultSet rset;
-		rset = db.executeStatement("Select * from groups");//Execute the statement and get results in rset
+		rset = db.executeFetch("Select * from groups");//Execute the statement and get results in rset
 		out.print("<br>");
 		if (rset != null){
 			while (rset.next()) {

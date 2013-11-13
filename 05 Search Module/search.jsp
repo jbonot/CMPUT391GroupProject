@@ -1,5 +1,6 @@
 <%@ page import="java.sql.*" %>
 <%@ page import="java.util.*"%>
+<%@ page import="proj1.*"%>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 	<head>
@@ -13,7 +14,7 @@
 		<TABLE>
 		<TR VALIGN=TOP ALIGN=LEFT>
 		<TD><B><I>Keywords:</I></B></TD>
-		<TD><INPUT TYPE="text" NAME="TEXT"><BR></TD>
+		<TD><INPUT TYPE="text" NAME="query"><BR></TD>
 		</TR>
 		<TR VALIGN=TOP ALIGN=LEFT>
 		<TD><B><I>Time Periods:</I></B></TD>
@@ -22,7 +23,7 @@
 		</TR>
 		</TABLE>
 
-		<INPUT TYPE="submit" NAME="Submit" VALUE="SEARCH">
+		<INPUT TYPE="submit" NAME="SEARCH" VALUE="SEARCH">
 	</FORM>
 
 	<p>Structure of Photos Table<br> 
@@ -37,173 +38,54 @@
 			<th>thumbnail</th>
 			<th>photo</th>
 		</tr>
-		<tr>
-			<td> </td>
-			<td> </td>
-			<td> </td>
-			<td> </td>
-			<td> </td>
-			<td> </td>
-			<td> </td>
-			<td> </td>
-		</tr>
 	</table>
 
 	<br>
     
     <%
-		String m_url = "jdbc:oracle:thin:@gwynne.cs.ualberta.ca:1521:CRS";
-		String m_driverName = "oracle.jdbc.driver.OracleDriver";
+	
+	SQLAdapter adapter = new SQLAdapter("username", "password");
+	String addItemError = "";
 
-		String m_userName = ""; //supply username
-		String m_password = ""; //supply password
+	String selectString = "select subject, place, description from images";
+	ResultSet rset = adapter.executeFetch(selectString);
 
-		String addItemError = "";
+	if (rset == null)
+	{
+		out.println("Need to run setup.sql<br>");
+	}
+	else
+	{
 
-		Connection m_con;
-		String createString;
-		String selectString = "select itemName, description from item";
-		Statement stmt;
-      
-		try
-		{
-			out.println("ok1");
-			Class drvClass = Class.forName(m_driverName);
-			out.println("ok2");
-			DriverManager.registerDriver((Driver)drvClass.newInstance());
-			out.println("ok3");
-			m_con = DriverManager.getConnection(m_url, m_userName, m_password);
-		} 
-		catch(Exception e)
-		{      
-			out.print("Error displaying data: ");
-			out.println(e.getMessage());
-			return;
+		out.println("<table border=1>");
+		out.println("<tr>");
+		out.println("<th>Subject</th>");
+		out.println("<th>Place</th>");
+		out.println("<th>Description</th>");
+		out.println("</tr>"); 
+
+		while(rset.next()) { 
+			out.println("<tr>");
+			out.println("<td>"); 
+			out.println(rset.getString(1));
+			out.println("</td>");
+			out.println("<td>"); 
+			out.println(rset.getString(2)); 
+			out.println("</td>");
+			out.println("<td>"); 
+			out.println(rset.getString(3)); 
+			out.println("</td>");
+			out.println("</tr>"); 
 		}
 
-      try
-      {
-             
-        //first try to see if we are adding any items to the database
-        if (request.getParameter("addRecord") != null)
-        {
-          if(!(request.getParameter("itemName").equals("") || request.getParameter("description").equals("")))
-          {
-             //disable the auto commit mode
-             m_con.setAutoCommit(false);
-            
-            Statement stmt2 = m_con.createStatement();
-            ResultSet rset2 = stmt2.executeQuery("select item_seq.nextVal from dual");
-            int nextItemId;
-            if(rset2.next())
-            {
-              nextItemId = rset2.getInt(1);
-            }
-            else    
-            {
-                m_con.close();
-                out.println("<b>Error: item_seq does not exist</b>");
-                return;       
-            }
-            
-            PreparedStatement addItem = m_con.prepareStatement("insert into item values(?, ?, ?)");
-            addItem.setInt(1, nextItemId);
-            addItem.setString(2, request.getParameter("itemName"));
-            addItem.setString(3, request.getParameter("description"));
-            addItem.executeUpdate();
-            m_con.commit();
-            stmt2.close();
-            addItem.close();
-            //enable the auto commit mode
-            m_con.setAutoCommit(true);
-          }
-          else
-          {
-            addItemError = "Item name or description is missing\n";
-          }
-        }
-        else if(request.getParameter("updateIndex") != null)
-        {
-        }
-        
-        stmt = m_con.createStatement();
-        ResultSet rset = stmt.executeQuery(selectString);
-        out.println("<table border=1>");
-        out.println("<tr>");
-        out.println("<th>Item Name</th>");
-        out.println("<th>Item Description</th>");
-        out.println("</tr>"); 
-        while(rset.next()) { 
-          out.println("<tr>");
-          out.println("<td>"); 
-          out.println(rset.getString(1));
-          out.println("</td>");
-          out.println("<td>"); 
-          out.println(rset.getString(2)); 
-          out.println("</td>");
-          out.println("</tr>"); 
-        } 
-        out.println("</table>");
-        stmt.close();     
-       
+		out.println("</table>"); 
+	}
       
     %>
     
-    <br><br>
-    We can create an inverted index on the column description using the following sql:
-    
-    <table border=1>
-      <tr>
-        <td face=Courier>
-          CREATE INDEX index_name ON item(column_name) INDEXTYPE IS CTXSYS.CONTEXT;
-          <br>
-        </td>
-      </tr>
-    </table>
-    <p>The <a href=myIndex.sql>sql</a> for creating the index</p>
-        Once the index is created we need to tell oracle to keep updating the index as new data is entered (this is turned off by default). To do this run the this <a href=drjobdml.sql>sql file</a>. This sql command takes two parameters: index name and rate of update (in seconds). 
-    
-    <br><br><br>
-    We can now query the table to find all documents and their relvance for a certain list of words
-    through the following query:
-    <table border=1>
-      <tr>
-        <td face=Courier>
-          SELECT score(1), itemName FROM item WHERE contains(description, 'database', 1) > 0 order by score(1) desc;
-          <br>
-        </td>
-      </tr>
-    </table>
-    This query returns all the item names along with their relevance score sorted descendingly by the relevance score
     <br>
-    <br>
-    <br>
-    You can add data to the table and then try querying it <br>
     <b><%=addItemError%></b><br>
-    <form name=insertData method=post action=indexExample.jsp> 
-      <table>
-        <tr>
-          <td>Item Name</td>
-          <td><input type=text name=itemName maxlengh=100> </td>
-        </tr>
-        <tr>
-          <td>Item description</td>
-          <td><textarea name=description cols=40 rows=6></textarea>
-        </tr>
-        <tr>
-          <td>&nbsp;</td>
-          <td><input type=submit name="addRecord" value="Add record">
-        </tr>
-      </table>
-    <br>
-    <br>
-    <br>
-      <!--Every time you add or update data you need to update the index. <br>
-      <input type=submit name="updateIndex" value="Update Index">
-    	<br>
-    	<br>
-    	<br>
-    -->
+    <form name=SearchData method=post action=search.jsp> 
     
       Query the database to see relevant items
       <table>
@@ -212,60 +94,65 @@
             <input type=text name=query>
           </td>
           <td>
-            <input type=submit value="Search" name="search">
+            <input type=submit value="Search" name="SEARCH">
           </td>
         </tr>
       </table>
-      <%
+	<%
         
-          if (request.getParameter("search") != null)
-          {
+	if (request.getParameter("SEARCH") != null)
+	{
           
-          	out.println("<br>");
-          	out.println("Query is " + request.getParameter("query"));
-          	out.println("<br>");
+		out.println("<br>");
+		out.println("Query is \"" + request.getParameter("query") + "\"");
+		out.println("<br>");
           
-            if(!(request.getParameter("query").equals("")))
-            {
-              PreparedStatement doSearch = m_con.prepareStatement("SELECT score(1), itemName, description FROM item WHERE contains(description, ?, 1) > 0 order by score(1) desc");
-              doSearch.setString(1, request.getParameter("query"));
-              ResultSet rset2 = doSearch.executeQuery();
-              out.println("<table border=1>");
-              out.println("<tr>");
-              out.println("<th>Item Name</th>");
-              out.println("<th>Item Description</th>");
-              out.println("<th>Score</th>");
-              out.println("</tr>");
-              while(rset2.next())
-              {
-                out.println("<tr>");
-                out.println("<td>"); 
-                out.println(rset2.getString(2));
-                out.println("</td>");
-                out.println("<td>"); 
-                out.println(rset2.getString(3)); 
-                out.println("</td>");
-                out.println("<td>");
-                out.println(rset2.getObject(1));
-                out.println("</td>");
-                out.println("</tr>");
-              } 
-              out.println("</table>");
-            }
-            else
-            {
-              out.println("<br><b>Please enter text for quering</b>");
-            }            
-          }
-          m_con.close();
-        }
-        catch(SQLException e)
-        {
-          out.println("SQLException: " +
-          e.getMessage());
-			m_con.rollback();
-        }
-      %>
+		if(!(request.getParameter("query").equals("")))
+		{
+			String query = request.getParameter("query");
+			PreparedStatement doSearch = adapter.prepareStatement("SELECT subject, place, description FROM images WHERE contains(subject, ?, 6) > 0 or contains(place, ?, 3) > 0  or contains(description, ?, 1) > 0 order by score(6) desc, score(3) desc, score(1) desc");	
+
+			doSearch.setString(1, query);
+			doSearch.setString(2, query);
+			doSearch.setString(3, query);
+			ResultSet rset2 = adapter.executeQuery(doSearch);
+		
+			out.println("<table border=1>");
+			out.println("<tr>");
+			out.println("<th>Subject</th>");
+			out.println("<th>Place</th>");
+			out.println("<th>Description</th>");
+			out.println("</tr>");
+		
+			while(rset2.next())
+			{
+				out.println("<tr>");
+				out.println("<td>"); 
+				out.println(rset2.getString(1));
+				out.println("</td>");
+				out.println("<td>"); 
+				out.println(rset2.getString(2)); 
+				out.println("</td>");
+				out.println("<td>");
+				out.println(rset2.getObject(3));
+				out.println("</td>");
+				out.println("</tr>");
+			} 
+
+			out.println("</table>");
+		}
+		else
+		{
+			out.println("<br><b>Please enter text for quering</b>");
+		}            
+	}
+	else
+	{
+		out.println("<br>");
+		out.println("SEARCH parameter not found.");
+		out.println("<br>");
+	}
+	%>
     </form>
   </body>
 </html>
