@@ -44,8 +44,8 @@
 		}%>
 		
 		<%
-		String username = "jukna";//OracleUsernameCookie.getValue();//Need to get username and password from cookie and/or input
-		String password = "math30pure";//OraclePasswordCookie.getValue();//**************
+		String username = "";//OracleUsernameCookie.getValue();//Need to get username and password from cookie and/or input
+		String password = "";//OraclePasswordCookie.getValue();//**************
 		SQLAdapter db = new SQLAdapter(username, password);//Create a new instance of the SQL Adapter to use 	
 		
 		ResultSet rset = db.executeFetch("select owner_name, subject, timing, count(*) from images group by cube(owner_name,subject,timing)");
