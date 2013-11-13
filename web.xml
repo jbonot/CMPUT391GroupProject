@@ -6,12 +6,21 @@
  version="2.4">
 
     <servlet>
-        <servlet-name>SessionInfo</servlet-name>
-        <servlet-class>SessionInfo</servlet-class>
+        <servlet-name>GetOnePic</servlet-name>
+        <servlet-class>GetOnePic</servlet-class>
     </servlet>
     <servlet-mapping>
-        <servlet-name>SessionInfo</servlet-name>
-        <url-pattern>/SessionInfo</url-pattern>
+        <servlet-name>GetOnePic</servlet-name>
+        <url-pattern>/GetOnePic</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>GetBigPic</servlet-name>
+        <servlet-class>GetBigPic</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>GetBigPic</servlet-name>
+        <url-pattern>/GetBigPic</url-pattern>
     </servlet-mapping>
 
 </web-app>
