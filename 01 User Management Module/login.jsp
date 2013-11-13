@@ -70,7 +70,7 @@
 			loginUser.close();
 			db.closeConnection();
 		%>
-			<jsp:forward page="LoginAndRegistration.html" />
+			<jsp:forward page="home.jsp" />
 		<%}
 		
 		db.closeConnection();
