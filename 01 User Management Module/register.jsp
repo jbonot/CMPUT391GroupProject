@@ -10,42 +10,19 @@
 <body>
 	<%@ page import="proj1.*" %>
 	<%@ page import="java.sql.*" %>
-	Username:
+	<%@ page import="java.util.Date" %>
 	<%
+		//Get the values from the login and registration page
 		String newName = 	request.getParameter("NEWUSERNAME");
-		out.print(newName);
-	%>
-	Password:
-	<%
 		String newPassword = 	request.getParameter("NEWPASSWD");
-		out.print(newPassword);
-	%>
-	First Name:
-	<%
 		String firstName = 	request.getParameter("FRSTNAME");
-		out.print(firstName);
-	%>
-	Last Name:
-	<%
 		String lastName = 	request.getParameter("FRSTNAME");
-		out.print(lastName);
-	%>
-	Address:
-	<%
 		String address = 	request.getParameter("ADDRESS");
-		out.print(address);
-	%>
-	Email:
-	<%
 		String email = 	request.getParameter("EMAIL");
-		out.print(email);
-	%>
-	Phone Number:
-	<%
 		String phonenumber = 	request.getParameter("PHONENUMBER");
-		out.print(phonenumber);
-	%>
-	<%
+		java.util.Date today = new java.util.Date();
+		
+		//Get the oracle username and password from the cookies
 		String cookieUsername = "OracleUsername";
 		String cookiePassword = "OraclePassword";
 		Cookie cookies [] = request.getCookies ();
@@ -68,28 +45,55 @@
 			}
 		}
 		
-		
-		String username = OracleUsernameCookie.getValue();//Need to get username and password from cookie and/or input
-		String password = OraclePasswordCookie.getValue();//**************
+		//Create the adapter using the oracle username and password from the cookies
+		String username = OracleUsernameCookie.getValue();
+		String password = OraclePasswordCookie.getValue();
 		SQLAdapter db = new SQLAdapter(username, password);//Create a new instance of the SQL Adapter to use 
 		
-		ResultSet rset;
-		rset = db.executeFetch("Select * from groups");//Execute the statement and get results in rset
-		out.print("<br>");
-		if (rset != null){
-			while (rset.next()) {
-			      // It is possible to get the columns via name
-			      // also possible to get the columns via the column number
-			      // which starts at 1
-			      String group_id = rset.getString("group_id");
-			      String group_name = rset.getString("group_name");
-			      String user_name = rset.getString("user_name");
-			      out.print(" Group ID: " + group_id);
-			      out.print(" Group Name: " + group_name);
-			      out.print(" Username: " + user_name);
-			      out.print("<br>");
-			 }
+		//Some variables for counting the rows updated
+		Integer rows_updated = 0;
+		Integer rows_updated_person = 0;
+		
+		//Setting up and executing the prepared statement
+		PreparedStatement registerUser = db.prepareStatement("INSERT INTO users(user_name,password,date_registered) VALUES(?,?,?)");	
+		registerUser.setString(1, newName);
+		registerUser.setString(2, newPassword);
+		registerUser.setDate(3, new java.sql.Date(today.getTime()));
+		rows_updated = db.executeUpdate(registerUser);
+		registerUser.close();
+		//If the username & password creation worked then insert their personal information						
+		if (rows_updated == 1){
+			PreparedStatement registerPerson = db.prepareStatement("INSERT INTO persons(user_name,first_name,last_name,address,email,phone) VALUES(?,?,?,?,?,?)");
+			registerPerson.setString(1,newName);
+			registerPerson.setString(2,firstName);
+			registerPerson.setString(3,lastName);
+			registerPerson.setString(4,address);
+			registerPerson.setString(5,email);
+			registerPerson.setString(6,phonenumber);
+			rows_updated_person = db.executeUpdate(registerPerson);
+			registerPerson.close();
+			if (rows_updated_person == 1){
+				out.print("Registration Successfull! Please log in with new username and password. You will be redirected in 5 seconds...");
+				//Create two new cookie for the logged in username
+				Cookie UsernameCookie = new Cookie ("Username",newName);
+				UsernameCookie.setMaxAge(365 * 24 * 60 * 60);
+				response.addCookie(UsernameCookie);
+				db.closeConnection();
+				//Wait for user to see successfull registration
+				response.setHeader("Refresh", "5; URL=LoginAndRegistration.html");
+
+			}
+			else{
+				out.print("Registration Failed! Please try again.");
+				db.closeConnection();
+				response.setHeader("Refresh", "5; URL=LoginAndRegistration.html");
+			}
+		
 		}
+			else{
+				out.print("Registration Failed ! "+ rows_updated);}
+		db.closeConnection();
+
 	%>
 </body>
 </html>
