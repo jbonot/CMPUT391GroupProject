@@ -86,4 +86,8 @@ CREATE INDEX placeindex
 ON images(place)
 INDEXTYPE IS CTXSYS.CONTEXT;
 
+@drjobdml descriptionindex 1
+@drjobdml subjectindex 1
+@drjobdml placeindex 1
+
 
