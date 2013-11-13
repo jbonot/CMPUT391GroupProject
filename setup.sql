@@ -71,6 +71,9 @@ CREATE TABLE images (
 
 /* End of original code. */
 
+/* Use this for generating photo_id sequence */
+CREATE SEQUENCE photo_id_sequence;
+
 CREATE INDEX descriptionindex
 ON images(description)
 INDEXTYPE IS CTXSYS.CONTEXT;

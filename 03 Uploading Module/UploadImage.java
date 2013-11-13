@@ -21,17 +21,26 @@
  *
  *
  *  the table shall be created using the following
-      CREATE TABLE pictures (
-            pic_id int,
-	        pic_desc  varchar(100),
-		    pic  BLOB,
-		        primary key(pic_id)
-      );
+      CREATE TABLE images (
+           photo_id    int,
+           owner_name  varchar(24),
+           permitted   int,
+           subject     varchar(128),
+           place       varchar(128),
+           timing      date,
+           description varchar(2048),
+           thumbnail   blob,
+           photo       blob,
+           
+           PRIMARY KEY(photo_id),
+           FOREIGN KEY(owner_name) REFERENCES users,
+           FOREIGN KEY(permitted) REFERENCES groups
+);
  *
  *  One may also need to create a sequence using the following 
  *  SQL statement to automatically generate a unique pic_id:
  *
- *   CREATE SEQUENCE pic_id_sequence;
+ *   CREATE SEQUENCE photo_id_sequence;
  *
  ***/
 
@@ -40,6 +49,7 @@ import javax.servlet.*;
 import javax.servlet.http.*;
 import java.sql.*;
 import java.util.*;
+import java.text.SimpleDateFormat;
 import oracle.sql.*;
 import oracle.jdbc.*;
 import java.awt.Image;
@@ -62,16 +72,53 @@ public class UploadImage extends HttpServlet
     public void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException
     {
-        //TODO add SQL adapter functionality
-        // change the following parameters to connect to the oracle database
-        String username = "******";
-        String password = "******";
-        String drivername = "oracle.jdbc.driver.OracleDriver";
-        String dbstring = "jdbc:oracle:thin:@gwynne.cs.ualberta.ca:1521:CRS";
+
+        // use a cookie to retrieve oracle database information, as well as current username.
+        String cookieUsername = "OracleUsername";
+        String cookiePassword = "OraclePassword";
+        String currentUser = "Username";
+        
+        Cookie cookies [] = request.getCookies ();
+        Cookie OracleUsernameCookie = null;
+        Cookie OraclePasswordCookie = null;
+        Cookie currentUserCookie = null;
+        
+        if (cookies != null){
+            for (int i = 0; i < cookies.length; i++) {
+                if (cookies [i].getName().equals (cookieUsername)){
+                    OracleUsernameCookie = cookies[i];
+                break;
+                }
+            }
+        }
+        if (cookies != null){
+            for (int i = 0; i < cookies.length; i++) {
+                if (cookies [i].getName().equals (cookiePassword)){
+                    OraclePasswordCookie = cookies[i];
+                break;
+                }
+            }
+        }
+        if (cookies != null){
+            for (int i = 0; i < cookies.length; i++) {
+                if (cookies [i].getName().equals (currentUser)){
+                    currentUserCookie = cookies[i];
+                    break;
+                }
+            }
+        }
+        
+        //connect to db
+        String username = OracleUsernameCookie.getValue();//Need to get username and password from cookie and/or input
+        String password = OraclePasswordCookie.getValue();//**************
+        SQLAdapter db = new SQLAdapter(username, password);//Create a new instance of the SQL Adapter to use
+        
+        //store current user's name in string
+        String user = currentUserCookie.getValue();
         
         //Uploaded picture and associated values
         int pic_id;
-        String subject, place, when, description;
+        String subject, place, day, month, year, description;
         int security;
 
         try
@@ -80,9 +127,17 @@ public class UploadImage extends HttpServlet
             //parse string data
             subject = request.getParameter("subject");
             place = request.getParameter("place");
-            when = request.getParameter("when");
+            day = request.getParameter("day");
+            month = request.getParameter("month");
+            year = request.getParameter("year");
             description = request.getParameter("description");
             security = Integer.parseInt(request.getParameter("security"));
+            
+            //create SimpleDateFormat object, parse into sql date object
+            String date = year + "-" + month + "-" + day;
+            SimpleDateFormat sdf = new SimpleDateFormat(yyyy-MM-dd);
+            java.util.Date parse = sdf.parse(date);
+            java.sql.Date when = new Date(date.getTime());
             
             // Parse the HTTP request to get the image stream
             DiskFileUpload fu = new DiskFileUpload();
@@ -102,32 +157,40 @@ public class UploadImage extends HttpServlet
             BufferedImage img = ImageIO.read(instream);
             BufferedImage thumbNail = shrink(img, 10);
 
-            // Connect to the database and create a statement
-            Connection conn = getConnected(drivername, dbstring, username,
-                    password);
-            Statement stmt = conn.createStatement();
 
             /*
              * First, to generate a unique pic_id using an SQL sequence
              */
-            ResultSet rset1 = stmt
-                    .executeQuery("SELECT pic_id_sequence.nextval from dual");
+            PreparedStatement getId = db.PrepareStatement("SELECT photo_id_sequence.nextval from DUAL");
+            ResultSet rset1 = db.ExecuteQuery(getId);
             rset1.next();
             pic_id = rset1.getInt(1);
+            getId.close();
 
             // Insert an empty blob into the table first. Note that you have to
             // use the Oracle specific function empty_blob() to create an empty
             // blob
-            //TODO username and date must be passed somehow to this function for storage of picture.
-            stmt.execute("INSERT INTO images VALUES(" + pic_id /*TODO + user_name*/
-                    + "," + security + ",'" + subject + "','" + place + "','"
-                    /*TODO + date*/ + description + "',empty_blob(), empty_blob())");
+            
+            PreparedStatement insertData = db.PrepareStatement("INSERT INTO images VALUES" +
+            		"(?, ?, ?, ?, ?, ?, ?, empty_blob(), empty_blob()");
+            
+            insertData.setString(1, pic_id);
+            insertData.setString(2, user);
+            insertData.setString(3, security);
+            insertData.setString(4, subject);
+            insertData.setString(5, place);
+            insertData.setDate(6, when);
+            insertData.setString(7, description);
+            
+            //TODO add exception handling for when the insert does not work
+            int numRows = db.executeUpdate(insertData);
+            insertData.close();
 
             // to retrieve the lob_locator
             // Note that you must use "FOR UPDATE" in the select statement
-            String cmd = "SELECT * FROM pictures WHERE pic_id = " + pic_id
+            PreparedStatement fillBlobs = "SELECT * FROM images WHERE pic_id = " + pic_id
                     + " FOR UPDATE";
-            ResultSet rset = stmt.executeQuery(cmd);
+            ResultSet rset = db.executeQuery(fillBlobs);
             rset.next();
             BLOB myblob = ((OracleResultSet) rset).getBLOB(8);
 
@@ -149,10 +212,12 @@ public class UploadImage extends HttpServlet
              */
             instream.close();
             outstream.close();
-
-            stmt.executeUpdate("commit");
+            
+            PreparedStatement commit = db.PrepareStatement("commit");
+            db.executeUpdate(commit);
+            commit.close();
             response_message = " Upload OK!  ";
-            conn.close();
+            db.closeConnection();
 
         }
         catch (Exception ex)
@@ -168,17 +233,6 @@ public class UploadImage extends HttpServlet
                 + "Transitional//EN\">\n" + "<HTML>\n"
                 + "<HEAD><TITLE>Upload Message</TITLE></HEAD>\n" + "<BODY>\n"
                 + "<H1>" + response_message + "</H1>\n" + "</BODY></HTML>");
-    }
-
-    /*
-     * /* To connect to the specified database
-     */
-    private static Connection getConnected(String drivername, String dbstring,
-            String username, String password) throws Exception
-    {
-        Class drvClass = Class.forName(drivername);
-        DriverManager.registerDriver((Driver) drvClass.newInstance());
-        return (DriverManager.getConnection(dbstring, username, password));
     }
 
     // shrink image by a factor of n, and return the shrinked image
