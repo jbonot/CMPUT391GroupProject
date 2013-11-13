@@ -55,6 +55,7 @@ import oracle.jdbc.*;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
+import proj1.*;
 
 /**
  *  The package commons-fileupload-1.0.jar is downloaded from 
