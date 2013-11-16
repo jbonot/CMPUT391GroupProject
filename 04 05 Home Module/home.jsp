@@ -29,13 +29,20 @@
 	String username = OracleUsernameCookie.getValue();
 	String password = OraclePasswordCookie.getValue();
 
+	String user = "matwood";
 	String dateFormat = "yyyy-mm-dd";
 	String query = request.getParameter("query");
+
+	// Select photos the user has access to.
 	StringBuilder queryString = new StringBuilder(
-			"SELECT photo_id, thumbnail, subject, place, description, timing FROM images ");
+			"SELECT photo_id, thumbnail, subject, place, description, timing "
+					+ "FROM images, group_lists "
+					+ "where ((permitted=2 and owner_name='" + user
+					+ "') or (group_id=permitted and friend_id='"
+					+ user + "')) ");
+
 	java.sql.Date dateStart = null;
 	java.sql.Date dateEnd = null;
-
 	try {
 		dateStart = java.sql.Date.valueOf(request
 				.getParameter("DATE_START"));
@@ -99,26 +106,33 @@
 		SQLAdapter adapter = new SQLAdapter(username, password);
 		ResultSet rset = null;
 		out.println("<a href=\"/proj1/DataAnalysis.jsp\">Analysis</a><br>");
+
+		rset = adapter
+				.executeFetch("select group_id, friend_id from group_lists");
+		int count = 0;
+		while (rset.next()) {
+			out.println(rset.getInt("group_id") + "\t"
+					+ rset.getString("friend_id") + "<br>");
+			count++;
+		}
+		out.println("found " + count + " rows in group_lists");
+
+		PreparedStatement doSearch;
 		if (request.getParameter("SEARCH") != null
 				&& (dateStart != null || dateEnd != null || query != null)) {
-
-			String conjunction = "where ";
 
 			out.println("<br>");
 
 			if (dateStart != null) {
-				queryString.append(conjunction + "timing >= ? ");
-				conjunction = "and ";
+				queryString.append("and timing >= ? ");
 			}
 
 			if (dateEnd != null) {
-				queryString.append(conjunction + "timing <= ? ");
-				conjunction = "and ";
+				queryString.append("and timing <= ? ");
 			}
 
 			if (query != null) {
-				queryString.append(conjunction);
-				queryString.append("(contains(subject, ?, 6) > 0 ");
+				queryString.append("and (contains(subject, ?, 6) > 0 ");
 				queryString.append("or contains(place, ?, 3) > 0 ");
 				queryString.append("or contains(description, ?, 1) > 0) ");
 				queryString
@@ -127,8 +141,7 @@
 				queryString.append("order by timing desc");
 			}
 
-			PreparedStatement doSearch = adapter
-					.prepareStatement(queryString.toString());
+			doSearch = adapter.prepareStatement(queryString.toString());
 
 			int i = 1;
 
@@ -145,11 +158,10 @@
 				doSearch.setString(i++, query);
 				doSearch.setString(i++, query);
 			}
-
-			rset = adapter.executeQuery(doSearch);
 		} else {
-			rset = adapter.executeFetch(queryString.toString());
+			doSearch = adapter.prepareStatement(queryString.toString());
 		}
+		rset = adapter.executeQuery(doSearch);
 
 		out.println("<table border=1>");
 		String p_id;

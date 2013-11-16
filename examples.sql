@@ -8,7 +8,12 @@ insert into persons values('matwood', 'Margaret', 'Atwood', '18 Blind Court', 'm
 
 insert into groups values(3, 'matwood', 'authors', sysdate);
 
-insert into group_lists values(1, 3, 'alice456', sysdate, 'alice notice');
+insert into group_lists values(1, 'alice456', sysdate, 'notice');
+insert into group_lists values(1, 'matwood', sysdate, 'notice');
+insert into group_lists values(1, 'bob123', sysdate, 'notice');
+insert into group_lists values(2, 'bob123', sysdate, 'notice');
+insert into group_lists values(3, 'matwood', sysdate, 'notice');
+insert into group_lists values(3, 'alice456', sysdate, 'notice');
 
 insert into images values(1, 'bob123', 1, 'fruit', 'the orchard', sysdate, 'a bunch of apples from the tree', EMPTY_BLOB(), EMPTY_BLOB());
 insert into images values(2, 'bob123', 2, 'animals', 'my house', sysdate, 'all my 27 kitty cats', EMPTY_BLOB(), EMPTY_BLOB());

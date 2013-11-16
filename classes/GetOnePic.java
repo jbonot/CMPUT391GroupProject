@@ -24,7 +24,6 @@ public class GetOnePic extends HttpServlet implements SingleThreadModel {
 	 * executes the query select image from yuan.photos where photo_id =
 	 * PHOTO_ID Finally, it sends the picture to the client
 	 */
-
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		String cookieUsername = "OracleUsername";
@@ -51,24 +50,35 @@ public class GetOnePic extends HttpServlet implements SingleThreadModel {
 
 		String username = OracleUsernameCookie.getValue();
 		String password = OraclePasswordCookie.getValue();
+		String user = "matwood";
+		String permissionCondition = "((permitted=2 and owner_name='" + user
+				+ "') or (group_id=permitted and friend_id='" + user + "'))";
+		ServletOutputStream out = response.getOutputStream();
 
 		// construct the query from the client's QueryString
 		String picid = request.getQueryString();
 		String query;
 
-		if (picid.startsWith("big"))
-			query = "select photo from images where photo_id="
-					+ picid.substring(3);
-		else
-			query = "select thumbnail from images where photo_id=" + picid;
+		try {
+			if (picid.startsWith("big")) {
+				query = "select photo from images where photo_id="
+						+ Integer.parseInt(picid.substring(3)) + " and "
+						+ permissionCondition;
 
-		ServletOutputStream out = response.getOutputStream();
+			} else {
+				query = "select thumbnail from images where photo_id="
+						+ Integer.parseInt(picid) + " and "
+						+ permissionCondition;
+			}
+		} catch (NumberFormatException e) {
+			out.println("no picture available");
+			return;
+		}
 
 		/*
 		 * to execute the given query
 		 */
 		SQLAdapter adapter = new SQLAdapter(username, password);
-
 		try {
 			ResultSet rset = adapter.executeFetch(query);
 
@@ -84,7 +94,6 @@ public class GetOnePic extends HttpServlet implements SingleThreadModel {
 				out.println("no picture available");
 		} catch (Exception ex) {
 			out.println(ex.getMessage());
-			out.println("cool");
 		}
 		adapter.closeConnection();
 	}
