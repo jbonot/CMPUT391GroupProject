@@ -57,9 +57,6 @@ public class GetBigPic extends HttpServlet implements SingleThreadModel {
 			String username = OracleUsernameCookie.getValue();
 			String password = OraclePasswordCookie.getValue();
 			String user = "matwood";
-			String permissionCondition = "((permitted=2 and owner_name='"
-					+ user + "') or (group_id=permitted and friend_id='" + user
-					+ "'))";
 			int photoId;
 			// construct the query from the client's QueryString
 			String picid = request.getQueryString().substring(3);
@@ -78,31 +75,49 @@ public class GetBigPic extends HttpServlet implements SingleThreadModel {
 			}
 
 			SQLAdapter adapter = new SQLAdapter(username, password);
-			permissionQuery = "select subject, place, description, owner_name from images, group_lists where photo_id="
-					+ photoId + " and " + permissionCondition;
-			out.println(permissionQuery);
+			permissionQuery = "select subject, place, description, owner_name, timing, g.group_name "
+					+ "from images, group_lists l, groups g "
+					+ "where photo_id="
+					+ photoId
+					+ " and ((permitted=2 and owner_name='"
+					+ user
+					+ "') or (l.group_id=permitted and l.friend_id='"
+					+ user
+					+ "'))" + "and l.group_id=g.group_id";
+
+			out.println(permissionQuery + "<BR>");
 			try {
 				ResultSet rset = adapter.executeFetch(permissionQuery);
 				if (rset.next()) {
-					String title, place, description, owner;
+					String title, place, description, owner, group;
+					java.sql.Date date;
 					try {
-						if (rset.next()) {
-							title = rset.getString(1);
-							place = rset.getString(2);
-							description = rset.getString(3);
-							owner = rset.getString(4);
-							out.println("<html><head><title>" + title
-									+ "</title></head>");
-							out.println("<body>");
-							out.println("<h3>" + title + "  at " + place
-									+ " </h3>");
-							out.println("<center><img src = \"/proj1/GetOnePic?"
-									+ picid + "\"></center>");
-							out.println(description + "<br>");
-							out.println(owner);
-							out.println("</body></html>");
-						} else
-							out.println("<html> Pictures are not avialable</html>");
+						title = rset.getString(1);
+						place = rset.getString(2);
+						description = rset.getString(3);
+						owner = rset.getString(4);
+						date = rset.getDate(5);
+						group = rset.getString(6);
+						out.println("<html><head><title>" + title
+								+ "</title></head>");
+						out.println("<body>");
+						out.println("<img src = \"/proj1/GetOnePic?" + picid
+								+ "\">");
+						out.println("<TABLE border=1>");
+						out.println("<TR><TD><B><I>Owner:</I></B></TD>");
+						out.println("<TD>" + owner + "</TD></TR>");
+						out.println("<TR><TD><B><I>Visible to:</I></B></TD>");
+						out.println("<TD>" + group + "</TD></TR>");
+						out.println("<TR><TD><B><I>Title:</I></B></TD>");
+						out.println("<TD>" + title + "</TD></TR>");
+						out.println("<TR><TD><B><I>Place:</I></B></TD>");
+						out.println("<TD>" + place + "</TD></TR>");
+						out.println("<TR><TD><B><I>Date:</I></B></TD>");
+						out.println("<TD>" + date + "</TD></TR>");
+						out.println("<TR><TD><B><I>Description:</I></B></TD>");
+						out.println("<TD>" + description + "</TD></TR>");
+						out.println("</TABLE>");
+						out.println("</body></html>");
 					} catch (SQLException e) {
 						e.printStackTrace();
 					}

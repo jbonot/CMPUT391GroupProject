@@ -61,12 +61,12 @@ public class GetOnePic extends HttpServlet implements SingleThreadModel {
 
 		try {
 			if (picid.startsWith("big")) {
-				query = "select photo from images where photo_id="
+				query = "select photo from images, group_lists where photo_id="
 						+ Integer.parseInt(picid.substring(3)) + " and "
 						+ permissionCondition;
 
 			} else {
-				query = "select thumbnail from images where photo_id="
+				query = "select thumbnail from images, group_lists where photo_id="
 						+ Integer.parseInt(picid) + " and "
 						+ permissionCondition;
 			}
