@@ -26,16 +26,23 @@
 		}
 	}
 
-	String username = OracleUsernameCookie.getValue();//Need to get username and password from cookie and/or input
-	String password = OraclePasswordCookie.getValue();//**************
+	String username = OracleUsernameCookie.getValue();
+	String password = OraclePasswordCookie.getValue();
 
+	String user = "matwood";
 	String dateFormat = "yyyy-mm-dd";
-	StringBuilder queryString = new StringBuilder(
-			"SELECT subject, place, description, timing FROM images ");
-	java.sql.Date dateStart = null;
-	java.sql.Date dateEnd = null;
 	String query = request.getParameter("query");
 
+	// Select photos the user has access to.
+	StringBuilder queryString = new StringBuilder(
+			"SELECT photo_id, thumbnail, subject, place, description, timing "
+					+ "FROM images, group_lists "
+					+ "where ((permitted=2 and owner_name='" + user
+					+ "') or (group_id=permitted and friend_id='"
+					+ user + "')) ");
+
+	java.sql.Date dateStart = null;
+	java.sql.Date dateEnd = null;
 	try {
 		dateStart = java.sql.Date.valueOf(request
 				.getParameter("DATE_START"));
@@ -74,7 +81,7 @@
 	<CENTER>Search</CENTER>
 </H1>
 <body>
-	<FORM NAME="SearchForm" ACTION="search.jsp" METHOD="post">
+	<FORM NAME="SearchForm" ACTION="home.jsp" METHOD="post">
 		<P>Search for images.</P>
 		<TABLE>
 			<TR VALIGN=TOP ALIGN=LEFT>
@@ -95,127 +102,94 @@
 	</FORM>
 
 	<br>
-
 	<%
 		SQLAdapter adapter = new SQLAdapter(username, password);
+		ResultSet rset = null;
+		out.println("<a href=\"/proj1/DataAnalysis.jsp\">Analysis</a><br>");
 
-		String selectString = "select photo_id, thumbnail from images";
-		ResultSet rset = adapter.executeFetch(selectString);
-
-		if (rset == null) {
-			out.println("Need to run setup.sql<br>");
-		} else {
-
-			out.println("<table border=1>");
-			String p_id;
-			while (rset.next()) {
-				rset.previous();
-				out.println("<tr>");
-				for (int i = 0; i < 4; i++) {
-					if (rset.next()) {
-						Object pic = rset.getObject(2);
-						p_id = rset.getString(1);
-						out.println("<td>");
-						out.println("<a href=\"/proj1/GetOnePic?big" + p_id
-								+ "\">");
-						out.println("<img src=\"/proj1/GetOnePic?" + p_id
-								+ "\"></a>");
-						out.println("</td>");
-					} else {
-						break;
-					}
-				}
-				out.println("</tr>");
-			}
-
-			out.println("</table>");
+		rset = adapter
+				.executeFetch("select group_id, friend_id from group_lists");
+		int count = 0;
+		while (rset.next()) {
+			out.println(rset.getInt("group_id") + "\t"
+					+ rset.getString("friend_id") + "<br>");
+			count++;
 		}
-	%>
+		out.println("found " + count + " rows in group_lists");
 
-	<br>
-	<br>
-	<%
-		if (request.getParameter("SEARCH") != null) {
+		PreparedStatement doSearch;
+		if (request.getParameter("SEARCH") != null
+				&& (dateStart != null || dateEnd != null || query != null)) {
 
-			boolean firstCondition = true;
-
-			out.println("<br>");
-			out.println("Query is \"" + request.getParameter("query")
-					+ "\"");
 			out.println("<br>");
 
 			if (dateStart != null) {
-				queryString.append("where timing >= ? ");
-				firstCondition = false;
+				queryString.append("and timing >= ? ");
 			}
 
 			if (dateEnd != null) {
-				queryString.append(firstCondition ? "where " : "and ");
-				queryString.append("timing <= ? ");
-				firstCondition = false;
+				queryString.append("and timing <= ? ");
 			}
 
 			if (query != null) {
-				queryString.append(firstCondition ? "where " : "and ");
+				queryString.append("and (contains(subject, ?, 6) > 0 ");
+				queryString.append("or contains(place, ?, 3) > 0 ");
+				queryString.append("or contains(description, ?, 1) > 0) ");
 				queryString
-						.append("(contains(subject, ?, 6) > 0 or contains(place, ?, 3) > 0 or contains(description, ?, 1) > 0) order by score(6) * 6 + score(3) * 3 + score(1) desc");
-				firstCondition = false;
+						.append("order by score(6) * 6 + score(3) * 3 + score(1) desc");
 			} else {
-				out.println("<br><b>Please enter text for quering</b>");
 				queryString.append("order by timing desc");
 			}
 
-			if (!firstCondition) {
-				PreparedStatement doSearch = adapter
-						.prepareStatement(queryString.toString());
+			doSearch = adapter.prepareStatement(queryString.toString());
 
-				int i = 1;
+			int i = 1;
 
-				if (dateStart != null) {
-					doSearch.setDate(i++, dateStart);
-				}
-
-				if (dateEnd != null) {
-					doSearch.setDate(i++, dateEnd);
-				}
-
-				if (query != null) {
-					doSearch.setString(i++, query);
-					doSearch.setString(i++, query);
-					doSearch.setString(i++, query);
-				}
-
-				ResultSet rset2 = adapter.executeQuery(doSearch);
-
-				out.println("<table border=1>");
-				out.println("<tr>");
-				out.println("<th>Subject</th>");
-				out.println("<th>Place</th>");
-				out.println("<th>Description</th>");
-				out.println("<th>Date</th>");
-				out.println("</tr>");
-
-				while (rset2.next()) {
-					out.println("<tr>");
-					out.println("<td>");
-					out.println(rset2.getString(1));
-					out.println("</td>");
-					out.println("<td>");
-					out.println(rset2.getString(2));
-					out.println("</td>");
-					out.println("<td>");
-					out.println(rset2.getObject(3));
-					out.println("</td>");
-					out.println("<td>");
-					out.println(rset2.getObject(4));
-					out.println("</td>");
-					out.println("</tr>");
-				}
-
-				out.println("</table>");
-				out.println("<br><b>" + queryString + "</b>");
+			if (dateStart != null) {
+				doSearch.setDate(i++, dateStart);
 			}
+
+			if (dateEnd != null) {
+				doSearch.setDate(i++, dateEnd);
+			}
+
+			if (query != null) {
+				doSearch.setString(i++, query);
+				doSearch.setString(i++, query);
+				doSearch.setString(i++, query);
+			}
+		} else {
+			doSearch = adapter.prepareStatement(queryString.toString());
 		}
+		rset = adapter.executeQuery(doSearch);
+
+		out.println("<table border=1>");
+		String p_id;
+		boolean done = false;
+		while (!done) {
+			out.println("<tr>");
+			for (int j = 0; j < 4; j++) {
+				if (!rset.next()) {
+					done = true;
+					break;
+				}
+				p_id = rset.getString("photo_id");
+				out.println("<td>");
+				out.println("<a href=\"/proj1/GetBigPic?big" + p_id + "\">");
+				out.println("<img src=\"/proj1/GetOnePic?" + p_id + "\">");
+				out.println(rset.getString("subject"));
+				out.println("<br>");
+				out.println(rset.getString("place"));
+				out.println("<br>");
+				out.println(rset.getString("timing"));
+				out.println("</a>");
+				out.println("</td>");
+			}
+			out.println("</tr>");
+		}
+
+		out.println("</table>");
+		out.println("<br><b>" + queryString + "</b>");
 
 		adapter.closeConnection();
 	%>
