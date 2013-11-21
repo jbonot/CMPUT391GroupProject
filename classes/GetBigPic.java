@@ -85,7 +85,6 @@ public class GetBigPic extends HttpServlet implements SingleThreadModel {
 					+ user
 					+ "'))" + "and l.group_id=g.group_id";
 
-			out.println(permissionQuery + "<BR>");
 			try {
 				ResultSet rset = adapter.executeFetch(permissionQuery);
 				if (rset.next()) {
@@ -101,8 +100,11 @@ public class GetBigPic extends HttpServlet implements SingleThreadModel {
 						out.println("<html><head><title>" + title
 								+ "</title></head>");
 						out.println("<body>");
+						out.println("<input type=\"button\" " +
+								"value=\"Home\" name=\"Home\" " +
+								"onclick=\"javascript:window.location='home.jsp';\" /><BR>");
 						out.println("<img src = \"/proj1/GetOnePic?" + picid
-								+ "\">");
+								+ "\"><BR>");
 						out.println("<TABLE border=1>");
 						out.println("<TR><TD><B><I>Owner:</I></B></TD>");
 						out.println("<TD>" + owner + "</TD></TR>");
@@ -138,3 +140,4 @@ public class GetBigPic extends HttpServlet implements SingleThreadModel {
 		}
 	}
 }
+
