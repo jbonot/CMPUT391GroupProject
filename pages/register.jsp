@@ -22,33 +22,8 @@
 		String phonenumber = 	request.getParameter("PHONENUMBER");
 		java.util.Date today = new java.util.Date();
 		
-		//Get the oracle username and password from the cookies
-		String cookieUsername = "OracleUsername";
-		String cookiePassword = "OraclePassword";
-		Cookie cookies [] = request.getCookies ();
-		Cookie OracleUsernameCookie = null;
-		Cookie OraclePasswordCookie = null;
-		if (cookies != null){
-			for (int i = 0; i < cookies.length; i++) {
-				if (cookies [i].getName().equals (cookieUsername)){
-					OracleUsernameCookie = cookies[i];
-				break;
-				}
-			}
-		}
-		if (cookies != null){
-			for (int i = 0; i < cookies.length; i++) {
-				if (cookies [i].getName().equals (cookiePassword)){
-					OraclePasswordCookie = cookies[i];
-				break;
-				}
-			}
-		}
-		
-		//Create the adapter using the oracle username and password from the cookies
-		String username = OracleUsernameCookie.getValue();
-		String password = OraclePasswordCookie.getValue();
-		SQLAdapter db = new SQLAdapter(username, password);//Create a new instance of the SQL Adapter to use 
+		//Create the adapter
+		SQLAdapter db = new SQLAdapter();//Create a new instance of the SQL Adapter to use 
 		
 		//Some variables for counting the rows updated
 		Integer rows_updated = 0;
