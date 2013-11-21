@@ -29,34 +29,23 @@ public class GetBigPic extends HttpServlet implements SingleThreadModel {
 
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		String cookieUsername = "OracleUsername";
-		String cookiePassword = "OraclePassword";
 		Cookie cookies[] = request.getCookies();
-		Cookie OracleUsernameCookie = null;
-		Cookie OraclePasswordCookie = null;
+		Cookie userCookie = null;
 		if (cookies != null) {
 			for (int i = 0; i < cookies.length; i++) {
-				if (cookies[i].getName().equals(cookieUsername)) {
-					OracleUsernameCookie = cookies[i];
+				if (cookies[i].getName().equals("User")) {
+					userCookie = cookies[i];
 					break;
 				}
 			}
 		}
-		if (cookies != null) {
-			for (int i = 0; i < cookies.length; i++) {
-				if (cookies[i].getName().equals(cookiePassword)) {
-					OraclePasswordCookie = cookies[i];
-					break;
-				}
-			}
-		}
+		
+		// TODO: Ensure that userCookie != null otherwise navigate back to index.html
+
+		String user = userCookie.getValue();
 		PrintWriter out = response.getWriter();
 		try {
 			response.setContentType("text/html");
-
-			String username = OracleUsernameCookie.getValue();
-			String password = OraclePasswordCookie.getValue();
-			String user = "matwood";
 			int photoId;
 			// construct the query from the client's QueryString
 			String picid = request.getQueryString().substring(3);
@@ -74,7 +63,7 @@ public class GetBigPic extends HttpServlet implements SingleThreadModel {
 				return;
 			}
 
-			SQLAdapter adapter = new SQLAdapter(username, password);
+			SQLAdapter adapter = new SQLAdapter();
 			permissionQuery = "select subject, place, description, owner_name, timing, g.group_name "
 					+ "from images, group_lists l, groups g "
 					+ "where photo_id="

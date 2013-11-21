@@ -1,6 +1,7 @@
 import java.io.*;
 import javax.servlet.*;
 import javax.servlet.http.*;
+
 import java.sql.*;
 import proj1.*;
 
@@ -26,31 +27,20 @@ public class GetOnePic extends HttpServlet implements SingleThreadModel {
 	 */
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		String cookieUsername = "OracleUsername";
-		String cookiePassword = "OraclePassword";
 		Cookie cookies[] = request.getCookies();
-		Cookie OracleUsernameCookie = null;
-		Cookie OraclePasswordCookie = null;
+		Cookie userCookie = null;
 		if (cookies != null) {
 			for (int i = 0; i < cookies.length; i++) {
-				if (cookies[i].getName().equals(cookieUsername)) {
-					OracleUsernameCookie = cookies[i];
+				if (cookies[i].getName().equals("User")) {
+					userCookie = cookies[i];
 					break;
 				}
 			}
 		}
-		if (cookies != null) {
-			for (int i = 0; i < cookies.length; i++) {
-				if (cookies[i].getName().equals(cookiePassword)) {
-					OraclePasswordCookie = cookies[i];
-					break;
-				}
-			}
-		}
+		
+		// TODO: Ensure that userCookie != null otherwise navigate back to index.html
 
-		String username = OracleUsernameCookie.getValue();
-		String password = OraclePasswordCookie.getValue();
-		String user = "matwood";
+		String user = userCookie.getValue();
 		String permissionCondition = "((permitted=2 and owner_name='" + user
 				+ "') or (group_id=permitted and friend_id='" + user + "'))";
 		ServletOutputStream out = response.getOutputStream();
@@ -78,7 +68,7 @@ public class GetOnePic extends HttpServlet implements SingleThreadModel {
 		/*
 		 * to execute the given query
 		 */
-		SQLAdapter adapter = new SQLAdapter(username, password);
+		SQLAdapter adapter = new SQLAdapter();
 		try {
 			ResultSet rset = adapter.executeFetch(query);
 

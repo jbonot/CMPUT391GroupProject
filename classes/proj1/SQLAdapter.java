@@ -17,19 +17,16 @@ public class SQLAdapter {
 	private static final String m_driverName = "oracle.jdbc.driver.OracleDriver";
 
 	private Connection m_con = null;
-	private String m_userName;
-	private String m_password;
+	private String m_userName = "c391g11";
+	private String m_password= "cmputgroup11";
 
 	public SQLAdapter() {
-		this("c391g11", "cmputgroup11");
 	}
 
 	/*
 	 * Initializes a new instance of the SQLAdapter class.
 	 */
 	public SQLAdapter(String username, String password) {
-		m_userName = username;
-		m_password = password;
 	}
 
 	/*
