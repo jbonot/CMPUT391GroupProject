@@ -4,32 +4,25 @@
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <%
-	String cookieUsername = "OracleUsername";
-	String cookiePassword = "OraclePassword";
 	Cookie cookies[] = request.getCookies();
-	Cookie OracleUsernameCookie = null;
-	Cookie OraclePasswordCookie = null;
+	Cookie UserCookie = null;
 	if (cookies != null) {
 		for (int i = 0; i < cookies.length; i++) {
-			if (cookies[i].getName().equals(cookieUsername)) {
-				OracleUsernameCookie = cookies[i];
-				break;
-			}
-		}
-	}
-	if (cookies != null) {
-		for (int i = 0; i < cookies.length; i++) {
-			if (cookies[i].getName().equals(cookiePassword)) {
-				OraclePasswordCookie = cookies[i];
+			if (cookies[i].getName().equals("User")) {
+				UserCookie = cookies[i];
 				break;
 			}
 		}
 	}
 
-	String username = OracleUsernameCookie.getValue();
-	String password = OraclePasswordCookie.getValue();
+	if (UserCookie == null) {
+%>
+<jsp:forward page="index.html" />
+<%
+		return;
+	}
 
-	String user = "matwood";
+	String user = UserCookie.getValue();
 	String dateFormat = "yyyy-mm-dd";
 	String query = request.getParameter("query");
 
@@ -100,7 +93,7 @@
 	</table>
 	<br>
 	<%
-		SQLAdapter adapter = new SQLAdapter(username, password);
+		SQLAdapter adapter = new SQLAdapter();
 		QueryHelper helper = new QueryHelper(adapter, user);
 		ResultSet rset = null;
 		String p_id;
