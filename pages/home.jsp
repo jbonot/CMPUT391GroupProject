@@ -89,6 +89,8 @@
 				onClick="javascript:window.location='DataAnalysis.jsp';"></td>
 			<td><input type="button" value="Upload"
 				onClick="javascript:window.location='upload_image.html';"></td>
+			<td><input type="button" value="Profile"
+				onClick="javascript:window.location='userProfile.html';"></td>
 		</tr>
 	</table>
 	<br>
