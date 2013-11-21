@@ -26,9 +26,11 @@
 
 		java.util.Date today = new java.util.Date();
 		String user = UserCookie != null ? UserCookie.getValue() : null;
+		Integer maxAge = UserCookie != null ? UserCookie.getMaxAge() : null;
 		SQLAdapter db = new SQLAdapter();//Create a new instance of the SQL Adapter to use 	
 		System.out.println(user);
-		if (user != null) {
+		//Check if a user is already logged in and cookie isnt expired
+		if ((user != null) && (maxAge > 0)) {
 	%>
 	<jsp:forward page="home.jsp" />
 	<%
