@@ -12,7 +12,8 @@
 	<FORM NAME="conditionsForm" ACTION="DataAnalysis.jsp" METHOD="post">
 	<P>Set the analysis conditions:</P>
 	  	<select name="timeselect">
-	  	<option value="day">Day</option>
+	  	<option value="none">None</option>
+	  	<option value="week">Week</option>
 	  	<option value="month">Month</option>
 	  	<option value="year">Year</option>
 		</select><br>
@@ -27,12 +28,11 @@
 	String gSubject = 	request.getParameter("gSubject");
 	String gDate = 	request.getParameter("gDate");
 	String gTime = 	request.getParameter("timeselect");
-	out.println(gUser);
 	%>	
 		<%
 		//Create a new instance of the SQL Adapter to use 	
 		SQLAdapter db = new SQLAdapter();
-		ResultSet rset = db.executeFetch("select owner_name, subject, timing, count(*) from images group by cube(owner_name,subject,timing)");
+		ResultSet rset = db.executeFetch("select owner_name, subject, timing, count from sum_cube");
 		
 		//Print the header of the table
 		out.println("<table border=1>");

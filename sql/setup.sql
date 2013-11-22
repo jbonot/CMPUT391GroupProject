@@ -90,4 +90,7 @@ INDEXTYPE IS CTXSYS.CONTEXT;
 @drjobdml subjectindex 1
 @drjobdml placeindex 1
 
+create view sum_cube as 
+select owner_name, subject, timing,TO_CHAR(timing, 'WW') as week,TO_CHAR(timing,'MM') as month,TO_CHAR(timing,'YYYY') as year, count(*) as count from images group by cube(owner_name,subject,timing);
+
 
