@@ -1,6 +1,7 @@
 insert into users values('bob123', 'bobpassword', sysdate);
 insert into users values('alice456', 'alicepassword', sysdate);
 insert into users values('matwood', 'margaretpassword', sysdate);
+insert into users values('admin', 'adminpassword', sysdate);
 
 insert into persons values('bob123', 'Bob', 'Barker', '199 Right Price Drive', 'bob@priceisright.com', '555-1234');
 insert into persons values('alice456', 'Alice', 'Munroe', '31 Wingham Street', 'amunro@books.ca', '555-1931');

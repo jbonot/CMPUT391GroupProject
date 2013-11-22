@@ -20,15 +20,6 @@ public class SQLAdapter {
 	private String m_userName = "c391g11";
 	private String m_password= "cmputgroup11";
 
-	public SQLAdapter() {
-	}
-
-	/*
-	 * Initializes a new instance of the SQLAdapter class.
-	 */
-	public SQLAdapter(String username, String password) {
-	}
-
 	/*
 	 * Executes a fetch statement.
 	 */
@@ -46,7 +37,7 @@ public class SQLAdapter {
 			System.err.println("SQLException: " + se.getMessage());
 			return null;
 		} catch (Exception e) {
-			System.err.println("Exception: " + e.getMessage());
+			System.err.println("Exception in SQLAdapter: " + e.getMessage());
 			return null;
 		}
 
@@ -63,7 +54,7 @@ public class SQLAdapter {
 			System.err.println("SQLException: " + se.getMessage());
 			return -1;
 		} catch (Exception e) {
-			System.err.println("Exception: " + e.getMessage());
+			System.err.println("Exception in SQLAdapter: " + e.getMessage());
 			return -1;
 		}
 	}
@@ -78,7 +69,7 @@ public class SQLAdapter {
 			System.err.println("SQLException: " + se.getMessage());
 			return null;
 		} catch (Exception e) {
-			System.err.println("Exception: " + e.getMessage());
+			System.err.println("Exception in SQLAdapter: " + e.getMessage());
 			return null;
 		}
 	}
@@ -97,7 +88,7 @@ public class SQLAdapter {
 			System.err.println("SQLException: " + se.getMessage());
 			return null;
 		} catch (Exception e) {
-			System.err.println("Exception: " + e.getMessage());
+			System.err.println("Exception in SQLAdapter: " + e.getMessage());
 			return null;
 		}
 	}
@@ -112,7 +103,7 @@ public class SQLAdapter {
 			}
 
 		} catch (Exception e) {
-			System.err.println("Exception: " + e.getMessage());
+			System.err.println("Exception in SQLAdapter: " + e.getMessage());
 		}
 	}
 
@@ -127,8 +118,7 @@ public class SQLAdapter {
 			m_con = DriverManager.getConnection(m_url, m_userName, m_password);
 
 		} catch (Exception e) {
-			System.err.print("ClassNotFoundException: ");
-			System.err.println(e.getMessage());
+			System.err.println("Exception in SQLAdapter: " + e.getMessage());
 		}
 	}
 }
