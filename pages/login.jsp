@@ -7,6 +7,8 @@
 <title>Login Confirmation</title>
 </head>
 <body>
+
+
 	<%@ page import="proj1.*"%>
 	<%@ page import="java.sql.*"%>
 	<%
@@ -29,29 +31,23 @@
 		Integer maxAge = UserCookie != null ? UserCookie.getMaxAge() : null;
 		SQLAdapter db = new SQLAdapter();//Create a new instance of the SQL Adapter to use 	
 		System.out.println(user);
-		//Check if a user is already logged in and cookie isnt expired
-		if ((user != null) && (maxAge > 0)) {
-	%>
-	<jsp:forward page="home.jsp" />
-	<%
-		} else {
-			PreparedStatement loginUser = db
-					.prepareStatement("SELECT * FROM users where user_name = ? and password = ?");
-			loginUser.setString(1, fUsername);
-			loginUser.setString(2, fPassword);
-			ResultSet rset = db.executeQuery(loginUser);
 
-			out.print("<br>");
-			boolean empty = true;
-			if (rset.next()) {
-				// Successful login.
-				Cookie userCookie = new Cookie("User",
-						rset.getString("user_name"));
-				userCookie.setMaxAge(30 * 60); // 30 minutes
-				response.addCookie(userCookie);
-				loginUser.close();
-				db.closeConnection();
-				empty = false;
+		PreparedStatement loginUser = db
+				.prepareStatement("SELECT * FROM users where user_name = ? and password = ?");
+		loginUser.setString(1, fUsername);
+		loginUser.setString(2, fPassword);
+		ResultSet rset = db.executeQuery(loginUser);
+
+		boolean empty = true;
+		if (rset.next()) {
+			// Successful login.
+			Cookie userCookie = new Cookie("User",
+					rset.getString("user_name"));
+			userCookie.setMaxAge(30 * 60); // 30 minutes
+			response.addCookie(userCookie);
+			loginUser.close();
+			db.closeConnection();
+			empty = false;
 	%>
 	<jsp:forward page="home.jsp" />
 	<%
@@ -62,7 +58,6 @@
 				loginUser.close();
 				db.closeConnection();
 				response.setHeader("Refresh", "5; URL=index.html");
-			}
 		}
 	%>
 </body>
