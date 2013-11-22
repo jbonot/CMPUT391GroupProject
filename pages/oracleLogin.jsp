@@ -9,11 +9,14 @@
 <body>	
 	<%@ page language="java" import="java.util.*"%>
 <%
+	//Get the users username and password
 	String username = 	request.getParameter("USERNAME");
 	String password = 	request.getParameter("PASSWD");
 
+	//Get the current date
 	Date now = new Date();
 	String timestamp = now.toString();
+	
 	
 	Cookie UsernameCookie = new Cookie ("OracleUsername",username);
 	UsernameCookie.setMaxAge(365 * 24 * 60 * 60);
