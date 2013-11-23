@@ -19,7 +19,7 @@
 %>
 <jsp:forward page="index.html" />
 <%
-		return;
+	return;
 	}
 
 	String user = UserCookie.getValue();
@@ -91,6 +91,8 @@
 				onClick="javascript:window.location='upload_image.html';"></td>
 			<td><input type="button" value="Profile"
 				onClick="javascript:window.location='userProfile.html';"></td>
+			<td><input type="button" value="Groups"
+				onClick="javascript:window.location='groups.jsp';"></td>
 			<td><input type="button" value="Logout"
 				onClick="javascript:window.location='logout.jsp';"></td>
 		</tr>

@@ -1,6 +1,6 @@
-cp -r ~/git/CMPUT391GroupProject/pages/*.* ../../
-cp -r ~/git/CMPUT391GroupProject/classes/*.java .
-cp -r ~/git/CMPUT391GroupProject/classes/proj1/*.java proj1/
+cp -ru ~/git/CMPUT391GroupProject/pages/*.* ../../
+cp -ru ~/git/CMPUT391GroupProject/classes/*.java .
+cp -ru ~/git/CMPUT391GroupProject/classes/proj1/*.java proj1/
 now=$(date +"%T")
 echo "$now Done importing from git."
 
