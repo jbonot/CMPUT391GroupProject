@@ -18,9 +18,6 @@
 	if (UserCookie == null || UserCookie.getMaxAge() == 0) {
 		response.setHeader("Refresh", "0; URL=index.jsp");
 	return;
-	} else {
-		System.out.println("home.jsp UserCookie value: " + UserCookie.getValue()
-				+ " maxAge: " + UserCookie.getMaxAge());
 	}
 
 	String user = UserCookie.getValue();
