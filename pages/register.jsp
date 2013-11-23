@@ -75,19 +75,19 @@
 				else{
 					out.print("Registration Failed! This shouldn't be possible.");
 					db.closeConnection();
-					response.setHeader("Refresh", "5; URL=index.html");
+					response.setHeader("Refresh", "5; URL=index.jsp");
 				}
 			
 			}
 			else{
 				out.print("Registration Failed!");
 				db.closeConnection();
-				response.setHeader("Refresh", "5; URL=index.html");
+				response.setHeader("Refresh", "5; URL=index.jsp");
 				}
 		}
 		out.print("Registration Failed! That username is already in use! You will be redirected in 5 seconds...");
 		db.closeConnection();
-		response.setHeader("Refresh", "5; URL=index.html");
+		response.setHeader("Refresh", "5; URL=index.jsp");
 	%>
 </body>
 </html>

@@ -46,7 +46,7 @@
 				//If the login information is wrong notify the user and redirect them
 				out.println("Login Failed! You will be redirected in 5 seconds...");
 				out.print("<br>");
-				out.print("<p><a href=index.html>Click here to be redirected now.</a></p>");
+				out.print("<p><a href=index.jsp>Click here to be redirected now.</a></p>");
 				loginUser.close();
 				db.closeConnection();
 				response.setHeader("Refresh", "5; URL=/");
