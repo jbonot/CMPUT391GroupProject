@@ -70,9 +70,16 @@ CREATE TABLE images (
 );
 
 /* End of original code. */
+DROP SEQUENCE photo_id_sequence;
+DROP SEQUENCE group_id_sequence;
+DROP INDEX descriptionindex;
+DROP INDEX subjectindex;
+DROP INDEX placeindex;
+DROP VIEW sum_cube;
 
 /* Use this for generating photo_id sequence */
 CREATE SEQUENCE photo_id_sequence;
+CREATE SEQUENCE group_sequence MINVALUE 3;
 
 CREATE INDEX descriptionindex
 ON images(description)
