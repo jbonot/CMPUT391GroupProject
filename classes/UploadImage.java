@@ -78,25 +78,20 @@ public class UploadImage extends HttpServlet
     public void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException
     {
-        //set up HTML printer
-        PrintWriter out = response.getWriter();
-        
         // use a cookie to retrieve oracle database information, as well as current username.
-        String currentUser = "User";
-        
         Cookie cookies [] = request.getCookies ();
         Cookie currentUserCookie = null;
 
         if (cookies != null){
             for (int i = 0; i < cookies.length; i++) {
-                if (cookies [i].getName().equals (currentUser)){
+                if (cookies [i].getName().equals ("User")){
                     currentUserCookie = cookies[i];
                     break;
                 }
             }
         }
         
-        if (userCookie == null) {
+        if (currentUserCookie == null) {
             response.setHeader("Refresh", "0; URL=index.html");
             return;
         }
