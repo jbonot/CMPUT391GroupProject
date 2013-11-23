@@ -12,11 +12,13 @@
 	<%@ page import="proj1.*"%>
 	<%@ page import="java.sql.*"%>
 	<%
+		//Get the provided username and password
 		String fUsername = request.getParameter("USERNAME");
 		String fPassword = request.getParameter("PASSWD");
+		
+		//See if there is already a username cookie		
 		Cookie cookies[] = request.getCookies();
 		Cookie UserCookie = null;
-
 		if (cookies != null) {
 			for (int i = 0; i < cookies.length; i++) {
 				if (cookies[i].getName().equals("User")) {
@@ -26,12 +28,16 @@
 			}
 		}
 
+		//Get the current date and get the user and maxage if there is a cookie
 		java.util.Date today = new java.util.Date();
 		String user = UserCookie != null ? UserCookie.getValue() : null;
 		Integer maxAge = UserCookie != null ? UserCookie.getMaxAge() : null;
-		SQLAdapter db = new SQLAdapter();//Create a new instance of the SQL Adapter to use 	
+		
+		//Create a new instance of the SQL Adapter to use 	
+		SQLAdapter db = new SQLAdapter();
 		System.out.println(user);
 
+		//Setup the prepared statement and try to log in
 		PreparedStatement loginUser = db
 				.prepareStatement("SELECT * FROM users where user_name = ? and password = ?");
 		loginUser.setString(1, fUsername);
@@ -52,6 +58,7 @@
 	<jsp:forward page="home.jsp" />
 	<%
 		} else {
+				//If the login information is wrong notify the user and redirect them
 				out.println("Login Failed! You will be redirected in 5 seconds...");
 				out.print("<br>");
 				out.print("<p><a href=index.html>Click here to be redirected now.</a></p>");

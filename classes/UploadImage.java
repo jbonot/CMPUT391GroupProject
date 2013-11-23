@@ -117,14 +117,17 @@ public class UploadImage extends HttpServlet
         //store current user's name in string
         String user = currentUserCookie.getValue();
         
-        //Uploaded picture and associated values
+        //declare and initialize all needed values to default
+        Calendar cal = Calendar.getInstance();
         int pic_id;
-        String subject, place, day, month, year, description;
+        String subject = "", place = "", description = "",
+                day = String.valueOf(cal.get(Calendar.DAY_OF_MONTH)),
+                month = String.valueOf(cal.get(Calendar.MONTH)),
+                year = String.valueOf(cal.get(Calendar.YEAR));
         int security;
 
         try
         {
-            //TODO add error handling for blank strings
             //parse string data
             subject = request.getParameter("subject");
             place = request.getParameter("place");
@@ -159,19 +162,15 @@ public class UploadImage extends HttpServlet
             BufferedImage thumbNail = shrink(img, 10);
 
 
-            /*
-             * First, to generate a unique pic_id using an SQL sequence
-             */
+            
+            //generate a unique pic_id using photo_id_sequence
             PreparedStatement getId = db.PrepareStatement("SELECT photo_id_sequence.nextval from DUAL");
             ResultSet rset1 = db.ExecuteQuery(getId);
             rset1.next();
             pic_id = rset1.getInt(1);
             getId.close();
 
-            // Insert an empty blob into the table first. Note that you have to
-            // use the Oracle specific function empty_blob() to create an empty
-            // blob
-            
+            //Prepare an INSERT statement, then embed gathered values into statement
             PreparedStatement insertData = db.PrepareStatement("INSERT INTO images VALUES" +
             		"(?, ?, ?, ?, ?, ?, ?, empty_blob(), empty_blob()");
             
@@ -182,13 +181,10 @@ public class UploadImage extends HttpServlet
             insertData.setString(5, place);
             insertData.setDate(6, when);
             insertData.setString(7, description);
-            
-            //TODO add exception handling for when the insert does not work
             int numRows = db.executeUpdate(insertData);
             insertData.close();
 
-            // to retrieve the lob_locator
-            // Note that you must use "FOR UPDATE" in the select statement
+            //now select empty blobs from the row, and update them
             PreparedStatement fillBlobs = "SELECT * FROM images WHERE pic_id = " + pic_id
                     + " FOR UPDATE";
             ResultSet rset = db.executeQuery(fillBlobs);
@@ -199,21 +195,14 @@ public class UploadImage extends HttpServlet
             OutputStream outstream = myblob.getBinaryOutputStream();
             ImageIO.write(thumbNail, "jpg", outstream);
             
-            //write bigger image
+            //write bigger image to next blob
             myblob = ((OracleResultSet) rset).getBLOB(9);
             outstream = myblob.getBinaryOutputStream();
             ImageIO.write(img, "jpg", outstream);
-            
 
-
-            /*
-             * int size = myblob.getBufferSize(); byte[] buffer = new
-             * byte[size]; int length = -1; while ((length =
-             * instream.read(buffer)) != -1) outstream.write(buffer, 0, length);
-             */
+            //close streams and commit the row change
             instream.close();
             outstream.close();
-            
             PreparedStatement commit = db.PrepareStatement("commit");
             db.executeUpdate(commit);
             commit.close();

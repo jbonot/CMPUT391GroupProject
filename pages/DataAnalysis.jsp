@@ -12,7 +12,8 @@
 	<FORM NAME="conditionsForm" ACTION="DataAnalysis.jsp" METHOD="post">
 	<P>Set the analysis conditions:</P>
 	  	<select name="timeselect">
-	  	<option value="day">Day</option>
+	  	<option value="none">None</option>
+	  	<option value="week">Week</option>
 	  	<option value="month">Month</option>
 	  	<option value="year">Year</option>
 		</select><br>
@@ -22,17 +23,18 @@
 		<INPUT TYPE="submit" NAME="Analyze" VALUE="Analyze">
 	</FORM>
 	<%
+	//Get the parameters set in the boxes
 	String gUser = 	request.getParameter("gUser");
 	String gSubject = 	request.getParameter("gSubject");
 	String gDate = 	request.getParameter("gDate");
 	String gTime = 	request.getParameter("timeselect");
-	out.println(gUser);
 	%>	
 		<%
-		SQLAdapter db = new SQLAdapter();//Create a new instance of the SQL Adapter to use 	
+		//Create a new instance of the SQL Adapter to use 	
+		SQLAdapter db = new SQLAdapter();
+		ResultSet rset = db.executeFetch("select owner_name, subject, timing, count from sum_cube");
 		
-		ResultSet rset = db.executeFetch("select owner_name, subject, timing, count(*) from images group by cube(owner_name,subject,timing)");
-		
+		//Print the header of the table
 		out.println("<table border=1>");
 		out.println("<tr>");
 		out.println("<th>Owner</th>");
@@ -40,7 +42,8 @@
 		out.println("<th>Date</th>");
 		out.println("<th>Count</th>");
 		out.println("</tr>");
-
+		
+		//Check what the current grouping is and do not show rows that do not match that grouping
 		while(rset.next())
 		{
 			if(gUser != null){
@@ -75,6 +78,7 @@
 		} 
 
 		out.println("</table>");
+		
 		db.closeConnection();
 		%>
   </body>
