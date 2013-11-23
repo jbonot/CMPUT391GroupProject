@@ -31,6 +31,8 @@
 	<title>OLAP Analysis</title>
 	</head>
 	<body>
+	<input type="button" value="Home"
+			onClick="javascript:window.location='home.jsp';">
 	<h1>OLAP Data Analysis</h1>
 	<FORM NAME="conditionsForm" ACTION="DataAnalysis.jsp" METHOD="post">
 	<P>Set the Roll-up conditions:</P>

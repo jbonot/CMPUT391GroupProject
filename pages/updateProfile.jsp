@@ -119,9 +119,9 @@
 			response.setHeader("Refresh", "5; URL=home.jsp");
 		}
 		else{
-			out.print("Update Failed.");
+			out.print("Update Failed. You will be redirected in 5 seconds...");
 			db.closeConnection();
-			response.setHeader("Refresh", "10; URL=home.jsp");
+			response.setHeader("Refresh", "5; URL=userProfile.html");
 		}
 		db.closeConnection();
 
