@@ -78,9 +78,11 @@ public class UploadImage extends HttpServlet
     public void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException
     {
-
+        //set up HTML printer
+        PrintWriter out = response.getWriter();
+        
         // use a cookie to retrieve oracle database information, as well as current username.
-        String currentUser = "Username";
+        String currentUser = "User";
         
         Cookie cookies [] = request.getCookies ();
         Cookie currentUserCookie = null;
@@ -94,6 +96,16 @@ public class UploadImage extends HttpServlet
             }
         }
         
+        if (userCookie == null) {
+            response.setHeader("Refresh", "0; URL=index.html");
+            return;
+        }
+
+        if (request.getParameter("SUBMIT") == null) {
+            response.setHeader("Refresh", "0; URL=upload_image.jsp");
+            return;
+        }
+        
         //connect to db
         SQLAdapter db = new SQLAdapter();//Create a new instance of the SQL Adapter to use
         
@@ -101,12 +113,9 @@ public class UploadImage extends HttpServlet
         String user = currentUserCookie.getValue();
         
         //declare and initialize all needed values to default
-        Calendar cal = Calendar.getInstance();
         int pic_id;
         String subject = "", place = "", description = "",
-                day = String.valueOf(cal.get(Calendar.DAY_OF_MONTH)),
-                month = String.valueOf(cal.get(Calendar.MONTH)),
-                year = String.valueOf(cal.get(Calendar.YEAR));
+                day = "", month = "", year = "";
         int security;
 
         try
@@ -191,8 +200,9 @@ public class UploadImage extends HttpServlet
             PreparedStatement commit = db.prepareStatement("commit");
             db.executeUpdate(commit);
             commit.close();
-            response_message = " Upload OK!  ";
             db.closeConnection();
+            response_message = " Upload OK!  ";
+            response.setHeader("Refresh", "3; URL=home.jsp");
 
         }
         catch (Exception ex)
