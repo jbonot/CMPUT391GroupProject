@@ -65,7 +65,7 @@
 					out.print("Registration Successful! Now logged in. You will be redirected in 5 seconds...");
 					//Create new cookie for the logged in username
 					Cookie UsernameCookie = new Cookie ("User",newName);
-					UsernameCookie.setMaxAge(365 * 24 * 60 * 60);
+					UsernameCookie.setMaxAge(60 * 60);
 					response.addCookie(UsernameCookie);
 					db.closeConnection();
 					//Wait for user to see successfull registration
