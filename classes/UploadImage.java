@@ -48,11 +48,11 @@ import java.io.*;
 import javax.servlet.*;
 import javax.servlet.http.*;
 import java.sql.*;
+import java.sql.Date;
 import java.util.*;
 import java.text.SimpleDateFormat;
 import oracle.sql.*;
 import oracle.jdbc.*;
-import java.awt.Image;
 import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
 import proj1.*;
@@ -66,8 +66,13 @@ import proj1.*;
 import org.apache.commons.fileupload.DiskFileUpload;
 import org.apache.commons.fileupload.FileItem;
 
+@SuppressWarnings("deprecation")
 public class UploadImage extends HttpServlet
 {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 8458915138413468330L;
     public String response_message;
 
     public void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -75,31 +80,11 @@ public class UploadImage extends HttpServlet
     {
 
         // use a cookie to retrieve oracle database information, as well as current username.
-        String cookieUsername = "OracleUsername";
-        String cookiePassword = "OraclePassword";
         String currentUser = "Username";
         
         Cookie cookies [] = request.getCookies ();
-        Cookie OracleUsernameCookie = null;
-        Cookie OraclePasswordCookie = null;
         Cookie currentUserCookie = null;
-        
-        if (cookies != null){
-            for (int i = 0; i < cookies.length; i++) {
-                if (cookies [i].getName().equals (cookieUsername)){
-                    OracleUsernameCookie = cookies[i];
-                break;
-                }
-            }
-        }
-        if (cookies != null){
-            for (int i = 0; i < cookies.length; i++) {
-                if (cookies [i].getName().equals (cookiePassword)){
-                    OraclePasswordCookie = cookies[i];
-                break;
-                }
-            }
-        }
+
         if (cookies != null){
             for (int i = 0; i < cookies.length; i++) {
                 if (cookies [i].getName().equals (currentUser)){
@@ -110,9 +95,7 @@ public class UploadImage extends HttpServlet
         }
         
         //connect to db
-        String username = OracleUsernameCookie.getValue();//Need to get username and password from cookie and/or input
-        String password = OraclePasswordCookie.getValue();//**************
-        SQLAdapter db = new SQLAdapter(username, password);//Create a new instance of the SQL Adapter to use
+        SQLAdapter db = new SQLAdapter();//Create a new instance of the SQL Adapter to use
         
         //store current user's name in string
         String user = currentUserCookie.getValue();
@@ -139,15 +122,17 @@ public class UploadImage extends HttpServlet
             
             //create SimpleDateFormat object, parse into sql date object
             String date = year + "-" + month + "-" + day;
-            SimpleDateFormat sdf = new SimpleDateFormat(yyyy-MM-dd);
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
             java.util.Date parse = sdf.parse(date);
-            java.sql.Date when = new Date(date.getTime());
+            java.sql.Date when = new Date(parse.getTime());
             
             // Parse the HTTP request to get the image stream
             DiskFileUpload fu = new DiskFileUpload();
+            @SuppressWarnings("rawtypes")
             List FileItems = fu.parseRequest(request);
 
             // Process the uploaded items, assuming only 1 image file uploaded
+            @SuppressWarnings("rawtypes")
             Iterator i = FileItems.iterator();
             FileItem item = (FileItem) i.next();
             while (i.hasNext() && item.isFormField())
@@ -164,14 +149,14 @@ public class UploadImage extends HttpServlet
 
             
             //generate a unique pic_id using photo_id_sequence
-            PreparedStatement getId = db.PrepareStatement("SELECT photo_id_sequence.nextval from DUAL");
-            ResultSet rset1 = db.ExecuteQuery(getId);
+            PreparedStatement getId = db.prepareStatement("SELECT photo_id_sequence.nextval from DUAL");
+            ResultSet rset1 = db.executeQuery(getId);
             rset1.next();
             pic_id = rset1.getInt(1);
             getId.close();
 
             //Prepare an INSERT statement, then embed gathered values into statement
-            PreparedStatement insertData = db.PrepareStatement("INSERT INTO images VALUES" +
+            PreparedStatement insertData = db.prepareStatement("INSERT INTO images VALUES" +
             		"(?, ?, ?, ?, ?, ?, ?, empty_blob(), empty_blob()");
             
             insertData.setInt(1, pic_id);
@@ -181,11 +166,11 @@ public class UploadImage extends HttpServlet
             insertData.setString(5, place);
             insertData.setDate(6, when);
             insertData.setString(7, description);
-            int numRows = db.executeUpdate(insertData);
+            db.executeUpdate(insertData);
             insertData.close();
 
             //now select empty blobs from the row, and update them
-            PreparedStatement fillBlobs = db.PrepareStatement("SELECT * FROM images WHERE pic_id = " + pic_id
+            PreparedStatement fillBlobs = db.prepareStatement("SELECT * FROM images WHERE pic_id = " + pic_id
                     + " FOR UPDATE");
             ResultSet rset = db.executeQuery(fillBlobs);
             rset.next();
@@ -203,7 +188,7 @@ public class UploadImage extends HttpServlet
             //close streams and commit the row change
             instream.close();
             outstream.close();
-            PreparedStatement commit = db.PrepareStatement("commit");
+            PreparedStatement commit = db.prepareStatement("commit");
             db.executeUpdate(commit);
             commit.close();
             response_message = " Upload OK!  ";
