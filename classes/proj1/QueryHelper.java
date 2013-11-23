@@ -12,7 +12,7 @@ public class QueryHelper {
 	private static String ADMIN = "admin";
 	private static String FETCH_USER_ADMIN = "SELECT photo_id, subject from images ";
 	private static String FETCH_USER_THUMBNAILS = "SELECT photo_id, subject "
-			+ "FROM images, group_lists where ((permitted=2 and owner_name=?) "
+			+ "FROM images, group_lists where ((permitted=2 or owner_name=?) "
 			+ "or (group_id=permitted and friend_id=?)) ";
 	private SQLAdapter adapter;
 	private String user;

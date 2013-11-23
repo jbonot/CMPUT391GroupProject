@@ -65,7 +65,7 @@ public class Groups extends HttpServlet implements SingleThreadModel {
 				// members.
 				if (!invMembers) {
 					// Insert new group
-					String[] validMembers = splitMembers[0].split(",");
+					String[] validMembers = splitMembers[0].concat("," + user).split(",");
 					Date date = new Date(System.currentTimeMillis());
 					int groupId = this.getNextId(adapter);
 
