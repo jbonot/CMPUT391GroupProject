@@ -59,7 +59,7 @@
         %>
         
 <h1>Upload an image...</h1><hr>
-<form name="upload-image" method="POST" enctype="multipart/form-data" action="UploadImage.java">
+<form name="upload-image" method="POST" enctype="multipart/form-data" action="classes/UploadImage.java">
 		<table>
 			<tr>
 				<th>Image path:</th>
