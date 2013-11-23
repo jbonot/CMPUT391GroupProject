@@ -118,7 +118,7 @@
 
  	 		}
  	 		else{
- 	 			if (rTime.equals("year")){prepareString = prepareString + "group by owner_name, subject, year ";}
+ 	 			if (rTime.equals("year")){prepareString = prepareString + "group by owner_name, subject, year order by owner_name";}
  	 			if (rTime.equals("month")){prepareString = prepareString + "group by owner_name, subject, month ";}
  	 			if (rTime.equals("week")){prepareString = prepareString + "group by owner_name, subject, week ";}
  	 		}
@@ -130,21 +130,20 @@
 		Integer count = 1;
 		if (uYear){
 			olap.setString(count,dYear);
+			out.println("Year =" + dYear + "<br>");
  			count++;
 		}
 		if (uMonth){
 			olap.setString(count,dMonth);
+			out.println("Month =" + dMonth + "<br>");
  			count++;
 		}
 		if (uWeek){
 			olap.setString(count,dWeek);
+			out.println("Week =" + dWeek + "<br>");
 			count++;
 		}
-		
 		ResultSet rset = db.executeQuery(olap);
-		
-			
-		//ResultSet rset = db.executeFetch("select owner_name, subject, timing, count from sum_cube where year = 2012 ");
 		
 		//Print the header of the table
 		out.println("<table border=1>");
@@ -176,16 +175,28 @@
 // 			}
 			out.println("<tr>");
 			out.println("<td>"); 
-			out.println(rset.getString(1));
+			if (rset.getString(1) != null){
+				out.println(rset.getString(1));
+			}else{
+				out.println("Any User");
+			}
 			out.println("</td>");
 			out.println("<td>"); 
-			out.println(rset.getString(2)); 
+			if (rset.getString(2) != null){
+				out.println(rset.getString(2));
+			}else{
+				out.println("Any Subject");
+			}
 			out.println("</td>");
 			out.println("<td>");
-			out.println(rset.getObject(3));
+			if (rset.getString(3) != null){
+				out.println(rset.getString(3));
+			}else{
+				out.println("Any Date");
+			}
 			out.println("</td>");
 			out.println("<td>");
-			out.println(rset.getObject(4));
+			out.println(rset.getString(4));
 			out.println("</td>");
 			out.println("</tr>");
 		} 
