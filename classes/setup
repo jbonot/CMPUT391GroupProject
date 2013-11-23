@@ -1,0 +1,6 @@
+cp -r ~/git/CMPUT391GroupProject/classes/proj1/*.java proj1/
+javac proj1/SQLAdapter.java proj1/QueryHelper.java
+javac *.java
+jar cf ../lib/proj1.jar proj1/*.class
+now=$(date +"%T")
+(cp ~/workspace/test/bin/*.class . && echo "$now Ready to execute.") || (echo "Need to run Eclipse.")
