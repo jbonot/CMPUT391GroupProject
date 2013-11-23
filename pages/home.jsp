@@ -79,8 +79,13 @@
 			onClick="javascript:window.location='upload_image.html';"></td>
 		<td><input type="button" value="Groups"
 			onClick="javascript:window.location='groups.jsp';"></td>
-		<td><input type="button" value="Analysis"
-			onClick="javascript:window.location='DataAnalysis.jsp';"></td>
+		<%
+			if (user.equals("admin"))
+			{
+				out.println("<td><input type=\"button\" value=\"Analysis\"onClick=\"javascript:window.location='DataAnalysis.jsp';\"></td>");
+			}
+		%>
+
 		<td><input type="button" value="Logout"
 			onClick="javascript:window.location='logout.jsp';"></td>
 	</tr>
