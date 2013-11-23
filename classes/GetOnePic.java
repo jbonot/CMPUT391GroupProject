@@ -37,8 +37,6 @@ public class GetOnePic extends HttpServlet implements SingleThreadModel {
 				}
 			}
 		}
-		
-		// TODO: Ensure that userCookie != null otherwise navigate back to index.html
 
 		String user = userCookie.getValue();
 		String permissionCondition = "((permitted=2 and owner_name='" + user
