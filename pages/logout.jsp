@@ -4,25 +4,28 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>Login Confirmation</title>
+<title>Logging out...</title>
 </head>
 <body>
-	<%@ page import="proj1.*"%>
-	<%@ page import="java.sql.*"%>
 	<%
-	Cookie cookies[] = request.getCookies();
-	Cookie UserCookie = null;
-	//Set the max age for the cookie to 0 (0 means it should be deleted)
-	if (cookies != null) {
-		for (int i = 0; i < cookies.length; i++) {
-			if (cookies[i].getName().equals("User")) {
-				cookies[i].setMaxAge(0);
-				break;
+		Cookie cookies[] = request.getCookies();
+		Cookie UserCookie = null;
+		String name = null;
+		//Set the max age for the cookie to 0 (0 means it should be deleted)
+		if (cookies != null) {
+			for (int i = 0; i < cookies.length; i++) {
+				if (cookies[i].getName().equals("User")) {
+					System.out.println("logout.jsp cookie value: " + cookies[i].getValue());
+					name = cookies[i].getValue();
+					Cookie cookie = new Cookie("User", name);
+					cookie.setPath("index.jsp");
+					cookie.setMaxAge(0);
+					response.addCookie(cookie);
+					break;
+				}
 			}
 		}
-	}
-	out.println("Logout Successful! You will be redirected in 3 seconds...");
-	response.setHeader("Refresh", "3; URL=index.html");
+		response.setHeader("Refresh", "0; URL=index.jsp");
 	%>
 
 </body>

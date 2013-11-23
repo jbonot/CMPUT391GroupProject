@@ -16,6 +16,7 @@ public class QueryHelper {
 			+ "or (group_id=permitted and friend_id=?)) ";
 	private SQLAdapter adapter;
 	private String user;
+	private String firstName;
 
 	public QueryHelper(SQLAdapter adapter, String user) {
 		this.adapter = adapter;
@@ -43,7 +44,9 @@ public class QueryHelper {
 	}
 
 	public ResultSet getSearchItems(String query, Date dateStart, Date dateEnd) {
-		StringBuilder queryString = new StringBuilder(this.user.equals(ADMIN) ? FETCH_USER_ADMIN : FETCH_USER_THUMBNAILS);
+		StringBuilder queryString = new StringBuilder(
+				this.user.equals(ADMIN) ? FETCH_USER_ADMIN
+						: FETCH_USER_THUMBNAILS);
 
 		int i = 1;
 		String conjunction = this.user.equals(ADMIN) ? "where " : "and ";
@@ -98,5 +101,25 @@ public class QueryHelper {
 		}
 
 		return null;
+	}
+
+	public String getFirstName() {
+		if (this.firstName == null) {
+			try {
+				PreparedStatement stmt = adapter
+						.prepareStatement("select first_name from persons where user_name=?");
+				stmt.setString(1, this.user);
+				ResultSet rset = adapter.executeQuery(stmt);
+				
+				if (rset.next()) {
+					this.firstName = rset.getString("first_name");
+				}
+				
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return this.firstName;
 	}
 }
