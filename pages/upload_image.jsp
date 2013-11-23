@@ -100,7 +100,6 @@
 					</select>
 					<select name="day">
 					<% 	//fill day dropdown all the way from 1 to 31
-						Calendar cal = Calendar.getInstance();
 						for(int i = 1; i < 32; i++)
 						{
 							if(i == cal.get(Calendar.DAY_OF_MONTH))
@@ -112,7 +111,6 @@
 					</select>
 					<select name="year">
 					<% 	//fill year dropdown all the way from 1900 to 2013
-						Calendar cal = Calendar.getInstance();
 						for(int i = 1900; i < 2014; i++)
 						{
 							if(i == cal.get(Calendar.YEAR))
@@ -142,7 +140,7 @@
 						<select name="security" style="width: 342px;">
 						<% 	//need to dynamically fill this dropdown with groups
 							PreparedStatement getGroups = db.PreparedStatement("SELECT group_id, group_name FROM groups WHERE user_name = ?");
-							getGroups.setString(user);
+							getGroups.setString(1, user);
 							ResultSet rset1 = db.ExecuteQuery(getGroups);
 							while(rset1.next())
 							{

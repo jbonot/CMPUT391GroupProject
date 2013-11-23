@@ -174,9 +174,9 @@ public class UploadImage extends HttpServlet
             PreparedStatement insertData = db.PrepareStatement("INSERT INTO images VALUES" +
             		"(?, ?, ?, ?, ?, ?, ?, empty_blob(), empty_blob()");
             
-            insertData.setString(1, pic_id);
+            insertData.setInt(1, pic_id);
             insertData.setString(2, user);
-            insertData.setString(3, security);
+            insertData.setInt(3, security);
             insertData.setString(4, subject);
             insertData.setString(5, place);
             insertData.setDate(6, when);
@@ -185,8 +185,8 @@ public class UploadImage extends HttpServlet
             insertData.close();
 
             //now select empty blobs from the row, and update them
-            PreparedStatement fillBlobs = "SELECT * FROM images WHERE pic_id = " + pic_id
-                    + " FOR UPDATE";
+            PreparedStatement fillBlobs = db.PrepareStatement("SELECT * FROM images WHERE pic_id = " + pic_id
+                    + " FOR UPDATE");
             ResultSet rset = db.executeQuery(fillBlobs);
             rset.next();
             BLOB myblob = ((OracleResultSet) rset).getBLOB(8);
