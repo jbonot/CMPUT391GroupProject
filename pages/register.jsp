@@ -16,7 +16,7 @@
 		String newName = 	request.getParameter("NEWUSERNAME");
 		String newPassword = 	request.getParameter("NEWPASSWD");
 		String firstName = 	request.getParameter("FRSTNAME");
-		String lastName = 	request.getParameter("FRSTNAME");
+		String lastName = 	request.getParameter("LASTNAME");
 		String address = 	request.getParameter("ADDRESS");
 		String email = 	request.getParameter("EMAIL");
 		String phonenumber = 	request.getParameter("PHONENUMBER");
