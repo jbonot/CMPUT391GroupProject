@@ -48,20 +48,20 @@
 			rows_updated_person = db.executeUpdate(registerPerson);
 			registerPerson.close();
 			if (rows_updated_person == 1){
-				out.print("Registration Successfull! Please log in with new username and password. You will be redirected in 5 seconds...");
-				//Create two new cookie for the logged in username
-				Cookie UsernameCookie = new Cookie ("Username",newName);
+				out.print("Registration Successful! Now logged in. You will be redirected in 5 seconds...");
+				//Create new cookie for the logged in username
+				Cookie UsernameCookie = new Cookie ("User",newName);
 				UsernameCookie.setMaxAge(365 * 24 * 60 * 60);
 				response.addCookie(UsernameCookie);
 				db.closeConnection();
 				//Wait for user to see successfull registration
-				response.setHeader("Refresh", "5; URL=LoginAndRegistration.html");
+				response.setHeader("Refresh", "5; URL=home.jsp");
 
 			}
 			else{
 				out.print("Registration Failed! Please try again.");
 				db.closeConnection();
-				response.setHeader("Refresh", "5; URL=LoginAndRegistration.html");
+				response.setHeader("Refresh", "5; URL=index.html");
 			}
 		
 		}
