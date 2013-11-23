@@ -121,8 +121,8 @@
  	 		}
  	 		else{
  	 			if (rTime.equals("year")){prepareString = prepareString + "group by owner_name, subject, year order by owner_name";}
- 	 			if (rTime.equals("month")){prepareString = prepareString + "group by owner_name, subject, month ";}
- 	 			if (rTime.equals("week")){prepareString = prepareString + "group by owner_name, subject, week ";}
+ 	 			if (rTime.equals("month")){prepareString = prepareString + "group by owner_name, subject, month order by owner_name ";}
+ 	 			if (rTime.equals("week")){prepareString = prepareString + "group by owner_name, subject, week order by owner_name";}
  	 		}
  		}
 		//out.println(prepareString + "<br>");
