@@ -9,7 +9,7 @@
     <param name="type" value="application/x-java-applet;version=1.4">
     <param name="scriptable" value="false">    
     <param name="postURL"
-    value="http://luscar.cs.ualberta.ca:8080/yuan/parseRequest.jsp?URLParam=URL+Parameter+Value">
+    value="http://ui04.cs.ualberta.ca:16380/pages/parseUploadRequest.jsp?URLParam=URL+Parameter+Value">
     <param name="nbFilesPerRequest" value="2">    
 Java 1.4 or higher plugin required.
 </applet>
