@@ -69,13 +69,13 @@
 				<TABLE>
 					<TR VALIGN=TOP ALIGN=LEFT>
 						<TD><B><I>Group Name:</I></B></TD>
-						<TD><INPUT TYPE="text" NAME="GROUP" VALUE="<%=groupName%>"
+						<TD><INPUT TYPE="text" NAME="GROUP" VALUE="<%=groupName.replaceAll("\"", "&quot;")%>"
 							required style="width: 178px;"><BR></TD>
 					</TR>
 					<TR VALIGN=TOP ALIGN=LEFT>
 						<TD><B><I>Members:</I></B></TD>
-						<TD><textarea name="MEMBERS" VALUE="<%=members%>" cols="40"
-								rows="5"></textarea></TD>
+						<TD><textarea name="MEMBERS" cols="40"
+								rows="5"><%=members%></textarea></TD>
 					</TR>
 					<TR>
 						<TD></TD>

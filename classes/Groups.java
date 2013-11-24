@@ -43,7 +43,7 @@ public class Groups extends HttpServlet implements SingleThreadModel {
 		String membersWithBlanks[] = membersText.split("[\\s,;]");
 
 		for (String member : membersWithBlanks) {
-			if (!member.isEmpty() && !member.equals("admin") && !member.equals(user)) {
+			if (!member.isEmpty()) {
 				members.add(member);
 			}
 		}
@@ -119,7 +119,7 @@ public class Groups extends HttpServlet implements SingleThreadModel {
 
 				if (!membersText.isEmpty()) {
 					encodedHeader += "&members="
-							+ URLEncoder.encode(splitMembers[0], "UTF-8");
+							+ URLEncoder.encode(membersText, "UTF-8");
 				}
 
 				if (!splitMembers[1].isEmpty()) {
@@ -157,7 +157,7 @@ public class Groups extends HttpServlet implements SingleThreadModel {
 		String prefix;
 
 		for (String member : members) {
-			if (this.isValidUser(adapter, member)) {
+			if (!member.equals(user) && !member.equals("admin") && this.isValidUser(adapter, member)) {
 				valid.add(member);
 			} else {
 				invalid.add(member);
