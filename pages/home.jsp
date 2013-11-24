@@ -18,9 +18,6 @@
 	if (UserCookie == null || UserCookie.getMaxAge() == 0) {
 		response.setHeader("Refresh", "0; URL=index.jsp");
 	return;
-	} else {
-		System.out.println("home.jsp UserCookie value: " + UserCookie.getValue()
-				+ " maxAge: " + UserCookie.getMaxAge());
 	}
 
 	String user = UserCookie.getValue();
@@ -79,8 +76,13 @@
 			onClick="javascript:window.location='upload_image.jsp';"></td>
 		<td><input type="button" value="Groups"
 			onClick="javascript:window.location='groups.jsp';"></td>
-		<td><input type="button" value="Analysis"
-			onClick="javascript:window.location='DataAnalysis.jsp';"></td>
+		<%
+			if (user.equals("admin"))
+			{
+				out.println("<td><input type=\"button\" value=\"Analysis\"onClick=\"javascript:window.location='DataAnalysis.jsp';\"></td>");
+			}
+		%>
+
 		<td><input type="button" value="Logout"
 			onClick="javascript:window.location='logout.jsp';"></td>
 	</tr>

@@ -9,11 +9,6 @@ import java.sql.Date;
 import proj1.*;
 
 public class Groups extends HttpServlet implements SingleThreadModel {
-	/**
-	 * This method first gets the query string indicating PHOTO_ID, and then
-	 * executes the query select image from yuan.photos where photo_id =
-	 * PHOTO_ID Finally, it sends the picture to the client
-	 */
 
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
@@ -30,7 +25,7 @@ public class Groups extends HttpServlet implements SingleThreadModel {
 		}
 
 		if (userCookie == null) {
-			response.setHeader("Refresh", "0; URL=index.html");
+			response.setHeader("Refresh", "0; URL=index.jsp");
 			return;
 		}
 
@@ -54,18 +49,23 @@ public class Groups extends HttpServlet implements SingleThreadModel {
 		}
 
 		SQLAdapter adapter = new SQLAdapter();
-
+		String encodedHeader = "0; URL=groups.jsp?group="
+				+ URLEncoder.encode(groupName, "UTF-8");
 		try {
 
 			String[] splitMembers = this.splitMembers(adapter, members);
-			String[] validMembers = splitMembers[0].split(",");
-			String invalidMembers = splitMembers[1];
 
-			System.out.println(invalidMembers);
+			// There must be at least one valid member and no invalid members.
+			boolean invMembers = splitMembers[0].isEmpty()
+					|| !splitMembers[1].isEmpty();
+
 			if (this.isValidGroup(adapter, groupName, user)) {
 
-				if (validMembers.length == members.size()) {
+				// There must be at least one valid member and no invalid
+				// members.
+				if (!invMembers) {
 					// Insert new group
+					String[] validMembers = splitMembers[0].concat("," + user).split(",");
 					Date date = new Date(System.currentTimeMillis());
 					int groupId = this.getNextId(adapter);
 
@@ -98,50 +98,32 @@ public class Groups extends HttpServlet implements SingleThreadModel {
 				status = "invgroup";
 			}
 
-			if (validMembers.length != members.size()) {
-
-				// Invalid list of members.
-				if (!status.isEmpty()) {
-					status += "+";
-				}
-
-				status += "invmembers";
-
+			if (invMembers) {
+				// Invalid members.
+				status += status.isEmpty() ? "invmembers" : "+invmembers";
 			}
-
-			String encodedHeader = "0; URL=groups.jsp?group="
-					+ URLEncoder.encode(groupName, "UTF-8");
 
 			// Set the status.
 			encodedHeader += "&status=" + status;
 
 			if (!status.equals("success")) {
-				membersText = "";
-
-				// Set the list of members.
-				String prefix = "";
-				for (String member : members) {
-					if (!member.isEmpty()) {
-						membersText += prefix + member;
-						prefix = ",";
-					}
-				}
 
 				if (!membersText.isEmpty()) {
 					encodedHeader += "&members="
-							+ URLEncoder.encode(membersText, "UTF-8");
+							+ URLEncoder.encode(splitMembers[0], "UTF-8");
 				}
 
-				if (!invalidMembers.isEmpty()) {
+				if (!splitMembers[1].isEmpty()) {
 					encodedHeader += "&invalid_members="
-							+ URLEncoder.encode(invalidMembers, "UTF-8");
+							+ URLEncoder.encode(splitMembers[1], "UTF-8");
 				}
 			}
-			response.setHeader("Refresh", encodedHeader);
 			adapter.closeConnection();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+
+		response.setHeader("Refresh", encodedHeader);
 	}
 
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -153,7 +135,7 @@ public class Groups extends HttpServlet implements SingleThreadModel {
 	private int getNextId(SQLAdapter adapter) throws SQLException {
 		ResultSet rset = adapter
 				.executeFetch("select group_sequence.nextVal from dual");
-		return rset.getInt(1);
+		return rset.next() ? rset.getInt(1) : -1;
 	}
 
 	private String[] splitMembers(SQLAdapter adapter, List<String> members)

@@ -16,10 +16,7 @@
 	}
 
 	if (UserCookie == null) {
-		System.out.println("Groups.jsp: UserCookies == null");
-%>
-<jsp:forward page="index.html" />
-<%
+		response.setHeader("Refresh", "0; URL=index.jsp");
 	return;
 	}
 
@@ -36,7 +33,6 @@
 			groupName = "";
 			
 		} else {
-
 			members = request.getParameter("members");
 			String invalidMembersString = request
 					.getParameter("invalid_members");
