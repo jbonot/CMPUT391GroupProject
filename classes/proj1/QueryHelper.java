@@ -132,12 +132,12 @@ public class QueryHelper {
 
 		try {
 			if (this.isAdmin) {
-				String permissionQuery = "select subject, place, description, owner_name, timing, group_id "
+				String permissionQuery = "select subject, place, description, owner_name, timing, permitted "
 						+ "from images, group_lists where photo_id=?";
 				stmt = this.adapter.prepareStatement(permissionQuery);
 				stmt.setInt(1, photoId);
 			} else {
-				String permissionQuery = "select subject, place, description, owner_name, timing, group_id "
+				String permissionQuery = "select subject, place, description, owner_name, timing, permitted "
 						+ "from images, group_lists "
 						+ "where photo_id=? and "
 						+ SECURITY_CONDITION;
@@ -153,7 +153,7 @@ public class QueryHelper {
 				String description = rset.getString("description");
 				String owner = rset.getString("owner_name");
 				Date date = rset.getDate("timing");
-				groupId = rset.getInt("group_id");
+				groupId = rset.getInt("permitted");
 				String group = null;
 				rset.close();
 

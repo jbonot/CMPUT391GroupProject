@@ -122,7 +122,7 @@
 							{
 								groupId = rset.getInt(1);
 								groupName = rset.getString(2);
-								out.println("<option value=\"" + groupId + "\"" + (image.groupId == groupId ? selected : "") + ">Visible to: " + groupName + "</option>");
+								out.println("<option value=\"" + groupId + "\"" + (image.groupId == groupId ? selected : "") + ">Visible to " + groupName + "</option>");
 						 	}
 							
 						 	adapter.closeConnection();

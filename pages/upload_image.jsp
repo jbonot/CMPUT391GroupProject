@@ -99,7 +99,7 @@
 							ResultSet rset = helper.getAccessibleGroups();
 							while(rset.next())
 							{
-								out.println("<option value=\"" + rset.getInt(1) + "\">Visible to: " + rset.getString(2) + "</option>");
+								out.println("<option value=\"" + rset.getInt(1) + "\">Visible to " + rset.getString(2) + "</option>");
 						 	}
 							
 						 	db.closeConnection();
