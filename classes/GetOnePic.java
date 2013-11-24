@@ -39,50 +39,40 @@ public class GetOnePic extends HttpServlet implements SingleThreadModel {
 		}
 
 		String user = userCookie.getValue();
-		String permissionCondition = "((permitted=2 and owner_name='" + user
-				+ "') or (group_id=permitted and friend_id='" + user + "'))";
 		ServletOutputStream out = response.getOutputStream();
 
 		// construct the query from the client's QueryString
 		String picid = request.getQueryString();
-		String query;
+		boolean big = picid.startsWith("big");
+		int photoId = -1;
 
 		try {
-			if (picid.startsWith("big")) {
-				query = "select photo from images, group_lists where photo_id="
-						+ Integer.parseInt(picid.substring(3)) + " and "
-						+ permissionCondition;
 
+			if (big) {
+				photoId = Integer.parseInt(picid.substring(3));
 			} else {
-				query = "select thumbnail from images, group_lists where photo_id="
-						+ Integer.parseInt(picid) + " and "
-						+ permissionCondition;
+				Integer.parseInt(picid);
 			}
 		} catch (NumberFormatException e) {
 			out.println("no picture available");
 			return;
 		}
 
-		/*
-		 * to execute the given query
-		 */
 		SQLAdapter adapter = new SQLAdapter();
-		try {
-			ResultSet rset = adapter.executeFetch(query);
-
-			if (rset.next()) {
-				response.setContentType("image/gif");
-				InputStream input = rset.getBinaryStream(1);
-				int imageByte;
-				while ((imageByte = input.read()) != -1) {
-					out.write(imageByte);
-				}
-				input.close();
-			} else
-				out.println("no picture available");
-		} catch (Exception ex) {
-			out.println(ex.getMessage());
-		}
+		QueryHelper helper = new QueryHelper(adapter, user);
+		InputStream input = helper.getImage(photoId, big);
 		adapter.closeConnection();
+		
+		if (input != null) {
+			response.setContentType("image/gif");
+			int imageByte;
+			while ((imageByte = input.read()) != -1) {
+				out.write(imageByte);
+			}
+
+			input.close();
+		} else {
+			out.println("no picture available");
+		}
 	}
 }

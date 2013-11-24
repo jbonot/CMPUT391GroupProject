@@ -137,7 +137,7 @@
 								+ "\">");
 						out.println("<img src=\"/proj1/GetOnePic?" + p_id
 								+ "\">");
-						out.println(rset.getString("subject"));
+						out.println(p_id + " " + rset.getString("subject") + "<BR>" + rset.getString("permitted"));
 						out.println("</a>");
 						out.println("</td>");
 					}
