@@ -96,14 +96,14 @@ public class GetBigPic extends HttpServlet implements SingleThreadModel {
 							+ "onclick=\"\" />");
 					out.println("<input type=\"button\" "
 							+ "value=\"Delete Image\" name=\"Home\" "
-							+ "onclick=\"/DeletePic?"+ photoId + "\" /><BR>");
+							+ "onclick=\"javascript:window.location='DeletePic?"+ photoId + "';\" /><BR>");
 				}
 			} else {
 
 				out.println("<html><head><title>Access Denied</title></head>");
 				out.println("<body>");
 				out.println("<h3>Access Denied</h3>");
-				out.println("Image does not exist or you do not have permission to view this image.");
+				out.println("Image does not exist or you do not have permission to access this image.");
 				out.println("</body></html>");
 			}
 		} catch (Exception e) {

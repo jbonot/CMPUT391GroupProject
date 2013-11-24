@@ -35,9 +35,9 @@ public class DeletePic extends HttpServlet implements SingleThreadModel {
 		}
 
 		ServletOutputStream out = response.getOutputStream();
-
 		// construct the query from the client's QueryString
 		String picid = request.getQueryString();
+		System.out.println("Delete " + picid);
 		int photoId = -1;
 
 		try {
@@ -69,6 +69,11 @@ public class DeletePic extends HttpServlet implements SingleThreadModel {
 				adapter.closeConnection();
 				response.setHeader("Refresh", "0; URL=home.jsp?deletesuccess");
 			} else {
+				out.println("<html><head><title>Access Denied</title></head>");
+				out.println("<body>");
+				out.println("<h3>Access Denied</h3>");
+				out.println("Image does not exist or you do not have permission to access this image.");
+				out.println("</body></html>");
 				adapter.closeConnection();
 			}
 		} catch (SQLException e) {
