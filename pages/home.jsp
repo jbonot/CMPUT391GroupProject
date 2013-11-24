@@ -76,7 +76,7 @@
 		<td><input type="button" value="Profile"
 			onClick="javascript:window.location='userProfile.html';"></td>
 		<td><input type="button" value="Upload"
-			onClick="javascript:window.location='upload_image.html';"></td>
+			onClick="javascript:window.location='upload_image.jsp';"></td>
 		<td><input type="button" value="Groups"
 			onClick="javascript:window.location='groups.jsp';"></td>
 		<td><input type="button" value="Analysis"

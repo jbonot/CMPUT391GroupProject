@@ -71,7 +71,7 @@ CREATE TABLE images (
 
 /* End of original code. */
 DROP SEQUENCE photo_id_sequence;
-DROP SEQUENCE group_id_sequence;
+DROP SEQUENCE group_sequence;
 DROP INDEX descriptionindex;
 DROP INDEX subjectindex;
 DROP INDEX placeindex;

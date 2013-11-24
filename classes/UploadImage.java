@@ -77,7 +77,10 @@ public class UploadImage extends HttpServlet
 
     public void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException
-    {
+    {   
+        //html printer
+        PrintWriter out = response.getWriter();
+        
         // use a cookie to retrieve oracle database information, as well as current username.
         Cookie cookies [] = request.getCookies ();
         Cookie currentUserCookie = null;
@@ -90,14 +93,9 @@ public class UploadImage extends HttpServlet
                 }
             }
         }
-        
+        //if cookie no longer valid, send back to login page
         if (currentUserCookie == null) {
-            response.setHeader("Refresh", "0; URL=index.html");
-            return;
-        }
-
-        if (request.getParameter("SUBMIT") == null) {
-            response.setHeader("Refresh", "0; URL=upload_image.jsp");
+            response.setHeader("Refresh", "0; URL=index.jsp");
             return;
         }
         
@@ -107,112 +105,147 @@ public class UploadImage extends HttpServlet
         //store current user's name in string
         String user = currentUserCookie.getValue();
         
-        //declare and initialize all needed values to default
+        //declare and initialize all needed form values to default
         int pic_id;
         String subject = "", place = "", description = "",
                 day = "", month = "", year = "";
-        int security;
+        int security = 0;
+        
+        //declare array of input streams, images, and image thumbnails
+        Vector<InputStream> instream = new Vector<InputStream>();
+        Vector<BufferedImage> img = new Vector<BufferedImage>();
+        Vector<BufferedImage> thumbNail = new Vector<BufferedImage>();
 
         try
-        {
-            //parse string data
-            subject = request.getParameter("subject");
-            place = request.getParameter("place");
-            day = request.getParameter("day");
-            month = request.getParameter("month");
-            year = request.getParameter("year");
-            description = request.getParameter("description");
-            security = Integer.parseInt(request.getParameter("security"));
-            
+        {   
+            // Parse the HTTP request to get the image stream
+            DiskFileUpload fu = new DiskFileUpload();
+            @SuppressWarnings("rawtypes")
+            List FileItems = fu.parseRequest(request);
+
+            // Process the uploaded items and form fields
+            @SuppressWarnings("rawtypes")
+            Iterator i = FileItems.iterator();
+            FileItem item = (FileItem) i.next();
+            while (i.hasNext())
+            {
+                //parse form data for photo
+                if(item.isFormField())
+                {
+                    if(item.getFieldName().equals("subject"))
+                        subject = item.getString();
+                    
+                    else if(item.getFieldName().equals("place"))
+                        place = item.getString();
+                    
+                    else if(item.getFieldName().equals("day"))
+                        day = item.getString();
+                    
+                    else if(item.getFieldName().equals("month"))
+                        month = item.getString();
+                    
+                    else if(item.getFieldName().equals("year"))
+                        year = item.getString();
+                    
+                    else if(item.getFieldName().equals("description"))
+                        description = item.getString();
+                    
+                    else if(item.getFieldName().equals("security"))
+                        security = Integer.parseInt(item.getString());
+
+                }
+                //parse photos themselves
+                else
+                {
+                    //check if file is a jpg or png. if not, refresh page.
+                    String type = item.getContentType();
+                    if(type.equals("image/jpeg") || type.equals("image/png"))
+                    {
+                        //get image stream, put into array
+                        instream.add(item.getInputStream());
+                        img.add(ImageIO.read(instream.lastElement()));
+                        thumbNail.add(shrink(img.lastElement(), 10));
+                    }
+                    else if(type.equals("application/octet-stream"))
+                    {
+                        response_message = " Nothing submitted for files!  ";
+                        writeResponse(response, out);
+                        response.setHeader("Refresh", "2; URL=upload_image.jsp");
+                        return;
+                    }
+                    else
+                    {
+                        response_message = " Improper file type(s) uploaded!  ";
+                        writeResponse(response, out);
+                        response.setHeader("Refresh", "2; URL=upload_image.jsp");
+                        return;
+                    }
+                }
+                item = (FileItem) i.next();
+            }
+
             //create SimpleDateFormat object, parse into sql date object
             String date = year + "-" + month + "-" + day;
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
             java.util.Date parse = sdf.parse(date);
             java.sql.Date when = new Date(parse.getTime());
             
-            // Parse the HTTP request to get the image stream
-            DiskFileUpload fu = new DiskFileUpload();
-            @SuppressWarnings("rawtypes")
-            List FileItems = fu.parseRequest(request);
-
-            // Process the uploaded items, assuming only 1 image file uploaded
-            @SuppressWarnings("rawtypes")
-            Iterator i = FileItems.iterator();
-            FileItem item = (FileItem) i.next();
-            while (i.hasNext() && item.isFormField())
+            for(int j = 0; j < img.size(); j++)
             {
-                item = (FileItem) i.next();
+                //generate a unique pic_id using photo_id_sequence
+                PreparedStatement getId = db.prepareStatement("SELECT photo_id_sequence.nextval from DUAL");
+                ResultSet rset1 = db.executeQuery(getId);
+                rset1.next();
+                pic_id = rset1.getInt(1);
+                getId.close();
+    
+                //Prepare an INSERT statement, then embed gathered values into statement
+                PreparedStatement insertData = db.prepareStatement("INSERT INTO images VALUES" +
+                		"(?, ?, ?, ?, ?, ?, ?, empty_blob(), empty_blob()");
+                
+                insertData.setInt(1, pic_id);
+                insertData.setString(2, user);
+                insertData.setInt(3, security);
+                insertData.setString(4, subject);
+                insertData.setString(5, place);
+                insertData.setDate(6, when);
+                insertData.setString(7, description);
+                db.executeUpdate(insertData);
+                insertData.close();
+    
+                //now select empty blobs from the row, and update them
+                PreparedStatement fillBlobs = db.prepareStatement("SELECT thumbnail, photo FROM images WHERE photo_id = ? FOR UPDATE of thumbnail, photo");
+                insertData.setInt(1, pic_id);
+                ResultSet rset = db.executeQuery(fillBlobs);
+                rset.next();
+                BLOB myblob = ((OracleResultSet) rset).getBLOB(8);
+    
+                // Write the thumbnail to the blob object
+                OutputStream outstream = myblob.setBinaryStream(0);
+                ImageIO.write(thumbNail.elementAt(j), "jpg", outstream);
+                
+                //write bigger image to next blob
+                myblob = ((OracleResultSet) rset).getBLOB(9);
+                outstream = myblob.setBinaryStream(0);
+                ImageIO.write(img.elementAt(j), "jpg", outstream);
+    
+                //close streams and commit the row change
+                instream.elementAt(j).close();
+                outstream.close();
             }
-
-            // Get the image stream
-            InputStream instream = item.getInputStream();
-
-            BufferedImage img = ImageIO.read(instream);
-            BufferedImage thumbNail = shrink(img, 10);
-
-
             
-            //generate a unique pic_id using photo_id_sequence
-            PreparedStatement getId = db.prepareStatement("SELECT photo_id_sequence.nextval from DUAL");
-            ResultSet rset1 = db.executeQuery(getId);
-            rset1.next();
-            pic_id = rset1.getInt(1);
-            getId.close();
-
-            //Prepare an INSERT statement, then embed gathered values into statement
-            PreparedStatement insertData = db.prepareStatement("INSERT INTO images VALUES" +
-            		"(?, ?, ?, ?, ?, ?, ?, empty_blob(), empty_blob()");
-            
-            insertData.setInt(1, pic_id);
-            insertData.setString(2, user);
-            insertData.setInt(3, security);
-            insertData.setString(4, subject);
-            insertData.setString(5, place);
-            insertData.setDate(6, when);
-            insertData.setString(7, description);
-            db.executeUpdate(insertData);
-            insertData.close();
-
-            //now select empty blobs from the row, and update them
-            PreparedStatement fillBlobs = db.prepareStatement("SELECT * FROM images WHERE pic_id = " + pic_id
-                    + " FOR UPDATE");
-            ResultSet rset = db.executeQuery(fillBlobs);
-            rset.next();
-            BLOB myblob = ((OracleResultSet) rset).getBLOB(8);
-
-            // Write the thumbnail to the blob object
-            OutputStream outstream = myblob.getBinaryOutputStream();
-            ImageIO.write(thumbNail, "jpg", outstream);
-            
-            //write bigger image to next blob
-            myblob = ((OracleResultSet) rset).getBLOB(9);
-            outstream = myblob.getBinaryOutputStream();
-            ImageIO.write(img, "jpg", outstream);
-
-            //close streams and commit the row change
-            instream.close();
-            outstream.close();
-            PreparedStatement commit = db.prepareStatement("commit");
-            db.executeUpdate(commit);
-            commit.close();
             db.closeConnection();
             response_message = " Upload OK!  ";
-            response.setHeader("Refresh", "3; URL=home.jsp");
-
         }
         catch (Exception ex)
         {
             // System.out.println( ex.getMessage());
             response_message = ex.getMessage();
         }
-
-        // Output response to the client
-        response.setContentType("text/html");
-        PrintWriter out = response.getWriter();
-        out.println("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0 "
-                + "Transitional//EN\">\n" + "<HTML>\n"
-                + "<HEAD><TITLE>Upload Message</TITLE></HEAD>\n" + "<BODY>\n"
-                + "<H1>" + response_message + "</H1>\n" + "</BODY></HTML>");
+        
+        writeResponse(response, out);
+        response.setHeader("Refresh", "2; URL=home.jsp");
+        return;
     }
 
     // shrink image by a factor of n, and return the shrinked image
@@ -229,5 +262,16 @@ public class UploadImage extends HttpServlet
                 shrunkImage.setRGB(x, y, image.getRGB(x * n, y * n));
 
         return shrunkImage;
+    }
+    
+    //give user response after clicking submit button
+    public void writeResponse(HttpServletResponse response, PrintWriter out)
+    {
+        // Output response to the client
+        response.setContentType("text/html");
+        out.println("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0 "
+                + "Transitional//EN\">\n" + "<HTML>\n"
+                + "<HEAD><TITLE>Upload Message</TITLE></HEAD>\n" + "<BODY>\n"
+                + "<H1>" + response_message + "</H1>\n" + "</BODY></HTML>");
     }
 }

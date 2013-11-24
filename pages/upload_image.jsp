@@ -4,7 +4,7 @@
 <html>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <head>
-<title>Upload an image</title> 
+<title>Upload image(s)</title> 
 </head>
 <body> 
 
@@ -29,6 +29,12 @@
             }
         }
         
+        if (currentUserCookie == null || currentUserCookie.getMaxAge() == 0)
+        {
+    		response.setHeader("Refresh", "0; URL=index.jsp");
+    		return;
+    	}
+        
         //connect to db
         SQLAdapter db = new SQLAdapter();//Create a new instance of the SQL Adapter to use
         
@@ -36,12 +42,13 @@
         String user = currentUserCookie.getValue();
         %>
         
-<h1>Upload an image...</h1><hr>
+<h1>Upload image(s)...</h1><hr>
+
 <form NAME="upload-image" METHOD="POST" ENCTYPE="multipart/form-data" ACTION="UploadImage">
 		<table>
 			<tr>
 				<th>Image path:</th>
-				<td><input name="file-path" type="file" size="30"></input></td>
+				<td><input name="file-path" type="file" size="30" multiple></input></td>
 			</tr>
 
 			<tr>
@@ -127,6 +134,7 @@
 								out.println("<option value=\"" + rset1.getInt(1) + "\">Group: " + rset1.getString(2) + "</option>");
 						 	}
 						 	getGroups.close();
+						 	db.closeConnection();
 						 %>
 						    <option value="1">Private (Only you can see it)</option>
 							<option value="2">Public (Everyone can see it)</option>
