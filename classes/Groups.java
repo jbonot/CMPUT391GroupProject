@@ -43,7 +43,7 @@ public class Groups extends HttpServlet implements SingleThreadModel {
 		String membersWithBlanks[] = membersText.split("[\\s,;]");
 
 		for (String member : membersWithBlanks) {
-			if (!member.isEmpty()) {
+			if (!member.isEmpty() && !member.equals("admin") && !member.equals(user)) {
 				members.add(member);
 			}
 		}
@@ -53,7 +53,7 @@ public class Groups extends HttpServlet implements SingleThreadModel {
 				+ URLEncoder.encode(groupName, "UTF-8");
 		try {
 
-			String[] splitMembers = this.splitMembers(adapter, members);
+			String[] splitMembers = this.splitMembers(adapter, members, user);
 
 			// There must be at least one valid member and no invalid members.
 			boolean invMembers = splitMembers[0].isEmpty()
@@ -65,7 +65,16 @@ public class Groups extends HttpServlet implements SingleThreadModel {
 				// members.
 				if (!invMembers) {
 					// Insert new group
-					String[] validMembers = splitMembers[0].concat("," + user).split(",");
+					
+					String[] validMembers;
+					if (user.equals("admin")) {
+						validMembers = splitMembers[0].split(",");
+					} else {
+						// Add the creator to the group if the user is not admin.
+						validMembers = splitMembers[0].concat("," + user)
+								.split(",");
+					}
+
 					Date date = new Date(System.currentTimeMillis());
 					int groupId = this.getNextId(adapter);
 
@@ -138,7 +147,7 @@ public class Groups extends HttpServlet implements SingleThreadModel {
 		return rset.next() ? rset.getInt(1) : -1;
 	}
 
-	private String[] splitMembers(SQLAdapter adapter, List<String> members)
+	private String[] splitMembers(SQLAdapter adapter, List<String> members, String user)
 			throws SQLException {
 		List<String> valid = new ArrayList<String>();
 		List<String> invalid = new ArrayList<String>();

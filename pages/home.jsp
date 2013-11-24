@@ -58,7 +58,7 @@
 %>
 </head>
 <H1>
-<CENTER>Welcome,<%=firstName == null ? user : firstName%>!</CENTER>
+<CENTER>Welcome, <%=firstName == null ? user : firstName%>!</CENTER>
 </H1>
 <body>
 	<%

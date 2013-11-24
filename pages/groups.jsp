@@ -13,6 +13,7 @@
 	HtmlPrinter.printHeader(out, user, null, null, null);
 %>
 <h3>Add Group</h3>
+<BR>
 <%
 
 	String groupName = "";
@@ -95,7 +96,10 @@
 				<tr>
 					<td valign="top">
 						<h3>Existing Members</h3> <%
- 	rset = adapter.executeFetch("select * from persons");
+ 	PreparedStatement stmt = adapter.prepareStatement("select * from persons where user_name<>?");
+	stmt.setString(1, "admin");
+	rset = adapter.executeQuery(stmt);
+	
  	out.println("<table border=1>");
  	out.println("<tr>");
  	out.println("<th align=\"center\" style=\"width: 178px;\">User Name</th>");
