@@ -27,18 +27,11 @@ public class GetOnePic extends HttpServlet implements SingleThreadModel {
 	 */
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		Cookie cookies[] = request.getCookies();
-		Cookie userCookie = null;
-		if (cookies != null) {
-			for (int i = 0; i < cookies.length; i++) {
-				if (cookies[i].getName().equals("User")) {
-					userCookie = cookies[i];
-					break;
-				}
-			}
+		String user = QueryHelper.getUserCookie(request.getCookies());
+		if (user == null) {
+			response.setHeader("Refresh", "0; URL=index.jsp");
+			return;
 		}
-
-		String user = userCookie.getValue();
 		ServletOutputStream out = response.getOutputStream();
 
 		// construct the query from the client's QueryString
@@ -62,7 +55,7 @@ public class GetOnePic extends HttpServlet implements SingleThreadModel {
 		QueryHelper helper = new QueryHelper(adapter, user);
 		InputStream input = helper.getImage(photoId, big);
 		adapter.closeConnection();
-		
+
 		if (input != null) {
 			response.setContentType("image/gif");
 			int imageByte;

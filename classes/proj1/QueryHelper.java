@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Date;
+import javax.servlet.http.*;
 
 /*
  * A query helper.
@@ -26,6 +27,60 @@ public class QueryHelper {
 		this.isAdmin = user.equals("admin");
 	}
 
+	public static void printHeader(Writer out, String user, String query,
+			Date dateStart, Date dateEnd) throws IOException {
+		out.write("<table width=\"100%\"><tr><td VALIGN=TOP>");
+		QueryHelper.printNavigationButtons(out, user);
+		out.write("</td><td VALIGN=TOP align=right>");
+		QueryHelper.printSearchBar(out, query, dateStart, dateEnd);
+		out.write("</td></tr></table");
+		out.flush();
+	}
+	
+	private static void printNavigationButtons(Writer out, String user) throws IOException{
+		out.write("<table border=1><tr>");
+		out.write("<td><input type=\"button\" value=\"Home\" onClick=\"javascript:window.location='home.jsp';\"></td>");
+		out.write("<td><input type=\"button\" value=\"Profile\" onClick=\"javascript:window.location='userProfile.jsp';\"></td>");
+		out.write("<td><input type=\"button\" value=\"Upload\" onClick=\"javascript:window.location='upload_image.jsp';\"></td>");
+		out.write("<td><input type=\"button\" value=\"Groups\" onClick=\"javascript:window.location='groups.jsp';\"></td>");
+
+		if (user.equals("admin")) {
+			out.write("<td><input type=\"button\" value=\"Analysis\"onClick=\"javascript:window.location='DataAnalysis.jsp';\"></td>");
+		}
+
+		out.write("<td><input type=\"button\" value=\"Logout\" onClick=\"javascript:window.location='logout.jsp';\"></td>");
+		out.write("</tr></table>");
+		out.flush();
+	}
+	
+	private static void printSearchBar(Writer out, String query, Date dateStart, Date dateEnd) throws IOException {
+		String dateFormat = "yyyy-mm-dd";
+		out.write("<FORM NAME=\"SearchForm\" ACTION=\"home.jsp\" METHOD=\"get\"><TABLE border=1><TR VALIGN=TOP>");
+		out.write("<TD><I>Search:</I></TD>");
+		out.write("<TD><INPUT TYPE=\"text\" NAME=\"query\" value=\""
+				+ (query != null ? query : "") + "\"></TD>");
+		out.write("<TD><I>From:</I><INPUT TYPE=\"date\" NAME=\"DATE_START\" value=\""
+				+ (dateStart != null ? dateStart : dateFormat) + "\"></TD>");
+		out.write("<TD><I>To:</I><INPUT TYPE=\"date\" NAME=\"DATE_END\" value=\""
+				+ (dateEnd != null ? dateEnd : dateFormat) + "\"></TD>");
+		out.write("<TD><INPUT TYPE=\"submit\" NAME=\"SEARCH\" VALUE=\"Search\"></TD>");
+		out.write("</TR></TABLE></FORM>");
+	}
+
+	public static String getUserCookie(Cookie[] cookies) {
+		Cookie userCookie = null;
+		if (cookies != null) {
+			for (int i = 0; i < cookies.length; i++) {
+				if (cookies[i].getName().equals("User")) {
+					userCookie = cookies[i];
+					break;
+				}
+			}
+		}
+
+		return userCookie == null ? null : userCookie.getValue();
+	}
+
 	public ResultSet getHomeItems() {
 		if (this.isAdmin) {
 
@@ -35,6 +90,7 @@ public class QueryHelper {
 			try {
 				String query = FETCH_USER_THUMBNAILS + "where "
 						+ SECURITY_CONDITION;
+				System.out.println(query.replace("?", "'" + user + "'"));
 				PreparedStatement stmt = adapter.prepareStatement(query);
 				this.setSecurityParameters(stmt, 1);
 				return adapter.executeQuery(stmt);

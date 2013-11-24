@@ -4,8 +4,17 @@
 </HEAD>
 
 <BODY>
-<input type="button" value="Home"
-			onClick="javascript:window.location='home.jsp';">
+
+<%@ page import="proj1.*" %>
+<%
+	String user = QueryHelper.getUserCookie(request.getCookies());
+	if (user == null) {
+		response.setHeader("Refresh", "0; URL=index.jsp");
+		return;
+	}
+	
+	QueryHelper.printHeader(out, user, null, null, null);
+%>
 <FORM NAME="UpdateForm" ACTION="updateProfile.jsp" METHOD="post" >
 <P>To change your profile fill out the form below. Anything left blank will not be changed.</P>
 <TABLE>

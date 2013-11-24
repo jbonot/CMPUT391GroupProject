@@ -3,24 +3,15 @@
 <%@ page import="proj1.*"%>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <%
-	//Get the cookie
-	Cookie cookies[] = request.getCookies();
-	Cookie UserCookie = null;
-	if (cookies != null) {
-		for (int i = 0; i < cookies.length; i++) {
-			if (cookies[i].getName().equals("User")) {
-				UserCookie = cookies[i];
-				break;
-			}
-		}
-	}
-
-	//Check if the cookie is not expired
-	if (UserCookie == null || UserCookie.getMaxAge() == 0) {
+	String user = QueryHelper.getUserCookie(request.getCookies());
+	if (user == null) {
 		response.setHeader("Refresh", "0; URL=index.jsp");
+		return;
 	}
+	
+	QueryHelper.printHeader(out, user, null, null, null);
+	
 	//Get the username and check if they are an admin
-	String user = UserCookie.getValue();
 	if (!user.equals("admin")){
 		response.setHeader("Refresh", "0; URL=home.jsp");
 	}
@@ -31,8 +22,7 @@
 	<title>OLAP Analysis</title>
 	</head>
 	<body>
-	<input type="button" value="Home"
-			onClick="javascript:window.location='home.jsp';">
+
 	<h1>OLAP Data Analysis</h1>
 	<FORM NAME="conditionsForm" ACTION="DataAnalysis.jsp" METHOD="post">
 	<P>Set the Roll-up conditions:</P>

@@ -3,30 +3,18 @@
 <%@ page import="proj1.*"%>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Home</title>
+<meta http-equiv="content-type"
+	content="text/html; charset=windows-1250">
 <%
-	Cookie cookies[] = request.getCookies();
-	Cookie UserCookie = null;
-	if (cookies != null) {
-		for (int i = 0; i < cookies.length; i++) {
-			if (cookies[i].getName().equals("User")) {
-				UserCookie = cookies[i];
-				break;
-			}
-		}
-	}
-
-	if (UserCookie == null || UserCookie.getMaxAge() == 0) {
-		response.setHeader("Refresh", "0; URL=index.jsp");
-	return;
-	}
-
-	String user = UserCookie.getValue();
 	String dateFormat = "yyyy-mm-dd";
 	String query = request.getParameter("query");
-
+	
 	java.sql.Date dateStart = null;
 	java.sql.Date dateEnd = null;
-
+	
 	// Validate Start Date
 	try {
 		dateStart = java.sql.Date.valueOf(request
@@ -40,7 +28,7 @@
 		dateStart = new java.sql.Date(c.getTimeInMillis());
 	} catch (IllegalArgumentException e) {
 	}
-
+	
 	// Validate End Date
 	try {
 		dateEnd = java.sql.Date.valueOf(request
@@ -54,61 +42,25 @@
 		dateEnd = new java.sql.Date(c.getTimeInMillis());
 	} catch (IllegalArgumentException e) {
 	}
-
+	
 	query = query == null || query.equals("") ? null : query;
+	
+	String user = QueryHelper.getUserCookie(request.getCookies());
+	if (user == null) {
+		response.setHeader("Refresh", "0; URL=index.jsp");
+		return;
+	}
+	
+	QueryHelper.printHeader(out, user, query, dateStart, dateEnd);
 	SQLAdapter adapter = new SQLAdapter();
 	QueryHelper helper = new QueryHelper(adapter, user);
 	String firstName = helper.getFirstName();
 %>
-<html>
-<head>
-<meta http-equiv="content-type"
-	content="text/html; charset=windows-1250">
-<title>Home</title>
 </head>
-<table border=1>
-	<tr>
-		<td><input type="button" value="Home"
-			onClick="javascript:window.location='home.jsp';"></td>
-		<td><input type="button" value="Profile"
-			onClick="javascript:window.location='userProfile.html';"></td>
-		<td><input type="button" value="Upload"
-			onClick="javascript:window.location='upload_image.jsp';"></td>
-		<td><input type="button" value="Groups"
-			onClick="javascript:window.location='groups.jsp';"></td>
-		<%
-			if (user.equals("admin"))
-			{
-				out.println("<td><input type=\"button\" value=\"Analysis\"onClick=\"javascript:window.location='DataAnalysis.jsp';\"></td>");
-			}
-		%>
-
-		<td><input type="button" value="Logout"
-			onClick="javascript:window.location='logout.jsp';"></td>
-	</tr>
-</table>
 <H1>
-	<CENTER>
-		Welcome,
-		<%=firstName%>!
-	</CENTER>
+<CENTER>Welcome,<%=firstName == null ? user : firstName%>!</CENTER>
 </H1>
 <body>
-	<FORM NAME="SearchForm" ACTION="home.jsp" METHOD="get">
-		<TABLE border=1>
-			<TR VALIGN=TOP ALIGN=LEFT>
-				<TD><I>Search:</I></TD>
-				<TD><INPUT TYPE="text" NAME="query"
-					value="<%=query != null ? query : new String()%>"><BR></TD>
-				<TD><I>From:</I><INPUT TYPE="date" NAME="DATE_START"
-					value="<%=dateStart != null ? dateStart : dateFormat%>"></TD>
-				<TD><I>To:</I><INPUT TYPE="date" NAME="DATE_END"
-					value="<%=dateEnd != null ? dateEnd : dateFormat%>"></TD>
-				<TD><INPUT TYPE="submit" NAME="SEARCH" VALUE="Search"></TD>
-			</TR>
-		</TABLE>
-	</FORM>
-	<br>
 	<%
 		ResultSet rset = null;
 		String p_id;
@@ -137,7 +89,7 @@
 								+ "\">");
 						out.println("<img src=\"/proj1/GetOnePic?" + p_id
 								+ "\">");
-						out.println(p_id + " " + rset.getString("subject") + "<BR>" + rset.getString("permitted"));
+						out.println(p_id + " " + rset.getString("subject"));
 						out.println("</a>");
 						out.println("</td>");
 					}

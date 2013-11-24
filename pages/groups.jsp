@@ -1,24 +1,19 @@
 <TITLE>Add Group</TITLE>
-<h3>Add Group</h3>
 <%@ page import="java.net.*"%>
 <%@ page import="proj1.*"%>
 <%@ page import="java.sql.*"%>
 <%
-	Cookie cookies[] = request.getCookies();
-	Cookie UserCookie = null;
-	if (cookies != null) {
-		for (int i = 0; i < cookies.length; i++) {
-			if (cookies[i].getName().equals("User")) {
-				UserCookie = cookies[i];
-				break;
-			}
-		}
-	}
 
-	if (UserCookie == null) {
+	String user = QueryHelper.getUserCookie(request.getCookies());
+	if (user == null) {
 		response.setHeader("Refresh", "0; URL=index.jsp");
-	return;
+		return;
 	}
+	
+	QueryHelper.printHeader(out, user, null, null, null);
+%>
+<h3>Add Group</h3>
+<%
 
 	String groupName = "";
 	String members = "";

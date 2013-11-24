@@ -29,26 +29,16 @@ public class GetBigPic extends HttpServlet implements SingleThreadModel {
 
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		Cookie cookies[] = request.getCookies();
-		Cookie userCookie = null;
-		if (cookies != null) {
-			for (int i = 0; i < cookies.length; i++) {
-				if (cookies[i].getName().equals("User")) {
-					userCookie = cookies[i];
-					break;
-				}
-			}
-		}
-
-		if (userCookie == null) {
+		String user = QueryHelper.getUserCookie(request.getCookies());
+		if (user == null) {
 			response.setHeader("Refresh", "0; URL=index.jsp");
 			return;
 		}
-
-		String user = userCookie.getValue();
 		PrintWriter out = response.getWriter();
 		try {
 			response.setContentType("text/html");
+			QueryHelper.printHeader(out, user, null, null, null);
+			
 			int photoId;
 			// construct the query from the client's QueryString
 			String picid = request.getQueryString().substring(3);

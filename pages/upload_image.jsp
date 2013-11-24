@@ -15,31 +15,17 @@
 		<%
 		/* COOKIE RETRIEVAL */
 	    // use a cookie to retrieve oracle database information, as well as current username.
-        String currentUser = "User";
-        
-        Cookie cookies [] = request.getCookies ();
-        Cookie currentUserCookie = null;
-
-        if (cookies != null){
-            for (int i = 0; i < cookies.length; i++) {
-                if (cookies [i].getName().equals (currentUser)){
-                    currentUserCookie = cookies[i];
-                    break;
-                }
-            }
-        }
-        
-        if (currentUserCookie == null || currentUserCookie.getMaxAge() == 0)
-        {
-    		response.setHeader("Refresh", "0; URL=index.jsp");
-    		return;
-    	}
+		String user = QueryHelper.getUserCookie(request.getCookies());
+		if (user == null) {
+			response.setHeader("Refresh", "0; URL=index.jsp");
+			return;
+		}
+		
+		// Print the header.
+		QueryHelper.printHeader(out, user, null, null, null);
         
         //connect to db
         SQLAdapter db = new SQLAdapter();//Create a new instance of the SQL Adapter to use
-        
-        //store current user's name in string
-        String user = currentUserCookie.getValue();
         %>
         
 <h1>Upload image(s)...</h1><hr>
