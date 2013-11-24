@@ -4,15 +4,15 @@
 <html>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <head>
-<title>Upload image(s)</title> 
+<title>Upload image(s)</title>
 </head>
-<body> 
+<body>
 
-<%@ page import="proj1.*"%>
-<%@ page import="java.sql.*"%>
-<%@ page import="java.util.*"%>
+	<%@ page import="proj1.*"%>
+	<%@ page import="java.sql.*"%>
+	<%@ page import="java.util.*"%>
 
-		<%
+	<%
 		/* COOKIE RETRIEVAL */
 	    // use a cookie to retrieve oracle database information, as well as current username.
 		String user = HtmlPrinter.getUserCookie(request.getCookies());
@@ -27,10 +27,12 @@
         //connect to db
         SQLAdapter db = new SQLAdapter();//Create a new instance of the SQL Adapter to use
         %>
-        
-<h1>Upload image(s)...</h1><hr>
 
-<form NAME="upload-image" METHOD="POST" ENCTYPE="multipart/form-data" ACTION="UploadImage">
+	<h1>Upload image(s)...</h1>
+	<hr>
+
+	<form NAME="upload-image" METHOD="POST" ENCTYPE="multipart/form-data"
+		ACTION="UploadImage">
 		<table>
 			<tr>
 				<th>Image path:</th>
@@ -44,18 +46,13 @@
 			</tr>
 			<tr>
 				<td><b>Place:</b></td>
-				<b> </b>
 				<td><INPUT TYPE="text" NAME="place" VALUE=""
 					style="width: 346px;"></td>
-				<b> </b>
 			</tr>
-			<b> </b>
 			<tr>
-				<b> </b>
 				<td><b>When:</b></td>
-				<b> </b>
 				<td><select name="month">
-					<% 	//fill day dropdown all the way from January to December
+						<% 	//fill day dropdown all the way from January to December
 						Calendar cal = Calendar.getInstance();
 						String[] str = {"January", "February", "March", "April",        
    										"May", "June", "July", "August",       
@@ -70,9 +67,8 @@
 								out.println("<option value=\"" + (i + 1) + "\">" + str[i]);
 						}
 					%>
-					</select>
-					<select name="day">
-					<% 	//fill day dropdown all the way from 1 to 31
+				</select> <select name="day">
+						<% 	//fill day dropdown all the way from 1 to 31
 						for(int i = 1; i < 32; i++)
 						{
 							if(i == cal.get(Calendar.DAY_OF_MONTH))
@@ -81,9 +77,8 @@
 								out.println("<option value=\"" + i + "\">" + i);
 						}
 					%>
-					</select>
-					<select name="year">
-					<% 	//fill year dropdown all the way from 1900 to 2013
+				</select> <select name="year">
+						<% 	//fill year dropdown all the way from 1900 to 2013
 						for(int i = 1900; i < 2014; i++)
 						{
 							if(i == cal.get(Calendar.YEAR))
@@ -92,25 +87,17 @@
 								out.println("<option value=\"" + i + "\">" + i);
 						}
 					%>
-	</select>
-				</td>
-				<b> </b>
+				</select></td>
 			</tr>
-			<b> </b>
 			<tr>
-				<b> </b>
 				<td><b>Description:</b></td>
-				<b> </b>
-				<td><textarea name="description" rows="10" cols="30" style="width: 346px;">
+				<td><textarea name="description" rows="10" cols="30"
+						style="width: 346px;">
 </textarea></td>
-				<b> </b>
 			</tr>
-			<b> </b>
 			<tr>
-				<b> </b>
 				<td><b>Security Level:</b></td>
-				<td>
-						<select name="security" style="width: 342px;">
+				<td><select name="security" style="width: 342px;">
 						<% 	//need to dynamically fill the security dropdown with groups
 							PreparedStatement getGroups = db.prepareStatement("SELECT group_id, group_name FROM groups WHERE user_name = ?");
 							getGroups.setString(1, user);
@@ -122,16 +109,17 @@
 						 	getGroups.close();
 						 	db.closeConnection();
 						 %>
-						    <option value="1">Private (Only you can see it)</option>
-							<option value="2">Public (Everyone can see it)</option>
+						<option value="1">Public (Everyone can see it)</option>
+						<option value="2">Private (Only you can see it)</option>
 
-						</select>
-				</td>
+
+				</select></td>
 			</tr>
 			<tr>
-				<td ALIGN="CENTER" COLSPAN="2"><input type="submit" name="SUBMIT" value="Upload"/></td>
+				<td ALIGN="CENTER" COLSPAN="2"><input type="submit"
+					name="SUBMIT" value="Upload" /></td>
 			</tr>
 		</table>
 	</form>
-</body> 
+</body>
 </html>
