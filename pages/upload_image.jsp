@@ -15,14 +15,14 @@
 		<%
 		/* COOKIE RETRIEVAL */
 	    // use a cookie to retrieve oracle database information, as well as current username.
-		String user = QueryHelper.getUserCookie(request.getCookies());
+		String user = HtmlPrinter.getUserCookie(request.getCookies());
 		if (user == null) {
 			response.setHeader("Refresh", "0; URL=index.jsp");
 			return;
 		}
 		
 		// Print the header.
-		QueryHelper.printHeader(out, user, null, null, null);
+		HtmlPrinter.printHeader(out, user, null, null, null);
         
         //connect to db
         SQLAdapter db = new SQLAdapter();//Create a new instance of the SQL Adapter to use

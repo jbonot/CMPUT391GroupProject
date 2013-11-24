@@ -29,7 +29,7 @@ public class GetBigPic extends HttpServlet implements SingleThreadModel {
 
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		String user = QueryHelper.getUserCookie(request.getCookies());
+		String user = HtmlPrinter.getUserCookie(request.getCookies());
 		if (user == null) {
 			response.setHeader("Refresh", "0; URL=index.jsp");
 			return;
@@ -47,7 +47,7 @@ public class GetBigPic extends HttpServlet implements SingleThreadModel {
 				photoId = Integer.parseInt(request.getQueryString()
 						.substring(3));
 			} catch (NumberFormatException e) {
-				QueryHelper.accessDenied(out);
+				HtmlPrinter.accessDenied(out);
 				return;
 			}
 
@@ -59,7 +59,7 @@ public class GetBigPic extends HttpServlet implements SingleThreadModel {
 			if (info != null) {
 
 				out.println("<html><head><title>" + info.subject + "</title>");
-				QueryHelper.printHeader(out, user, null, null, null);
+				HtmlPrinter.printHeader(out, user, null, null, null);
 				out.println("</head>");
 				out.println("<body>");
 				out.println("<TABLE>");
@@ -91,7 +91,7 @@ public class GetBigPic extends HttpServlet implements SingleThreadModel {
 							+ photoId + "';\" /><BR>");
 				}
 			} else {
-				QueryHelper.accessDenied(out);
+				HtmlPrinter.accessDenied(out);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

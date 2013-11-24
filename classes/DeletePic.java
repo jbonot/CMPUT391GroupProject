@@ -28,7 +28,7 @@ public class DeletePic extends HttpServlet implements SingleThreadModel {
 	 */
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		String user = QueryHelper.getUserCookie(request.getCookies());
+		String user = HtmlPrinter.getUserCookie(request.getCookies());
 		if (user == null) {
 			response.setHeader("Refresh", "0; URL=index.jsp");
 			return;
@@ -58,7 +58,7 @@ public class DeletePic extends HttpServlet implements SingleThreadModel {
 				adapter.closeConnection();
 				response.setHeader("Refresh", "0; URL=home.jsp?deletesuccess");
 			} else {
-				QueryHelper.accessDenied(out);
+				HtmlPrinter.accessDenied(out);
 				adapter.closeConnection();
 			}
 		} catch (SQLException e) {

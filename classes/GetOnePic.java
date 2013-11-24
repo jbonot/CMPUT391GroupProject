@@ -27,7 +27,7 @@ public class GetOnePic extends HttpServlet implements SingleThreadModel {
 	 */
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		String user = QueryHelper.getUserCookie(request.getCookies());
+		String user = HtmlPrinter.getUserCookie(request.getCookies());
 		if (user == null) {
 			response.setHeader("Refresh", "0; URL=index.jsp");
 			return;

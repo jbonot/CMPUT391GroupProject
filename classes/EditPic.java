@@ -28,7 +28,7 @@ public class EditPic extends HttpServlet implements SingleThreadModel {
 	 */
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		String user = QueryHelper.getUserCookie(request.getCookies());
+		String user = HtmlPrinter.getUserCookie(request.getCookies());
 		if (user == null) {
 			response.setHeader("Refresh", "0; URL=index.jsp");
 			return;
@@ -42,7 +42,7 @@ public class EditPic extends HttpServlet implements SingleThreadModel {
 		try {
 			photoId = Integer.parseInt(picid);
 		} catch (NumberFormatException e) {
-			QueryHelper.accessDenied(out);
+			HtmlPrinter.accessDenied(out);
 			return;
 		}
 //		PreparedStatement stmt;
@@ -63,7 +63,7 @@ public class EditPic extends HttpServlet implements SingleThreadModel {
 //				adapter.closeConnection();
 //				response.setHeader("Refresh", "0; URL=GetBigPic?" + photoId);
 //			} else {
-//				QueryHelper.accessDenied(out);
+//				HtmlPrinter.accessDenied(out);
 //				adapter.closeConnection();
 //			}
 //		} catch (SQLException e) {

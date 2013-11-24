@@ -4,13 +4,13 @@
 <%@ page import="java.sql.*"%>
 <%
 
-	String user = QueryHelper.getUserCookie(request.getCookies());
+	String user = HtmlPrinter.getUserCookie(request.getCookies());
 	if (user == null) {
 		response.setHeader("Refresh", "0; URL=index.jsp");
 		return;
 	}
 	
-	QueryHelper.printHeader(out, user, null, null, null);
+	HtmlPrinter.printHeader(out, user, null, null, null);
 %>
 <h3>Add Group</h3>
 <%

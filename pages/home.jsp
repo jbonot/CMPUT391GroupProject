@@ -45,13 +45,13 @@
 	
 	query = query == null || query.equals("") ? null : query;
 	
-	String user = QueryHelper.getUserCookie(request.getCookies());
+	String user = HtmlPrinter.getUserCookie(request.getCookies());
 	if (user == null) {
 		response.setHeader("Refresh", "0; URL=index.jsp");
 		return;
 	}
 	
-	QueryHelper.printHeader(out, user, query, dateStart, dateEnd);
+	HtmlPrinter.printHeader(out, user, query, dateStart, dateEnd);
 	SQLAdapter adapter = new SQLAdapter();
 	QueryHelper helper = new QueryHelper(adapter, user);
 	String firstName = helper.getFirstName();
