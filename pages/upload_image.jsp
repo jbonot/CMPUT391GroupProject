@@ -98,6 +98,9 @@
 			<tr>
 				<td><b>Security Level:</b></td>
 				<td><select name="security" style="width: 342px;">
+						<option value="1" selected="selected">Public (Everyone can see it)</option>
+						<option value="2">Private (Only you can see it)</option>
+						
 						<% 	//need to dynamically fill the security dropdown with groups
 							PreparedStatement getGroups = db.prepareStatement("SELECT group_id, group_name FROM groups WHERE user_name = ?");
 							getGroups.setString(1, user);
@@ -109,8 +112,6 @@
 						 	getGroups.close();
 						 	db.closeConnection();
 						 %>
-						<option value="1">Public (Everyone can see it)</option>
-						<option value="2">Private (Only you can see it)</option>
 
 
 				</select></td>
