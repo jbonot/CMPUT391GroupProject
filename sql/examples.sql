@@ -6,6 +6,7 @@ insert into users values('admin', 'adminpassword', sysdate);
 insert into persons values('bob123', 'Bob', 'Barker', '199 Right Price Drive', 'bob@priceisright.com', '555-1234');
 insert into persons values('alice456', 'Alice', 'Munroe', '31 Wingham Street', 'amunro@books.ca', '555-1931');
 insert into persons values('matwood', 'Margaret', 'Atwood', '18 Blind Court', 'matwood@margaretatwood.ca', '555-1939');
+insert into persons values('admin', 'Administrator', '', '', 'admin@admin.ca', '555-5555');
 
 
 select group_sequence.nextVal from dual;
