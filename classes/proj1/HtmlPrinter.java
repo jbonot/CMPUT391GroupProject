@@ -8,7 +8,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.Cookie;
 
 public class HtmlPrinter {
-	
+
 	public static void printHeader(Writer out, String user, String query,
 			Date dateStart, Date dateEnd) throws IOException {
 		out.write("<table width=\"100%\"><tr><td VALIGN=TOP>");
@@ -17,6 +17,15 @@ public class HtmlPrinter {
 		HtmlPrinter.printSearchBar(out, query, dateStart, dateEnd);
 		out.write("</td></tr></table");
 		out.flush();
+	}
+	
+	public static void printHeader(ServletOutputStream out, String user, String query,
+			Date dateStart, Date dateEnd) throws IOException {
+		out.println("<table width=\"100%\"><tr><td VALIGN=TOP>");
+		HtmlPrinter.printNavigationButtons(out, user);
+		out.println("</td><td VALIGN=TOP align=right>");
+		HtmlPrinter.printSearchBar(out, query, dateStart, dateEnd);
+		out.println("</td></tr></table");
 	}
 
 	public static void accessDenied(Writer out) throws IOException {
@@ -61,6 +70,23 @@ public class HtmlPrinter {
 		out.flush();
 	}
 
+	private static void printNavigationButtons(ServletOutputStream out, String user)
+			throws IOException {
+		out.println("<table border=1><tr>");
+		out.println("<td><input type=\"button\" value=\"Home\" onClick=\"javascript:window.location='home.jsp';\"></td>");
+		out.println("<td><input type=\"button\" value=\"Profile\" onClick=\"javascript:window.location='userProfile.jsp';\"></td>");
+		out.println("<td><input type=\"button\" value=\"Upload\" onClick=\"javascript:window.location='upload_image.jsp';\"></td>");
+		out.println("<td><input type=\"button\" value=\"Groups\" onClick=\"javascript:window.location='groups.jsp';\"></td>");
+
+		if (user.equals("admin")) {
+			out.println("<td><input type=\"button\" value=\"Analysis\"onClick=\"javascript:window.location='DataAnalysis.jsp';\"></td>");
+		}
+
+		out.println("<td><input type=\"button\" value=\"Logout\" onClick=\"javascript:window.location='logout.jsp';\"></td>");
+		out.println("</tr></table>");
+		out.flush();
+	}
+
 	private static void printSearchBar(Writer out, String query,
 			Date dateStart, Date dateEnd) throws IOException {
 		String dateFormat = "yyyy-mm-dd";
@@ -74,6 +100,22 @@ public class HtmlPrinter {
 				+ (dateEnd != null ? dateEnd : dateFormat) + "\"></TD>");
 		out.write("<TD><INPUT TYPE=\"submit\" NAME=\"SEARCH\" VALUE=\"Search\"></TD>");
 		out.write("</TR></TABLE></FORM>");
+		out.flush();
+	}
+
+	private static void printSearchBar(ServletOutputStream out, String query,
+			Date dateStart, Date dateEnd) throws IOException {
+		String dateFormat = "yyyy-mm-dd";
+		out.println("<FORM NAME=\"SearchForm\" ACTION=\"home.jsp\" METHOD=\"get\"><TABLE border=1><TR VALIGN=TOP>");
+		out.println("<TD><I>Search:</I></TD>");
+		out.println("<TD><INPUT TYPE=\"text\" NAME=\"query\" value=\""
+				+ (query != null ? query : "") + "\"></TD>");
+		out.println("<TD><I>From:</I><INPUT TYPE=\"date\" NAME=\"DATE_START\" value=\""
+				+ (dateStart != null ? dateStart : dateFormat) + "\"></TD>");
+		out.println("<TD><I>To:</I><INPUT TYPE=\"date\" NAME=\"DATE_END\" value=\""
+				+ (dateEnd != null ? dateEnd : dateFormat) + "\"></TD>");
+		out.println("<TD><INPUT TYPE=\"submit\" NAME=\"SEARCH\" VALUE=\"Search\"></TD>");
+		out.println("</TR></TABLE></FORM>");
 	}
 
 	public static String getUserCookie(Cookie[] cookies) {

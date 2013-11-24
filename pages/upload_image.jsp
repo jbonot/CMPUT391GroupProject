@@ -26,6 +26,9 @@
         
         //connect to db
         SQLAdapter db = new SQLAdapter();//Create a new instance of the SQL Adapter to use
+        QueryHelper helper = new QueryHelper(db, user);
+        
+		String selected = " selected=\"selected\"";
         %>
 
 	<h1>Upload image(s)...</h1>
@@ -54,37 +57,28 @@
 				<td><select name="month">
 						<% 	//fill day dropdown all the way from January to December
 						Calendar cal = Calendar.getInstance();
+					
 						String[] str = {"January", "February", "March", "April",        
    										"May", "June", "July", "August",       
    										"September", "October", "November", "December"};
+						
 						for(int i = 0; i < 12; i++)
 						{
-							if(i == cal.get(Calendar.MONTH))
-							{
-								out.println("<option selected=\"selected\" value=\"" + (i + 1) + "\">" + str[i]);
-							}
-							else
-								out.println("<option value=\"" + (i + 1) + "\">" + str[i]);
+							out.println("<option value=\"" + (i + 1) + "\"" + (i == cal.get(Calendar.MONTH) ? selected : "") + ">" + str[i]);
 						}
 					%>
 				</select> <select name="day">
 						<% 	//fill day dropdown all the way from 1 to 31
 						for(int i = 1; i < 32; i++)
 						{
-							if(i == cal.get(Calendar.DAY_OF_MONTH))
-								out.println("<option selected=\"selected\" value=\"" + i + "\">" + i);
-							else
-								out.println("<option value=\"" + i + "\">" + i);
+							out.println("<option value=\"" + i + "\"" + (i == cal.get(Calendar.DAY_OF_MONTH) ? selected : "") + ">" + i);
 						}
 					%>
 				</select> <select name="year">
 						<% 	//fill year dropdown all the way from 1900 to 2013
 						for(int i = 1900; i < 2014; i++)
 						{
-							if(i == cal.get(Calendar.YEAR))
-								out.println("<option selected=\"selected\" value=\"" + i + "\">" + i);
-							else
-								out.println("<option value=\"" + i + "\">" + i);
+							out.println("<option value=\"" + i + "\"" + (i == cal.get(Calendar.YEAR) ? selected : "") + ">" + i);
 						}
 					%>
 				</select></td>
@@ -102,14 +96,12 @@
 						<option value="2">Private (Only you can see it)</option>
 						
 						<% 	//need to dynamically fill the security dropdown with groups
-							PreparedStatement getGroups = db.prepareStatement("SELECT group_id, group_name FROM groups WHERE user_name = ?");
-							getGroups.setString(1, user);
-							ResultSet rset1 = db.executeQuery(getGroups);
-							while(rset1.next())
+							ResultSet rset = helper.getAccessibleGroups();
+							while(rset.next())
 							{
-								out.println("<option value=\"" + rset1.getInt(1) + "\">Group: " + rset1.getString(2) + "</option>");
+								out.println("<option value=\"" + rset.getInt(1) + "\">Visible to: " + rset.getString(2) + "</option>");
 						 	}
-						 	getGroups.close();
+							
 						 	db.closeConnection();
 						 %>
 
@@ -117,7 +109,7 @@
 				</select></td>
 			</tr>
 			<tr>
-				<td ALIGN="CENTER" COLSPAN="2"><input type="submit"
+				<td ALIGN="right" COLSPAN="2"><input type="submit"
 					name="SUBMIT" value="Upload" /></td>
 			</tr>
 		</table>

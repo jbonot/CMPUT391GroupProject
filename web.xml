@@ -13,6 +13,15 @@
         <servlet-name>DeletePic</servlet-name>
         <url-pattern>/DeletePic</url-pattern>
     </servlet-mapping>
+
+    <servlet>
+        <servlet-name>EditPic</servlet-name>
+        <servlet-class>EditPic</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>EditPic</servlet-name>
+        <url-pattern>/EditPic</url-pattern>
+    </servlet-mapping>
     
     <servlet>
         <servlet-name>GetOnePic</servlet-name>

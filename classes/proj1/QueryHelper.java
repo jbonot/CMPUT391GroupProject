@@ -38,7 +38,6 @@ public class QueryHelper {
 			try {
 				String query = FETCH_USER_THUMBNAILS + "where "
 						+ SECURITY_CONDITION;
-				System.out.println(query.replace("?", "'" + user + "'"));
 				PreparedStatement stmt = adapter.prepareStatement(query);
 				this.setSecurityParameters(stmt, 1);
 				return adapter.executeQuery(stmt);
@@ -214,6 +213,20 @@ public class QueryHelper {
 			e.printStackTrace();
 		}
 		return null;
+	}
+
+	public ResultSet getAccessibleGroups() throws SQLException {
+		PreparedStatement stmt;
+
+		if (this.isAdmin) {
+			return adapter
+					.executeFetch("select group_id, group_name from groups where group_id<>1 and group_id<>2");
+		} else {
+				stmt = adapter
+						.prepareStatement("SELECT group_id, group_name FROM groups WHERE user_name = ?");
+				stmt.setString(1, user);
+				return adapter.executeQuery(stmt);
+		}
 	}
 
 	public String getFirstName() {
