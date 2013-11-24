@@ -5,7 +5,7 @@ cp -r ~/git/CMPUT391GroupProject/pages/*.* ../../
 cp -r ~/git/CMPUT391GroupProject/classes/proj1/*.java proj1/
 echo "Done importing from git."
 echo ""
-javac proj1/SQLAdapter.java proj1/ImageInfo.java proj1/QueryHelper.java
+javac proj1/*.java
 jar cf ../lib/proj1.jar proj1/*.class
 (cp ~/workspace/test/bin/*.class . && echo "$now Compiled and ready to execute.") || (echo "Need to run Eclipse to compile page files.")
 echo ""
