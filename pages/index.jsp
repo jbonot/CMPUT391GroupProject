@@ -52,15 +52,9 @@ if (username!=null && username!="")
 		}
 
 		if (UserCookie != null) {
-			System.out.println("index.jsp UserCookie value: "
-					+ UserCookie.getValue() + " maxAge: "
-					+ UserCookie.getMaxAge());
-
 			if (UserCookie.getMaxAge() != 0) {
 				response.setHeader("Refresh", "0; URL=home.jsp");
 			}
-		} else {
-			System.out.println("null cookie");
 		}
 	%>
 	<H1>Login</H1>

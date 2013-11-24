@@ -37,7 +37,6 @@
 					rset.getString("user_name"));
 			userCookie.setMaxAge(60 * 60); // 1 hour
 			response.addCookie(userCookie);
-			System.out.println("Set cookie: " + userCookie.getValue() + " maxAge: " + userCookie.getMaxAge());
 			loginUser.close();
 			db.closeConnection();
 			empty = false;
