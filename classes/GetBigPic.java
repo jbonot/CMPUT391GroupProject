@@ -34,12 +34,11 @@ public class GetBigPic extends HttpServlet implements SingleThreadModel {
 			response.setHeader("Refresh", "0; URL=index.jsp");
 			return;
 		}
-		
+
 		PrintWriter out = response.getWriter();
 		try {
 			response.setContentType("text/html");
-			QueryHelper.printHeader(out, user, null, null, null);
-			
+
 			int photoId;
 			// construct the query from the client's QueryString
 			String picid = request.getQueryString().substring(3);
@@ -60,7 +59,7 @@ public class GetBigPic extends HttpServlet implements SingleThreadModel {
 			QueryHelper helper = new QueryHelper(adapter, user);
 			String[] info = helper.getImageInfo(photoId);
 			adapter.closeConnection();
-			
+
 			if (info != null) {
 
 				String title = info[0];
@@ -70,12 +69,14 @@ public class GetBigPic extends HttpServlet implements SingleThreadModel {
 				String date = info[4];
 				String group = info[5];
 
-				out.println("<html><head><title>" + title + "</title></head>");
+				out.println("<html><head><title>" + title + "</title>");
+				QueryHelper.printHeader(out, user, null, null, null);
+				out.println("</head>");
 				out.println("<body>");
-				out.println("<img src = \"/proj1/GetOnePic?" + picid
-						+ "\"><BR>");
-				out.println("<TABLE border=1>");
-				out.println("<TR><TD><B><I>Owner:</I></B></TD>");
+				out.println("<TABLE>");
+				out.println("<TR><TD align=center><img src = \"/proj1/GetOnePic?" + picid
+						+ "\"></TD><TR>");
+				out.println("<TR><TD><TABLE border=1><TR><TD><B><I>Owner:</I></B></TD>");
 				out.println("<TD>" + owner + "</TD></TR>");
 				out.println("<TR><TD><B><I>Visible to:</I></B></TD>");
 				out.println("<TD>" + group + "</TD></TR>");
@@ -87,16 +88,17 @@ public class GetBigPic extends HttpServlet implements SingleThreadModel {
 				out.println("<TD>" + date + "</TD></TR>");
 				out.println("<TR><TD><B><I>Description:</I></B></TD>");
 				out.println("<TD>" + description + "</TD></TR>");
-				out.println("</TABLE>");
+				out.println("</TABLE></TD></TR></TABLE>");
 				out.println("</body></html>");
-				
-				if (user.equals(owner) || user.equals("admin")){
+
+				if (user.equals(owner) || user.equals("admin")) {
 					out.println("<BR><input type=\"button\" "
 							+ "value=\"Edit Image\" name=\"Home\" "
 							+ "onclick=\"\" />");
 					out.println("<input type=\"button\" "
 							+ "value=\"Delete Image\" name=\"Home\" "
-							+ "onclick=\"javascript:window.location='DeletePic?"+ photoId + "';\" /><BR>");
+							+ "onclick=\"javascript:window.location='DeletePic?"
+							+ photoId + "';\" /><BR>");
 				}
 			} else {
 
