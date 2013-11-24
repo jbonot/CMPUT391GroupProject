@@ -47,29 +47,18 @@ public class GetBigPic extends HttpServlet implements SingleThreadModel {
 				photoId = Integer.parseInt(request.getQueryString()
 						.substring(3));
 			} catch (NumberFormatException e) {
-				out.println("<html><head><title>Not Found</title></head>");
-				out.println("<body>");
-				out.println("<h3>Error</h3>");
-				out.println("Image does not exist or you do not have permission to view this image.");
-				out.println("</body></html>");
+				QueryHelper.accessDenied(out);
 				return;
 			}
 
 			SQLAdapter adapter = new SQLAdapter();
 			QueryHelper helper = new QueryHelper(adapter, user);
-			String[] info = helper.getImageInfo(photoId);
+			ImageInfo info = helper.getImageInfo(photoId);
 			adapter.closeConnection();
 
 			if (info != null) {
 
-				String title = info[0];
-				String place = info[1];
-				String description = info[2];
-				String owner = info[3];
-				String date = info[4];
-				String group = info[5];
-
-				out.println("<html><head><title>" + title + "</title>");
+				out.println("<html><head><title>" + info.subject + "</title>");
 				QueryHelper.printHeader(out, user, null, null, null);
 				out.println("</head>");
 				out.println("<body>");
@@ -77,36 +66,32 @@ public class GetBigPic extends HttpServlet implements SingleThreadModel {
 				out.println("<TR><TD align=center><img src = \"/proj1/GetOnePic?" + picid
 						+ "\"></TD><TR>");
 				out.println("<TR><TD><TABLE border=1><TR><TD><B><I>Owner:</I></B></TD>");
-				out.println("<TD>" + owner + "</TD></TR>");
+				out.println("<TD>" + info.owner + "</TD></TR>");
 				out.println("<TR><TD><B><I>Visible to:</I></B></TD>");
-				out.println("<TD>" + group + "</TD></TR>");
+				out.println("<TD>" + info.group + "</TD></TR>");
 				out.println("<TR><TD><B><I>Title:</I></B></TD>");
-				out.println("<TD>" + title + "</TD></TR>");
+				out.println("<TD>" + info.subject + "</TD></TR>");
 				out.println("<TR><TD><B><I>Place:</I></B></TD>");
-				out.println("<TD>" + place + "</TD></TR>");
+				out.println("<TD>" + info.place + "</TD></TR>");
 				out.println("<TR><TD><B><I>Date:</I></B></TD>");
-				out.println("<TD>" + date + "</TD></TR>");
+				out.println("<TD>" + info.date + "</TD></TR>");
 				out.println("<TR><TD><B><I>Description:</I></B></TD>");
-				out.println("<TD>" + description + "</TD></TR>");
+				out.println("<TD>" + info.description + "</TD></TR>");
 				out.println("</TABLE></TD></TR></TABLE>");
 				out.println("</body></html>");
 
-				if (user.equals(owner) || user.equals("admin")) {
+				if (user.equals(info.owner) || user.equals("admin")) {
 					out.println("<BR><input type=\"button\" "
 							+ "value=\"Edit Image\" name=\"Home\" "
-							+ "onclick=\"\" />");
+							+ "onclick=\"javascript:window.location='edit_image.jsp?"
+							+ photoId + "';\" />");
 					out.println("<input type=\"button\" "
 							+ "value=\"Delete Image\" name=\"Home\" "
 							+ "onclick=\"javascript:window.location='DeletePic?"
 							+ photoId + "';\" /><BR>");
 				}
 			} else {
-
-				out.println("<html><head><title>Access Denied</title></head>");
-				out.println("<body>");
-				out.println("<h3>Access Denied</h3>");
-				out.println("Image does not exist or you do not have permission to access this image.");
-				out.println("</body></html>");
+				QueryHelper.accessDenied(out);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

@@ -5,6 +5,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Date;
+
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.*;
 
 /*
@@ -37,7 +39,33 @@ public class QueryHelper {
 		out.flush();
 	}
 	
-	private static void printNavigationButtons(Writer out, String user) throws IOException{
+	public static void accessDenied(Writer out) throws IOException {
+		out.write("<html>");
+		out.write("<head>");
+		out.write("<title>Access Denied</title>");
+		out.write("</head>");
+		out.write("<body>");
+		out.write("<h3>Access Denied</h3>");
+		out.write("Page does not exist or you do not have permission to access it.");
+		out.write("</body>");
+		out.write("</html>");
+		out.flush();
+	}
+	
+	public static void accessDenied(ServletOutputStream out) throws IOException {
+		out.println("<html>");
+		out.println("<head>");
+		out.println("<title>Access Denied</title>");
+		out.println("</head>");
+		out.println("<body>");
+		out.println("<h3>Access Denied</h3>");
+		out.println("Page does not exist or you do not have permission to access it.");
+		out.println("</body>");
+		out.println("</html>");
+	}
+
+	private static void printNavigationButtons(Writer out, String user)
+			throws IOException {
 		out.write("<table border=1><tr>");
 		out.write("<td><input type=\"button\" value=\"Home\" onClick=\"javascript:window.location='home.jsp';\"></td>");
 		out.write("<td><input type=\"button\" value=\"Profile\" onClick=\"javascript:window.location='userProfile.jsp';\"></td>");
@@ -52,8 +80,9 @@ public class QueryHelper {
 		out.write("</tr></table>");
 		out.flush();
 	}
-	
-	private static void printSearchBar(Writer out, String query, Date dateStart, Date dateEnd) throws IOException {
+
+	private static void printSearchBar(Writer out, String query,
+			Date dateStart, Date dateEnd) throws IOException {
 		String dateFormat = "yyyy-mm-dd";
 		out.write("<FORM NAME=\"SearchForm\" ACTION=\"home.jsp\" METHOD=\"get\"><TABLE border=1><TR VALIGN=TOP>");
 		out.write("<TD><I>Search:</I></TD>");
@@ -160,7 +189,25 @@ public class QueryHelper {
 		return null;
 	}
 
-	public String[] getImageInfo(int photoId) {
+	public boolean hasImageEditingAccess(int photoId) {
+		if (this.isAdmin) {
+			return true;
+		}
+
+		try {
+			PreparedStatement stmt = adapter
+					.prepareStatement("select * from images where photo_id=? and owner_name=?");
+			stmt.setInt(1, photoId);
+			stmt.setString(2, user);
+			ResultSet rset = adapter.executeQuery(stmt);
+			return rset.next();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+
+	public ImageInfo getImageInfo(int photoId) {
 		int groupId = -1;
 		PreparedStatement stmt;
 		ResultSet rset;
@@ -200,8 +247,15 @@ public class QueryHelper {
 					group = rset.getString("group_name");
 					rset.close();
 
-					return new String[] { title, place, description, owner,
-							date.toString(), group, Integer.toString(groupId) };
+					ImageInfo info = new ImageInfo();
+					info.subject = title;
+					info.place = place;
+					info.description = description;
+					info.owner = owner;
+					info.date = date;
+					info.group = group;
+					info.groupId = groupId;
+					return info;
 				}
 			}
 		} catch (SQLException e) {

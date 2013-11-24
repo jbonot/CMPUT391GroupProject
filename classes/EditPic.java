@@ -20,7 +20,7 @@ import proj1.*;
  * @author Li-Yan Yuan
  * 
  */
-public class DeletePic extends HttpServlet implements SingleThreadModel {
+public class EditPic extends HttpServlet implements SingleThreadModel {
 	/**
 	 * This method first gets the query string indicating PHOTO_ID, and then
 	 * executes the query select image from yuan.photos where photo_id =
@@ -42,28 +42,33 @@ public class DeletePic extends HttpServlet implements SingleThreadModel {
 		try {
 			photoId = Integer.parseInt(picid);
 		} catch (NumberFormatException e) {
-			out.println("no picture available");
+			QueryHelper.accessDenied(out);
 			return;
 		}
-		PreparedStatement stmt;
-
-		SQLAdapter adapter = new SQLAdapter();
-		QueryHelper helper = new QueryHelper(adapter, user);
-		try {
-			if (helper.hasImageEditingAccess(photoId)) {
-				stmt = adapter
-						.prepareStatement("delete from images where photo_id=?");
-				stmt.setInt(1, photoId);
-				adapter.executeUpdate(stmt);
-				adapter.closeConnection();
-				response.setHeader("Refresh", "0; URL=home.jsp?deletesuccess");
-			} else {
-				QueryHelper.accessDenied(out);
-				adapter.closeConnection();
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+//		PreparedStatement stmt;
+//		int permitted;
+//		
+//		SQLAdapter adapter = new SQLAdapter();
+//		QueryHelper helper = new QueryHelper(adapter, user);
+//		try {
+//			if (helper.hasImageEditingAccess(photoId)) {
+//
+//				String query = "update from images "
+//						+ " set permitted=? subject=? place=? timing=? "
+//						+ "description=? thumbnail=? photo=? "
+//						+ "where photo_id=?";
+//				stmt = adapter.prepareStatement(query);
+//				stmt.setInt(1, photoId);
+//				adapter.executeUpdate(stmt);
+//				adapter.closeConnection();
+//				response.setHeader("Refresh", "0; URL=GetBigPic?" + photoId);
+//			} else {
+//				QueryHelper.accessDenied(out);
+//				adapter.closeConnection();
+//			}
+//		} catch (SQLException e) {
+//			e.printStackTrace();
+//		}
 
 	}
 }
