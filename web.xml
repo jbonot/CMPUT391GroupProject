@@ -6,6 +6,15 @@
  version="2.4">
 
     <servlet>
+        <servlet-name>DeletePic</servlet-name>
+        <servlet-class>DeletePic</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>DeletePic</servlet-name>
+        <url-pattern>/DeletePic</url-pattern>
+    </servlet-mapping>
+    
+    <servlet>
         <servlet-name>GetOnePic</servlet-name>
         <servlet-class>GetOnePic</servlet-class>
     </servlet>

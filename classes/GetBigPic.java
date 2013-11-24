@@ -34,6 +34,7 @@ public class GetBigPic extends HttpServlet implements SingleThreadModel {
 			response.setHeader("Refresh", "0; URL=index.jsp");
 			return;
 		}
+		
 		PrintWriter out = response.getWriter();
 		try {
 			response.setContentType("text/html");
@@ -71,9 +72,6 @@ public class GetBigPic extends HttpServlet implements SingleThreadModel {
 
 				out.println("<html><head><title>" + title + "</title></head>");
 				out.println("<body>");
-				out.println("<input type=\"button\" "
-						+ "value=\"Home\" name=\"Home\" "
-						+ "onclick=\"javascript:window.location='home.jsp';\" /><BR>");
 				out.println("<img src = \"/proj1/GetOnePic?" + picid
 						+ "\"><BR>");
 				out.println("<TABLE border=1>");
@@ -91,6 +89,15 @@ public class GetBigPic extends HttpServlet implements SingleThreadModel {
 				out.println("<TD>" + description + "</TD></TR>");
 				out.println("</TABLE>");
 				out.println("</body></html>");
+				
+				if (user.equals(owner) || user.equals("admin")){
+					out.println("<BR><input type=\"button\" "
+							+ "value=\"Edit Image\" name=\"Home\" "
+							+ "onclick=\"\" />");
+					out.println("<input type=\"button\" "
+							+ "value=\"Delete Image\" name=\"Home\" "
+							+ "onclick=\"/DeletePic?"+ photoId + "\" /><BR>");
+				}
 			} else {
 
 				out.println("<html><head><title>Access Denied</title></head>");
