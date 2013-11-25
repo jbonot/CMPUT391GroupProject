@@ -159,7 +159,7 @@ public class UploadImage extends HttpServlet
                 {
                     //check if file is a jpg or png. if not, refresh page.
                     String type = item.getContentType();
-                    if(type.equals("image/jpeg") || type.equals("image/png"))
+                    if(type.equals("image/jpeg") || type.equals("image/gif"))
                     {
                         //get image stream, put into array
                         instream.add(item.getInputStream());
@@ -218,6 +218,7 @@ public class UploadImage extends HttpServlet
                 PreparedStatement fillBlobs = db.prepareStatement("SELECT * FROM images WHERE photo_id = ? FOR UPDATE");
                 fillBlobs.setInt(1, pic_id);
                 ResultSet rset2 = db.executeQuery(fillBlobs);
+                rset2.next();
 
                 // Write the thumbnail to the blob object
                 BLOB myThumbnail = ((OracleResultSet) rset2).getBLOB(8);
@@ -244,6 +245,7 @@ public class UploadImage extends HttpServlet
         catch (Exception ex)
         {
             response_message = ex.getMessage();
+            ex.printStackTrace();
         }
 
         writeResponse(response, out);
