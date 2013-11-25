@@ -81,7 +81,7 @@ public class UploadImage extends HttpServlet
         //html printer
         PrintWriter out = response.getWriter();
         
-        // use a cookie to retrieve oracle database information, as well as current username.
+        //use a cookie to retrieve oracle database information, as well as current username.
         Cookie cookies [] = request.getCookies ();
         Cookie currentUserCookie = null;
 
@@ -197,6 +197,7 @@ public class UploadImage extends HttpServlet
                 ResultSet rset1 = db.executeQuery(getId);
                 rset1.next();
                 pic_id = rset1.getInt(1);
+                rset1.close();
                 getId.close();
     
                 //Prepare an INSERT statement, then embed gathered values into statement
@@ -212,38 +213,39 @@ public class UploadImage extends HttpServlet
                 insertData.setString(7, description);
                 db.executeUpdate(insertData);
                 insertData.close();
-    
+                
                 //now select empty blobs from the row, and update them
-                PreparedStatement fillBlobs = db.prepareStatement("SELECT thumbnail, photo FROM images WHERE photo_id = ? FOR UPDATE of thumbnail, photo");
-                insertData.setInt(1, pic_id);
-                ResultSet rset = db.executeQuery(fillBlobs);
-                fillBlobs.close();
-                rset.next();
-                BLOB myblob = ((OracleResultSet) rset).getBLOB(1);
-    
+                PreparedStatement fillBlobs = db.prepareStatement("SELECT * FROM images WHERE photo_id = ? FOR UPDATE");
+                fillBlobs.setInt(1, pic_id);
+                ResultSet rset2 = db.executeQuery(fillBlobs);
+
                 // Write the thumbnail to the blob object
-                OutputStream outstream = myblob.setBinaryStream(0);
-                ImageIO.write(thumbNail.elementAt(j), "jpg", outstream);
+                BLOB myThumbnail = ((OracleResultSet) rset2).getBLOB(8);
+                OutputStream outstreamThumb = myThumbnail.setBinaryStream(0);
+                ImageIO.write(thumbNail.elementAt(j), "jpg", outstreamThumb);
                 
                 //write bigger image to next blob
-                myblob = ((OracleResultSet) rset).getBLOB(2);
-                outstream = myblob.setBinaryStream(0);
-                ImageIO.write(img.elementAt(j), "jpg", outstream);
-    
-                //close streams and commit the row change
+                BLOB myImg = ((OracleResultSet) rset2).getBLOB(9);
+                OutputStream outstreamImg = myImg.setBinaryStream(0);
+                ImageIO.write(img.elementAt(j), "jpg", outstreamImg);
+                
                 instream.elementAt(j).close();
+                outstreamThumb.close();
+                outstreamImg.close();
+                    
+                //close streams and commit the row change
+                rset2.close();
+                fillBlobs.close();
             }
             
-            outstream.close();
             db.closeConnection();
             response_message = " Upload OK!  ";
         }
         catch (Exception ex)
         {
-            // System.out.println( ex.getMessage());
             response_message = ex.getMessage();
         }
-        
+
         writeResponse(response, out);
         response.setHeader("Refresh", "2; URL=home.jsp");
         return;
