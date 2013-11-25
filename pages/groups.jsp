@@ -16,43 +16,70 @@
 	String members = "";
 	String status = request.getParameter("status");
 	int groupId = -1;
+	Mode mode;
+	String title = "";
+	String readonly = "";
 
-	// Check if we are in edit mode.
-	String editString = request.getParameter("edit");
-	if (editString != null) {
+	// Check if we are in view/edit mode.
+	String viewString = request.getParameter("view");
+	if (viewString != null) {
 		try {
-			groupId = Integer.parseInt(editString);
-
+			String prefix = "";
+			groupId = Integer.parseInt(viewString);
+			System.out.println("groups.java groupId: " + groupId);
 			// Validate access.
 			rset = helper.fetchGroupAsEditor(groupId);
 			if (rset.next()) {
-				String prefix = "";
 				// Get group info.
 				groupName = rset.getString("group_name");
-
 				rset.close();
+				mode = Mode.EDIT;
+				System.out.println("groups.java edit");
 
-				// Get string of members.
-				rset = helper.fetchGroupMembers(groupId);
-				while (rset.next()) {
-
-					String member = rset.getString("friend_id");
-					if (!member.equals(user)) {
-						members += prefix + member;
-						prefix = ", ";
-					}
-
-				}
 			} else {
-				groupId = -1;
+				rset.close();
+				rset = helper.fetchGroup(groupId);
+				groupName = rset.getString("group_name");
+				rset.close();
+				mode = Mode.VIEW;
+				System.out.println("groups.java view");
 			}
+
+			// Get string of members.
+			rset = helper.fetchGroupMembers(groupId);
+			while (rset.next()) {
+
+				String member = rset.getString("friend_id");
+				if (!member.equals(user)) {
+					members += prefix + member;
+					prefix = ", ";
+				}
+
+			}
+			rset.close();
 		} catch (Exception e) {
 			e.printStackTrace();
+			mode = Mode.ADD;
 		}
+	} else {
+		mode = Mode.ADD;
+	}
+
+	switch (mode) {
+	case EDIT:
+		title = "View/Edit Group";
+		break;
+	case VIEW:
+		title = "View Group";
+		readonly = " readonly";
+		break;
+	default:
+		title = "Add Group";
+		break;
 	}
 %>
 
-<TITLE><%=(groupId == -1 ? "Add Group" : "Edit Group")%></TITLE>
+<TITLE><%=title%></TITLE>
 <table width="100%">
 	<tr>
 		<td>
@@ -80,9 +107,17 @@
 						members = request.getParameter("members");
 						String invalidMembersString = request
 								.getParameter("invalid_members");
-						
-						// TODO: this needs to go above?
+
 						String id = request.getParameter("id");
+
+						if (id != null) {
+							try {
+								// We are editing a group.
+								groupId = Integer.parseInt(id);
+							} catch (Exception e) {
+								e.printStackTrace();
+							}
+						}
 
 						if (status.contains("invgroup")) {
 							// Invalid group name.
@@ -103,18 +138,6 @@
 								}
 							}
 						}
-						
-						// TODO: Need to assign.
-						if (id != null){
-							try
-							{
-								groupId = Integer.parseInt(id);
-							}catch (Exception e){
-								e.printStackTrace();
-							}
-						}
-						
-						
 					}
 
 					if (members != null) {
@@ -123,33 +146,37 @@
 						members = "";
 					}
 				}
-
-				out.println("<h3>" + (groupId == -1 ? "Add Group" : "Edit Group")
-						+ "</h3>");
 			%>
-
+			<H3><%=title %></H3>
 			<Table width="%100">
 				<tr>
 					<td valign="top">
 						<FORM NAME="RegisterForm"
-							ACTION="Groups?<%=(groupId == -1 ? "Add" : "Update=" + groupId)%>"
+							ACTION="Groups?<%=(mode == Mode.EDIT ? "Add" : "Update=" + groupId)%>"
 							METHOD="post">
 							<TABLE>
 								<TR VALIGN=TOP ALIGN=LEFT>
 									<TD><B><I>Group Name:</I></B></TD>
 									<TD><INPUT TYPE="text" NAME="GROUP"
 										VALUE="<%=groupName.replaceAll("\"", "&quot;")%>" required
-										style="width: 178px;"><BR></TD>
+										style="width: 178px;" <%=readonly%>><BR></TD>
 								</TR>
 								<TR VALIGN=TOP ALIGN=LEFT>
 									<TD><B><I>Members:</I></B></TD>
-									<TD><textarea name="MEMBERS" cols="40" rows="5"><%=members%></textarea></TD>
+									<TD><textarea name="MEMBERS" cols="40" rows="5"
+											<%=readonly%>><%=members%></textarea></TD>
 								</TR>
-								<TR>
-									<TD></TD>
-									<TD align="right"><input type="submit" name="SUBMIT"
-										value="<%=(groupId == -1 ? "Add Group" : "Update Group")%>"></TD>
-								</TR>
+								<%
+									if (mode != Mode.VIEW) {
+
+										out.println("<TR><TD></TD>");
+										out.println("<TD align=\"right\">");
+										out.println("<input type=\"submit\" name=\"SUBMIT\" value=\""
+												+ (mode == Mode.EDIT ? "Add Group" : "Update Group")
+												+ "\"></TD>");
+										out.println("</TR>");
+									}
+								%>
 							</TABLE>
 						</FORM>
 					</td>
@@ -199,10 +226,8 @@
  		creator = rset.getString("user_name");
  		out.println("<tr>");
  		out.println("<td align=\"center\">");
- 		if (user.equals(creator)) {
- 			out.println("<a href=\"/proj1/groups.jsp?edit="
- 					+ rset.getInt("group_id") + "\">");
- 		}
+ 		out.println("<a href=\"/proj1/groups.jsp?view="
+ 				+ rset.getInt("group_id") + "\">");
  		out.println(rset.getString("group_name") + "</a></td>");
  		out.println("<td align=\"center\">" + creator + "</td>");
  		out.println("<td align=\"center\">"
