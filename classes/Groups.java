@@ -13,18 +13,8 @@ public class Groups extends HttpServlet implements SingleThreadModel {
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
-		Cookie cookies[] = request.getCookies();
-		Cookie userCookie = null;
-		if (cookies != null) {
-			for (int i = 0; i < cookies.length; i++) {
-				if (cookies[i].getName().equals("User")) {
-					userCookie = cookies[i];
-					break;
-				}
-			}
-		}
-
-		if (userCookie == null) {
+		String user = HtmlPrinter.getUserCookie(request.getCookies());
+		if (user == null) {
 			response.setHeader("Refresh", "0; URL=index.jsp");
 			return;
 		}
@@ -34,7 +24,6 @@ public class Groups extends HttpServlet implements SingleThreadModel {
 			return;
 		}
 
-		String user = userCookie.getValue();
 		String groupName = request.getParameter("GROUP");
 		String membersText = request.getParameter("MEMBERS");
 
@@ -42,15 +31,45 @@ public class Groups extends HttpServlet implements SingleThreadModel {
 		List<String> members = new ArrayList<String>();
 		String membersWithBlanks[] = membersText.split("[\\s,;]");
 
+		SQLAdapter adapter = new SQLAdapter();
+		QueryHelper helper = new QueryHelper(adapter, user);
+
+		String encodedHeader = "0; URL=groups.jsp?group="
+				+ URLEncoder.encode(groupName, "UTF-8");
+
 		for (String member : membersWithBlanks) {
 			if (!member.isEmpty()) {
 				members.add(member);
 			}
 		}
 
-		SQLAdapter adapter = new SQLAdapter();
-		String encodedHeader = "0; URL=groups.jsp?group="
-				+ URLEncoder.encode(groupName, "UTF-8");
+		ResultSet rset;
+		int groupId = -1;
+		List<String> storedMembers = null;
+		String storedGroupName = null;
+
+		String editGroup = request.getParameter("Update");
+		if (editGroup != null) {
+			try {
+				groupId = Integer.parseInt(editGroup);
+
+				// Validate access.
+				rset = helper.fetchGroupAsEditor(groupId);
+				if (rset.next()) {
+					// Get group info.
+					storedGroupName = rset.getString("group_name");
+					rset.close();
+
+					storedMembers = this
+							.getStoredMembers(helper, groupId, user);
+				} else {
+					groupId = -1;
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+
 		try {
 
 			String[] splitMembers = this.splitMembers(adapter, members, user);
@@ -65,38 +84,25 @@ public class Groups extends HttpServlet implements SingleThreadModel {
 				// members.
 				if (!invMembers) {
 					// Insert new group
-					
+
 					String[] validMembers;
 					if (user.equals("admin")) {
 						validMembers = splitMembers[0].split(",");
 					} else {
-						// Add the creator to the group if the user is not admin.
+						// Add the creator to the group if the user is not
+						// admin.
 						validMembers = splitMembers[0].concat("," + user)
 								.split(",");
 					}
 
 					Date date = new Date(System.currentTimeMillis());
-					int groupId = this.getNextId(adapter);
+					groupId = this.getNextId(adapter);
 
-					PreparedStatement stmt = adapter
-							.prepareStatement("insert into groups values(?,?,?,?)");
-					stmt.setInt(1, groupId);
-					stmt.setString(2, user);
-					stmt.setString(3, groupName);
-					stmt.setDate(4, date);
-					adapter.executeUpdate(stmt);
-					stmt.close();
+					helper.insertGroup(groupId, groupName, date);
 
 					for (String member : validMembers) {
 						// Insert member into group
-						stmt = adapter
-								.prepareStatement("insert into group_lists values(?,?,?,?)");
-						stmt.setInt(1, groupId);
-						stmt.setString(2, member);
-						stmt.setDate(3, date);
-						stmt.setString(4, null);
-						adapter.executeUpdate(stmt);
-						stmt.close();
+						helper.insertGroupMember(groupId, member, date);
 					}
 
 					// Success
@@ -141,14 +147,32 @@ public class Groups extends HttpServlet implements SingleThreadModel {
 		doGet(request, response);
 	}
 
+	private List<String> getStoredMembers(QueryHelper helper, int groupId,
+			String creator) {
+		ResultSet rset = helper.fetchGroupMembers(groupId);
+		List<String> oldMembers = new ArrayList<String>();
+		try {
+
+			while (rset.next()) {
+				String member = rset.getString("friend_id");
+				if (!member.equals(creator)) {
+					oldMembers.add(member);
+				}
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return oldMembers;
+	}
+
 	private int getNextId(SQLAdapter adapter) throws SQLException {
 		ResultSet rset = adapter
 				.executeFetch("select group_sequence.nextVal from dual");
 		return rset.next() ? rset.getInt(1) : -1;
 	}
 
-	private String[] splitMembers(SQLAdapter adapter, List<String> members, String user)
-			throws SQLException {
+	private String[] splitMembers(SQLAdapter adapter, List<String> members,
+			String user) throws SQLException {
 		List<String> valid = new ArrayList<String>();
 		List<String> invalid = new ArrayList<String>();
 
@@ -157,7 +181,8 @@ public class Groups extends HttpServlet implements SingleThreadModel {
 		String prefix;
 
 		for (String member : members) {
-			if (!member.equals(user) && !member.equals("admin") && this.isValidUser(adapter, member)) {
+			if (!member.equals(user) && !member.equals("admin")
+					&& this.isValidUser(adapter, member)) {
 				valid.add(member);
 			} else {
 				invalid.add(member);

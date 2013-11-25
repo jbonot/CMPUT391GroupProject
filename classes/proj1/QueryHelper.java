@@ -122,7 +122,111 @@ public class QueryHelper {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+
 		return false;
+	}
+	
+	public void insertGroupMember(int groupId, String member, Date date) throws SQLException{
+		PreparedStatement stmt;
+		stmt = adapter
+				.prepareStatement("insert into group_lists values(?,?,?,?)");
+		stmt.setInt(1, groupId);
+		stmt.setString(2, member);
+		stmt.setDate(3, date);
+		stmt.setString(4, null);
+		adapter.executeUpdate(stmt);
+		stmt.close();
+	}
+	
+	public void insertGroup(int groupId, String groupName, Date date) throws SQLException{
+		PreparedStatement stmt = adapter
+				.prepareStatement("insert into groups values(?,?,?,?)");
+		stmt.setInt(1, groupId);
+		stmt.setString(2, user);
+		stmt.setString(3, groupName);
+		stmt.setDate(4, date);
+		adapter.executeUpdate(stmt);
+		stmt.close();
+	}
+	
+	public void updateGroup(int groupId, String groupName) throws SQLException{
+		PreparedStatement stmt = adapter
+				.prepareStatement("update groups group_name=? where group_id=?");
+		stmt.setString(1, groupName);
+		stmt.setInt(2, groupId);
+		adapter.executeUpdate(stmt);
+		stmt.close();
+	}
+	
+	public void removeGroupMember(int groupId, String member) throws SQLException{
+		PreparedStatement stmt;
+		stmt = adapter
+				.prepareStatement("delete from group_lists where group_id=? and friend_id=?");
+		stmt.setInt(1, groupId);
+		stmt.setString(2, member);
+		adapter.executeUpdate(stmt);
+		stmt.close();
+	}
+
+	public ResultSet fetchGroupAsEditor(int groupId) {
+
+		try {
+			PreparedStatement stmt;
+			ResultSet rset;
+			if (this.isAdmin) {
+				stmt = adapter
+						.prepareStatement("select * from groups where group_id=? and user_name=?");
+				stmt.setInt(1, groupId);
+				rset = adapter.executeQuery(stmt);
+
+				return rset;
+			}
+
+			// Check if the user owns the group.
+			stmt = adapter
+					.prepareStatement("select * from groups where group_id=? and user_name=?");
+			stmt.setInt(1, groupId);
+			stmt.setString(2, user);
+			rset = adapter.executeQuery(stmt);
+
+			return rset;
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		return null;
+	}
+
+	public ResultSet fetchGroupMembers(int groupId) {
+		PreparedStatement stmt;
+
+		try {
+			stmt = adapter
+					.prepareStatement("select * from group_lists where group_id=?");
+
+			stmt.setInt(1, groupId);
+
+			return adapter.executeQuery(stmt);
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		return null;
+	}
+
+	public ResultSet fetchGroup(int groupId) {
+		PreparedStatement stmt;
+		try {
+			stmt = adapter
+					.prepareStatement("select * from groups where group_id=?");
+			stmt.setInt(1, groupId);
+			return adapter.executeQuery(stmt);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	public ImageInfo getImageInfo(int photoId) {
@@ -222,10 +326,10 @@ public class QueryHelper {
 			return adapter
 					.executeFetch("select group_id, group_name from groups where group_id<>1 and group_id<>2");
 		} else {
-				stmt = adapter
-						.prepareStatement("SELECT group_id, group_name FROM groups WHERE user_name = ?");
-				stmt.setString(1, user);
-				return adapter.executeQuery(stmt);
+			stmt = adapter
+					.prepareStatement("SELECT group_id, group_name FROM groups WHERE user_name = ?");
+			stmt.setString(1, user);
+			return adapter.executeQuery(stmt);
 		}
 	}
 
