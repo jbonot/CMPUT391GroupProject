@@ -11,13 +11,13 @@ insert into persons values('admin', 'Administrator', '', '', 'admin@admin.ca', '
 
 select group_sequence.nextVal from dual;
 insert into groups values(3, 'matwood', 'authors', sysdate);
+select group_sequence.nextVal from dual;
+insert into groups values(4, 'bob123', 'spies', sysdate);
 
-insert into group_lists values(1, 'alice456', sysdate, 'notice');
-insert into group_lists values(1, 'matwood', sysdate, 'notice');
-insert into group_lists values(1, 'bob123', sysdate, 'notice');
-insert into group_lists values(2, 'bob123', sysdate, 'notice');
 insert into group_lists values(3, 'matwood', sysdate, 'notice');
 insert into group_lists values(3, 'alice456', sysdate, 'notice');
+insert into group_lists values(4, 'alice456', sysdate, 'notice');
+insert into group_lists values(4, 'bob123', sysdate, 'notice');
 
 select photo_id_sequence.nextVal from dual;
 insert into images values(1, 'bob123', 1, 'fruit', 'the orchard', sysdate, 'a bunch of apples from the tree', EMPTY_BLOB(), EMPTY_BLOB());
