@@ -24,6 +24,7 @@ public class Groups extends HttpServlet implements SingleThreadModel {
 			return;
 		}
 
+		Mode mode = Mode.ADD;
 		String groupName = request.getParameter("GROUP");
 		String membersText = request.getParameter("MEMBERS");
 
@@ -62,6 +63,7 @@ public class Groups extends HttpServlet implements SingleThreadModel {
 
 					storedMembers = this
 							.getStoredMembers(helper, groupId, user);
+					mode = Mode.EDIT;
 				} else {
 					groupId = -1;
 				}
@@ -78,7 +80,10 @@ public class Groups extends HttpServlet implements SingleThreadModel {
 			boolean invMembers = splitMembers[0].isEmpty()
 					|| !splitMembers[1].isEmpty();
 
-			if (this.isValidGroup(adapter, groupName, user)) {
+			// Group name is valid if it wasn't changed or if it does not yet
+			// exist in the database.
+			if ((mode == Mode.EDIT && groupName.equals(storedGroupName))
+					|| (this.isValidGroup(adapter, groupName, user))) {
 
 				// There must be at least one valid member and no invalid
 				// members.
@@ -96,15 +101,17 @@ public class Groups extends HttpServlet implements SingleThreadModel {
 					}
 
 					Date date = new Date(System.currentTimeMillis());
-					groupId = this.getNextId(adapter);
 
-					if (groupId == -1) {
+					if (mode == Mode.ADD) {
+						// Insert a new group.
+						groupId = this.getNextId(adapter);
 						helper.insertGroup(groupId, groupName, date);
 					} else if (!groupName.equals(storedGroupName)) {
+						// Update the group name.
 						helper.updateGroup(groupId, groupName);
 					}
 
-					if (storedMembers == null) {
+					if (mode == Mode.ADD) {
 						for (String member : validMembers) {
 							// Insert member into group
 							helper.insertGroupMember(groupId, member, date);
@@ -116,20 +123,20 @@ public class Groups extends HttpServlet implements SingleThreadModel {
 								newMembers.add(member);
 							}
 						}
-						
+
 						// Remaining members in the list are to be deleted.
-						for (String member : storedMembers){
+						for (String member : storedMembers) {
 							helper.removeGroupMember(groupId, member);
 						}
-						
+
 						// Add new members.
-						for (String member : newMembers){
+						for (String member : newMembers) {
 							helper.insertGroupMember(groupId, member, date);
 						}
 					}
 
 					// Success
-					status = storedGroupName == null ? "success" : "updated";
+					status = mode == Mode.ADD ? "success" : "updated";
 				}
 			} else {
 				// Invalid group name.
@@ -141,14 +148,19 @@ public class Groups extends HttpServlet implements SingleThreadModel {
 				status += status.isEmpty() ? "invmembers" : "+invmembers";
 			}
 
+			if (mode == Mode.EDIT) {
+				encodedHeader += "&id=" + groupId;
+			}
+
 			// Set the status.
 			encodedHeader += "&status=" + status;
 
 			if (!status.equals("success")) {
 
-				if (!membersText.isEmpty()) {
+				if (!members.isEmpty()) {
+					String membersCondensed = this.getCondensedList(members);
 					encodedHeader += "&members="
-							+ URLEncoder.encode(membersText, "UTF-8");
+							+ URLEncoder.encode(membersCondensed, "UTF-8");
 				}
 
 				if (!splitMembers[1].isEmpty()) {
@@ -192,14 +204,21 @@ public class Groups extends HttpServlet implements SingleThreadModel {
 		return rset.next() ? rset.getInt(1) : -1;
 	}
 
+	private String getCondensedList(List<String> items) {
+		String prefix = "";
+		String list = "";
+		for (String item : items) {
+			list += prefix + item;
+			prefix = ",";
+		}
+
+		return list;
+	}
+
 	private String[] splitMembers(SQLAdapter adapter, List<String> members,
 			String user) throws SQLException {
 		List<String> valid = new ArrayList<String>();
 		List<String> invalid = new ArrayList<String>();
-
-		String validMembers = "";
-		String invalidMembers = "";
-		String prefix;
 
 		for (String member : members) {
 			if (!member.equals(user) && !member.equals("admin")
@@ -211,18 +230,8 @@ public class Groups extends HttpServlet implements SingleThreadModel {
 		}
 
 		// Set the string of valid members.
-		prefix = "";
-		for (String member : valid) {
-			validMembers += prefix + member;
-			prefix = ",";
-		}
-
-		// Set the string of invalid members.
-		prefix = "";
-		for (String member : invalid) {
-			invalidMembers += prefix + member;
-			prefix = ",";
-		}
+		String validMembers = this.getCondensedList(valid);
+		String invalidMembers = this.getCondensedList(invalid);
 
 		return new String[] { validMembers, invalidMembers };
 	}
