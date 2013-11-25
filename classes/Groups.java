@@ -98,11 +98,32 @@ public class Groups extends HttpServlet implements SingleThreadModel {
 					Date date = new Date(System.currentTimeMillis());
 					groupId = this.getNextId(adapter);
 
-					helper.insertGroup(groupId, groupName, date);
+					if (groupId == -1) {
+						helper.insertGroup(groupId, groupName, date);
+					} else if (!groupName.equals(storedGroupName)) {
+						helper.updateGroup(groupId, groupName);
+					}
 
-					for (String member : validMembers) {
-						// Insert member into group
-						helper.insertGroupMember(groupId, member, date);
+					if (storedMembers == null) {
+						for (String member : validMembers) {
+							// Insert member into group
+							helper.insertGroupMember(groupId, member, date);
+						}
+					} else {
+						List<String> newMembers = new ArrayList<String>();
+						for (String member : validMembers) {
+							if (!storedMembers.remove(member)) {
+								newMembers.add(member);
+							}
+						}
+						
+						for (String member : storedMembers){
+							helper.removeGroupMember(groupId, member);
+						}
+						
+						for (String member : newMembers){
+							helper.insertGroupMember(groupId, member, date);
+						}
 					}
 
 					// Success
@@ -155,9 +176,7 @@ public class Groups extends HttpServlet implements SingleThreadModel {
 
 			while (rset.next()) {
 				String member = rset.getString("friend_id");
-				if (!member.equals(creator)) {
-					oldMembers.add(member);
-				}
+				oldMembers.add(member);
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
