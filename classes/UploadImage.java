@@ -201,7 +201,7 @@ public class UploadImage extends HttpServlet
     
                 //Prepare an INSERT statement, then embed gathered values into statement
                 PreparedStatement insertData = db.prepareStatement("INSERT INTO images VALUES" +
-                		"(?, ?, ?, ?, ?, ?, ?, empty_blob(), empty_blob()");
+                		"(?, ?, ?, ?, ?, ?, ?, empty_blob(), empty_blob())");
                 
                 insertData.setInt(1, pic_id);
                 insertData.setString(2, user);
@@ -217,23 +217,24 @@ public class UploadImage extends HttpServlet
                 PreparedStatement fillBlobs = db.prepareStatement("SELECT thumbnail, photo FROM images WHERE photo_id = ? FOR UPDATE of thumbnail, photo");
                 insertData.setInt(1, pic_id);
                 ResultSet rset = db.executeQuery(fillBlobs);
+                fillBlobs.close();
                 rset.next();
-                BLOB myblob = ((OracleResultSet) rset).getBLOB(8);
+                BLOB myblob = ((OracleResultSet) rset).getBLOB(1);
     
                 // Write the thumbnail to the blob object
                 OutputStream outstream = myblob.setBinaryStream(0);
                 ImageIO.write(thumbNail.elementAt(j), "jpg", outstream);
                 
                 //write bigger image to next blob
-                myblob = ((OracleResultSet) rset).getBLOB(9);
+                myblob = ((OracleResultSet) rset).getBLOB(2);
                 outstream = myblob.setBinaryStream(0);
                 ImageIO.write(img.elementAt(j), "jpg", outstream);
     
                 //close streams and commit the row change
                 instream.elementAt(j).close();
-                outstream.close();
             }
             
+            outstream.close();
             db.closeConnection();
             response_message = " Upload OK!  ";
         }
