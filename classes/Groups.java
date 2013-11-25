@@ -117,17 +117,19 @@ public class Groups extends HttpServlet implements SingleThreadModel {
 							}
 						}
 						
+						// Remaining members in the list are to be deleted.
 						for (String member : storedMembers){
 							helper.removeGroupMember(groupId, member);
 						}
 						
+						// Add new members.
 						for (String member : newMembers){
 							helper.insertGroupMember(groupId, member, date);
 						}
 					}
 
 					// Success
-					status = "success";
+					status = storedGroupName == null ? "success" : "updated";
 				}
 			} else {
 				// Invalid group name.

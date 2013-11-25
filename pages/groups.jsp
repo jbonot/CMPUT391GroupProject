@@ -72,10 +72,17 @@
 						out.println("Successfully added '" + groupName + "'");
 						groupName = "";
 
+					} else if (status.equals("updated")) {
+						// Successful updated.
+						out.println("Successfully updated '" + groupName + "'");
+						groupName = "";
 					} else {
 						members = request.getParameter("members");
 						String invalidMembersString = request
 								.getParameter("invalid_members");
+						
+						// TODO: this needs to go above?
+						String id = request.getParameter("id");
 
 						if (status.contains("invgroup")) {
 							// Invalid group name.
@@ -96,6 +103,18 @@
 								}
 							}
 						}
+						
+						// TODO: Need to assign.
+						if (id != null){
+							try
+							{
+								groupId = Integer.parseInt(id);
+							}catch (Exception e){
+								e.printStackTrace();
+							}
+						}
+						
+						
 					}
 
 					if (members != null) {
@@ -113,7 +132,7 @@
 				<tr>
 					<td valign="top">
 						<FORM NAME="RegisterForm"
-							ACTION="Groups?<%=(groupId== -1 ? "Add" : "Update=" + groupId) %>"
+							ACTION="Groups?<%=(groupId == -1 ? "Add" : "Update=" + groupId)%>"
 							METHOD="post">
 							<TABLE>
 								<TR VALIGN=TOP ALIGN=LEFT>
