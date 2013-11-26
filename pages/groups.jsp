@@ -16,7 +16,7 @@
 	String members = "";
 	String status = request.getParameter("status");
 	int groupId = -1;
-	Mode mode;
+	Mode mode = Mode.ADD;
 	String title = "";
 	String readonly = "";
 
@@ -26,7 +26,6 @@
 		try {
 			String prefix = "";
 			groupId = Integer.parseInt(viewString);
-			System.out.println("groups.java groupId: " + groupId);
 			// Validate access.
 			rset = helper.fetchGroupAsEditor(groupId);
 			if (rset.next()) {
@@ -34,15 +33,15 @@
 				groupName = rset.getString("group_name");
 				rset.close();
 				mode = Mode.EDIT;
-				System.out.println("groups.java edit");
-
+				
 			} else {
 				rset.close();
 				rset = helper.fetchGroup(groupId);
-				groupName = rset.getString("group_name");
-				rset.close();
-				mode = Mode.VIEW;
-				System.out.println("groups.java view");
+				if (rset.next()) {
+					groupName = rset.getString("group_name");
+					rset.close();
+					mode = Mode.VIEW;
+				}
 			}
 
 			// Get string of members.
@@ -59,10 +58,7 @@
 			rset.close();
 		} catch (Exception e) {
 			e.printStackTrace();
-			mode = Mode.ADD;
 		}
-	} else {
-		mode = Mode.ADD;
 	}
 
 	switch (mode) {
@@ -147,7 +143,7 @@
 					}
 				}
 			%>
-			<H3><%=title %></H3>
+			<H3><%=title%></H3>
 			<Table width="%100">
 				<tr>
 					<td valign="top">

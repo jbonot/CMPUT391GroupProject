@@ -175,7 +175,7 @@ public class QueryHelper {
 			ResultSet rset;
 			if (this.isAdmin) {
 				stmt = adapter
-						.prepareStatement("select * from groups where group_id=? and user_name=?");
+						.prepareStatement("select * from groups where group_id=?");
 				stmt.setInt(1, groupId);
 				rset = adapter.executeQuery(stmt);
 
