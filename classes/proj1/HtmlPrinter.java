@@ -76,7 +76,7 @@ public class HtmlPrinter {
 
 	private static void printNavigationButtons(ServletOutputStream out, String user)
 			throws IOException {
-		out.println("<table border=1><tr>");
+		out.println("<table><tr>");
 		out.println("<td><input type=\"button\" value=\"Home\" onClick=\"javascript:window.location='home.jsp';\"></td>");
 		out.println("<td><input type=\"button\" value=\"Profile\" onClick=\"javascript:window.location='userProfile.jsp';\"></td>");
 		out.println("<td><input type=\"button\" value=\"Upload\" onClick=\"javascript:window.location='upload_image.jsp';\"></td>");
@@ -87,6 +87,8 @@ public class HtmlPrinter {
 		}
 
 		out.println("<td><input type=\"button\" value=\"Logout\" onClick=\"javascript:window.location='logout.jsp';\"></td>");
+		out.println("</tr>");
+		out.println("<tr><td><table><tr><td>Logged in as " + user + "</td></tr></table></td></tr>");
 		out.println("</tr></table>");
 		out.flush();
 	}
@@ -135,6 +137,10 @@ public class HtmlPrinter {
 		}
 
 		return userCookie == null ? null : userCookie.getValue();
+	}
+	
+	public static String toAttributeString(String value){
+		return value.replaceAll("\"", "&quot;");
 	}
 
 }
