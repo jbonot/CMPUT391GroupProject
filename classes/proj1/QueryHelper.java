@@ -5,6 +5,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Date;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.*;
@@ -147,6 +149,54 @@ public class QueryHelper {
 		stmt.setDate(4, date);
 		adapter.executeUpdate(stmt);
 		stmt.close();
+	}
+	
+	public ResultSet fetchGroupImages(int groupId) throws SQLException{
+		PreparedStatement stmt = adapter.prepareStatement("select * from images where permitted=?");
+		stmt.setInt(1, groupId);
+		return adapter.executeQuery(stmt);
+	}
+	
+	private ResultSet setImagesPrivate(List<Integer> photoIds) throws SQLException{
+		String query = "update images permitted=2 where ";
+		String conjunction = "";
+		
+		for (int i = 0; i < photoIds.size(); i++){
+			query += conjunction + "photo_id=? ";
+			conjunction = "or ";
+		}
+		
+		PreparedStatement stmt = adapter.prepareStatement(query);
+		
+		int i = 1;
+		for (int id : photoIds){
+			stmt.setInt(i++, id);
+		}
+		
+		return adapter.executeQuery(stmt);
+	}
+	
+	public void deleteGroup(int groupId) throws SQLException{
+		PreparedStatement stmt;
+		ResultSet rset;
+		List<Integer> photoIds = new ArrayList<Integer>();
+		
+		stmt = adapter.prepareStatement("select * from images where permitted=?");
+		stmt.setInt(1, groupId);
+		rset = adapter.executeQuery(stmt);
+		
+		while (rset.next()){
+			photoIds.add(rset.getInt("photo_id"));
+		}
+		
+		rset.close();
+		stmt.close();
+		
+		this.setImagesPrivate(photoIds);
+		
+		stmt = adapter.prepareStatement("delete from groups where group_id=?");
+		stmt.setInt(1, groupId);
+		adapter.executeQuery(stmt);
 	}
 	
 	public void updateGroup(int groupId, String groupName) throws SQLException{
@@ -314,8 +364,10 @@ public class QueryHelper {
 			}
 
 		} catch (SQLException e) {
+			System.out.println(e);
 			e.printStackTrace();
 		}
+		
 		return null;
 	}
 

@@ -130,6 +130,7 @@
  			}
  		}
  	}
+	
  %>
 			<Table width="%100">
 				<tr>
@@ -202,9 +203,16 @@
 
 										out.println("<TR><TD></TD>");
 										out.println("<TD align=\"right\">");
-										out.println("<input type=\"submit\" name=\"SUBMIT\" value=\""
-												+ (mode == Mode.ADD ? "Add Group" : "Update Group")
-												+ "\"></TD>");
+										if (mode == Mode.EDIT){
+											out.println("<input type=\"submit\" name=\"SUBMIT\" value=\"Update Group\">");
+											out.println("<input type=\"submit\" name=\"DELETE\" value=\"Delete Group\">");
+										}
+										else
+										{
+											out.println("<input type=\"submit\" name=\"SUBMIT\" value=\"Add Group\">");
+										}
+										
+										out.println("</TD>");
 										out.println("</TR>");
 									}
 								%>
