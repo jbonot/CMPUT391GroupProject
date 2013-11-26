@@ -32,7 +32,6 @@
         %>
 
 	<h1>Upload image(s)...</h1>
-	<hr>
 
 	<form NAME="upload-image" METHOD="POST" ENCTYPE="multipart/form-data"
 		ACTION="UploadImage">

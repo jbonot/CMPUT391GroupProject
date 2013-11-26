@@ -15,7 +15,8 @@ public class HtmlPrinter {
 		HtmlPrinter.printNavigationButtons(out, user);
 		out.write("</td><td VALIGN=TOP align=right>");
 		HtmlPrinter.printSearchBar(out, query, dateStart, dateEnd);
-		out.write("</td></tr></table");
+		out.write("</td></tr></table>");
+		out.write("<hr>");
 		out.flush();
 	}
 	
@@ -25,7 +26,9 @@ public class HtmlPrinter {
 		HtmlPrinter.printNavigationButtons(out, user);
 		out.println("</td><td VALIGN=TOP align=right>");
 		HtmlPrinter.printSearchBar(out, query, dateStart, dateEnd);
-		out.println("</td></tr></table");
+		out.println("</td></tr></table>");
+		out.println("<hr>");
+		out.flush();
 	}
 
 	public static void accessDenied(Writer out) throws IOException {
@@ -51,6 +54,7 @@ public class HtmlPrinter {
 		out.println("Page does not exist or you do not have permission to access it.");
 		out.println("</body>");
 		out.println("</html>");
+		out.flush();
 	}
 
 	private static void printNavigationButtons(Writer out, String user)
@@ -116,6 +120,7 @@ public class HtmlPrinter {
 				+ (dateEnd != null ? dateEnd : dateFormat) + "\"></TD>");
 		out.println("<TD><INPUT TYPE=\"submit\" NAME=\"SEARCH\" VALUE=\"Search\"></TD>");
 		out.println("</TR></TABLE></FORM>");
+		out.flush();
 	}
 
 	public static String getUserCookie(Cookie[] cookies) {

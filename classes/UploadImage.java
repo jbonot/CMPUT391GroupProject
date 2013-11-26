@@ -81,29 +81,16 @@ public class UploadImage extends HttpServlet
         //html printer
         PrintWriter out = response.getWriter();
         
-        //use a cookie to retrieve oracle database information, as well as current username.
-        Cookie cookies [] = request.getCookies ();
-        Cookie currentUserCookie = null;
-
-        if (cookies != null){
-            for (int i = 0; i < cookies.length; i++) {
-                if (cookies [i].getName().equals ("User")){
-                    currentUserCookie = cookies[i];
-                    break;
-                }
-            }
-        }
-        //if cookie no longer valid, send back to login page
-        if (currentUserCookie == null) {
-            response.setHeader("Refresh", "0; URL=index.jsp");
-            return;
-        }
-        
         //connect to db
         SQLAdapter db = new SQLAdapter();//Create a new instance of the SQL Adapter to use
         
-        //store current user's name in string
-        String user = currentUserCookie.getValue();
+        //store current user's name in string from the cookie
+        String user = HtmlPrinter.getUserCookie(request.getCookies());
+        //if cookie no longer valid, send back to login page
+        if (user.equals(null)) {
+            response.setHeader("Refresh", "0; URL=index.jsp");
+            return;
+        }
         
         //declare and initialize all needed form values to default
         int pic_id;
@@ -185,10 +172,22 @@ public class UploadImage extends HttpServlet
             }
 
             //create SimpleDateFormat object, parse into sql date object
-            String date = year + "-" + month + "-" + day;
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-            java.util.Date parse = sdf.parse(date);
-            java.sql.Date when = new Date(parse.getTime());
+            java.sql.Date when;
+            try
+            {
+                String date = year + "-" + month + "-" + day;
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                sdf.setLenient(false);
+                java.util.Date parse = sdf.parse(date);
+                when = new Date(parse.getTime());
+            }
+            catch(Exception e)
+            {
+                response_message = " Invalid Date Entered!  ";
+                writeResponse(response, out);
+                response.setHeader("Refresh", "2; URL=upload_image.jsp");
+                return;
+            }
             
             for(int j = 0; j < img.size(); j++)
             {
