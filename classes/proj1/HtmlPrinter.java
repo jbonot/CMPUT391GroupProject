@@ -38,7 +38,7 @@ public class HtmlPrinter {
 		out.write("</head>");
 		out.write("<body>");
 		out.write("<h3>Access Denied</h3>");
-		out.write("Page does not exist or you do not have permission to access it.");
+		out.write("Page does not exist, or you do not have permission to access it.");
 		out.write("</body>");
 		out.write("</html>");
 		out.flush();

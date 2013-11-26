@@ -36,7 +36,8 @@ public class GetBigPic extends HttpServlet implements SingleThreadModel {
 		}
 
 		PrintWriter out = response.getWriter();
-		try {
+		try
+		{
 			response.setContentType("text/html");
 
 			int photoId;
@@ -56,7 +57,8 @@ public class GetBigPic extends HttpServlet implements SingleThreadModel {
 			ImageInfo info = helper.getImageInfo(photoId);
 			adapter.closeConnection();
 
-			if (info != null) {
+			if (info != null)
+			{
 
 				out.println("<html><head><title>" + info.subject + "</title>");
 				HtmlPrinter.printHeader(out, user, null, null, null);
@@ -78,9 +80,9 @@ public class GetBigPic extends HttpServlet implements SingleThreadModel {
 				out.println("<TR><TD><B><I>Description:</I></B></TD>");
 				out.println("<TD>" + info.description + "</TD></TR>");
 				out.println("</TABLE></TD></TR></TABLE>");
-				out.println("</body></html>");
 
-				if (user.equals(info.owner) || user.equals("admin")) {
+				if (user.equals(info.owner) || user.equals("admin"))
+				{
 					out.println("<BR><input type=\"button\" "
 							+ "value=\"Edit Image\" name=\"Home\" "
 							+ "onclick=\"javascript:window.location='edit_image.jsp?"
@@ -89,11 +91,21 @@ public class GetBigPic extends HttpServlet implements SingleThreadModel {
 							+ "value=\"Delete Image\" name=\"Home\" "
 							+ "onclick=\"javascript:window.location='DeletePic?"
 							+ photoId + "';\" /><BR>");
+					
+					out.println("</body></html>");
 				}
-			} else {
+				else
+				{
+				    out.println("</body></html>");
+				}
+			}
+			else
+			{
 				HtmlPrinter.accessDenied(out);
 			}
-		} catch (Exception e) {
+		}
+		catch (Exception e)
+		{
 			e.printStackTrace();
 		}
 	}

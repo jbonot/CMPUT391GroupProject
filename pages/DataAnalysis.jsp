@@ -3,13 +3,13 @@
 <%@ page import="proj1.*"%>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <%
-	String user = QueryHelper.getUserCookie(request.getCookies());
+	String user = HtmlPrinter.getUserCookie(request.getCookies());
 	if (user == null) {
 		response.setHeader("Refresh", "0; URL=index.jsp");
 		return;
 	}
 	
-	QueryHelper.printHeader(out, user, null, null, null);
+	HtmlPrinter.printHeader(out, user, null, null, null);
 	
 	//Get the username and check if they are an admin
 	if (!user.equals("admin")){

@@ -151,7 +151,7 @@ public class UploadImage extends HttpServlet
                         //get image stream, put into array
                         instream.add(item.getInputStream());
                         img.add(ImageIO.read(instream.lastElement()));
-                        thumbNail.add(shrink(img.lastElement(), 10));
+                        thumbNail.add(shrink(img.lastElement(), 3));
                     }
                     else if(type.equals("application/octet-stream"))
                     {
