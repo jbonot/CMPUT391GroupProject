@@ -3,6 +3,7 @@ import javax.servlet.*;
 import javax.servlet.http.*;
 
 import java.sql.*;
+
 import proj1.*;
 
 /**
@@ -54,8 +55,16 @@ public class GetOnePic extends HttpServlet implements SingleThreadModel {
 
 		SQLAdapter adapter = new SQLAdapter();
 		QueryHelper helper = new QueryHelper(adapter, user);
-		InputStream input = helper.getImage(photoId, big);
-		adapter.closeConnection();
+		ResultSet rset = helper.getImage(photoId, big);
+		InputStream input = null;
+
+		try {
+			if (rset.next()) {
+				input = rset.getBinaryStream(1);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 
 		if (input != null) {
 			response.setContentType("image/jpg");
@@ -64,10 +73,13 @@ public class GetOnePic extends HttpServlet implements SingleThreadModel {
 			while ((imageByte = input.read()) != -1) {
 				out.write(imageByte);
 			}
-			
+
 			input.close();
 		} else {
 			out.println("no picture available");
 		}
+
+		adapter.closeConnection();
+
 	}
 }
