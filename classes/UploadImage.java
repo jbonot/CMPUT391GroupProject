@@ -151,7 +151,7 @@ public class UploadImage extends HttpServlet
                         //get image stream, put into array
                         instream.add(item.getInputStream());
                         img.add(ImageIO.read(instream.lastElement()));
-                        thumbNail.add(shrink(img.lastElement(), 5));
+                        thumbNail.add(shrink(img.lastElement()));
                     }
                     else if(type.equals("application/octet-stream"))
                     {
@@ -252,12 +252,12 @@ public class UploadImage extends HttpServlet
         return;
     }
 
-    // shrink image by a factor of n, and return the shrinked image
-    public static BufferedImage shrink(BufferedImage image, int n)
+    // shrink image so that it is 150px in one direction, and return the shrinked image
+    public static BufferedImage shrink(BufferedImage image)
     {
-
-        int w = image.getWidth() / n;
-        int h = image.getHeight() / n;
+        int scale = image.getWidth() / 150;
+        int w = image.getWidth() / scale;
+        int h = image.getHeight() / scale;
 
         BufferedImage shrunkImage = new BufferedImage(w, h, image.getType());
 

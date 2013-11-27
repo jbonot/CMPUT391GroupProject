@@ -30,25 +30,50 @@
 	</p>
 	<h3>SQL Server and Tables</h3>
 	<p>
+	<blockquote>
+	
+	</blockquote>
 	</p>
 	<h3>Web Pages and Servlets</h3>
 	<p>
-		Once the SQL tables have been set up, it is now time to move onto the actual web content.
-		Navigate to your catalina/webapps/proj1/ directory, and copy all .jsp files from the pages folder of the project
+	<blockquote>
+		1. Once the SQL tables have been set up, it is now time to move onto the actual web content.
+		Navigate to your <i>catalina/webapps/proj1/</i> directory, and copy all <b>.jsp</b> files from the pages folder of the project
 		to this location.
 		<br><br>
-		Now go into the WEB-INF folder for the server, and copy web.xml to this location from the project folder.
+		2. Now go into the <i>WEB-INF/</i> folder for the server, and copy <b>web.xml</b> to this location from the project folder.
 		<br><br>
-		Next, navigate into the lib/ directory, and copy all .jar files from the lib folder of the project
+		3. Next, navigate into the <i>lib/</i> directory, and copy all <b>.jar</b> files from the lib folder of the project
 		to this location.
 		<br><br>
-		Then for a last copy operation, first navigate up one directory so that now you reside in the WEB-INF folder
-		once again. Create a new folder called classes, and navigate into it. Grab all files/folders from the classes folder
+		4. Then for a last copy operation, first navigate up one directory so that now you reside in the <i>WEB-INF/</i> folder
+		once again. Create a new folder called <i>classes</i>, and navigate into it. Grab all files/folders from the classes folder
 		of the project, and drag them to the newly created classes folder. This concludes the copying of files.
 		<br><br>
-		What now must be done is the compilation process. A Makefile will exist in the classes folder, which upon
-		executing will compile all java files in this folder (and in subfolder proj1). The user must open a terminal,
-		navigate to the classes directory, and simply type "make" (without quotations) to compile the servlets.
+		5. To make sure the website will be connecting to the right SQL database, the user must now edit the file
+		<b>SQLAdapter.java</b>, located within the classes/proj1 folder. At the top of this file are four variables:
+		<b>'m_url'</b>, <b>'m_driverName'</b>, <b>'m_userName'</b>, and <b>'m_password'</b>. Each one must be edited so 
+		that not only is the right database is being accessed, but the right username and password are used as well. Hard code
+		these values, then save the file.
+		<br><br>
+		6. What now must be done is the compilation process. A Makefile now exists in the <i>classes/</i> folder, which upon
+		executing will compile all java files in this folder (and in subfolder <i>proj1/</i>). The user must open a terminal,
+		navigate to the classes directory, and simply type <b><i>make</i></b> to compile the servlets.
+		<br><br>
+		The installation is now complete, and the user may now run the server with the command <b><i>starttomcat</i></b>.
+	</blockquote>
+	</p>
+	
+	<h1>Using the Modules</h1>
+	<p>
+		Using the actual website is pretty straight-forward, and is broken down into several different modules that are essential
+		for the website to function as intended. Below is a description of each module, and how to use them.
+	</p>
+	<h3>Login/Registration Module</h3>
+	<p>
+	<blockquote>
+	
+	</blockquote>
 	</p>
 	
 </body>
