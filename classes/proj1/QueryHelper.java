@@ -372,10 +372,12 @@ public class QueryHelper {
 				stmt.setInt(1, photoId);
 
 			} else {
-				String query = "select " + format
-						+ " from images, group_lists where photo_id=? and "
+				String query = "select * from"
+						+ " (select " + format + ", photo_id, owner_name, permitted, group_id, friend_id from images outer left join group_lists on permitted=group_id) "
+												+ "where photo_id=? and "
 						+ SECURITY_CONDITION;
 
+				System.out.println(query);
 				stmt = adapter.prepareStatement(query);
 				stmt.setInt(1, photoId);
 				this.setSecurityParameters(stmt, 2);
