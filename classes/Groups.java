@@ -19,18 +19,16 @@ public class Groups extends HttpServlet implements SingleThreadModel {
 			return;
 		}
 
-		if (request.getParameter("SUBMIT") == null) {
+		boolean delete = request.getParameter("DELETE") != null;
+		if (request.getParameter("SUBMIT") == null && !delete) {
 			response.setHeader("Refresh", "0; URL=groups.jsp");
 			return;
 		}
 
 		Mode mode = Mode.ADD;
 		String groupName = request.getParameter("GROUP");
-		String membersText = request.getParameter("MEMBERS");
 
 		String status = "";
-		List<String> members = new ArrayList<String>();
-		String membersWithBlanks[] = membersText.split("[\\s,;]");
 
 		SQLAdapter adapter = new SQLAdapter();
 		QueryHelper helper = new QueryHelper(adapter, user);
@@ -38,17 +36,12 @@ public class Groups extends HttpServlet implements SingleThreadModel {
 		String encodedHeader = "0; URL=groups.jsp?group="
 				+ URLEncoder.encode(groupName, "UTF-8");
 
-		for (String member : membersWithBlanks) {
-			if (!member.isEmpty()) {
-				members.add(member);
-			}
-		}
-
 		ResultSet rset;
 		int groupId = -1;
 		List<String> storedMembers = null;
 		String storedGroupName = null;
 
+		String[] groupMembers = request.getParameterValues("GROUPMEMBERS");
 		String editGroup = request.getParameter("Update");
 		if (editGroup != null) {
 			try {
@@ -57,13 +50,20 @@ public class Groups extends HttpServlet implements SingleThreadModel {
 				// Validate access.
 				rset = helper.fetchGroupAsEditor(groupId);
 				if (rset.next()) {
-					// Get group info.
-					storedGroupName = rset.getString("group_name");
-					rset.close();
 
-					storedMembers = this
-							.getStoredMembers(helper, groupId, user);
-					mode = Mode.EDIT;
+					if (delete) {
+						rset.close();
+						helper.deleteGroup(groupId);
+					} else {
+
+						// Get group info.
+						storedGroupName = rset.getString("group_name");
+						rset.close();
+
+						storedMembers = this.getStoredMembers(helper, groupId,
+								user);
+						mode = Mode.EDIT;
+					}
 				} else {
 					groupId = -1;
 				}
@@ -72,105 +72,78 @@ public class Groups extends HttpServlet implements SingleThreadModel {
 			}
 		}
 
-		try {
+		if (!delete) {
+			try {
+				boolean hasMembers = groupMembers != null
+						&& groupMembers.length > 1;
 
-			String[] splitMembers = this.splitMembers(adapter, members, user);
-
-			// There must be at least one valid member and no invalid members.
-			boolean invMembers = splitMembers[0].isEmpty()
-					|| !splitMembers[1].isEmpty();
-
-			// Group name is valid if it wasn't changed or if it does not yet
-			// exist in the database.
-			if ((mode == Mode.EDIT && groupName.equals(storedGroupName))
-					|| (this.isValidGroup(adapter, groupName, user))) {
-
-				// There must be at least one valid member and no invalid
-				// members.
-				if (!invMembers) {
-					// Insert new group
-
-					String[] validMembers;
-					if (user.equals("admin")) {
-						validMembers = splitMembers[0].split(",");
-					} else {
-						// Add the creator to the group if the user is not
-						// admin.
-						validMembers = splitMembers[0].concat("," + user)
-								.split(",");
-					}
-
+				if (this.isValidGroup(adapter, groupName, user)) {
 					Date date = new Date(System.currentTimeMillis());
 
-					if (mode == Mode.ADD) {
-						// Insert a new group.
-						groupId = this.getNextId(adapter);
-						helper.insertGroup(groupId, groupName, date);
-					} else if (!groupName.equals(storedGroupName)) {
-						// Update the group name.
-						helper.updateGroup(groupId, groupName);
-					}
+					if (hasMembers) {
+						if (mode == Mode.ADD) {
+							// Insert a new group.
+							groupId = this.getNextId(adapter);
+							helper.insertGroup(groupId, groupName, date);
 
-					if (mode == Mode.ADD) {
-						for (String member : validMembers) {
-							// Insert member into group
-							helper.insertGroupMember(groupId, member, date);
+						} else if (!groupName.equals(storedGroupName)) {
+							// Update the group name.
+							helper.updateGroup(groupId, groupName);
 						}
-					} else {
-						List<String> newMembers = new ArrayList<String>();
-						for (String member : validMembers) {
-							if (!storedMembers.remove(member)) {
-								newMembers.add(member);
+
+						if (mode == Mode.ADD) {
+							for (String member : groupMembers) {
+								// Insert member into group
+								helper.insertGroupMember(groupId, member, date);
 							}
-						}
 
-						// Remaining members in the list are to be deleted.
-						for (String member : storedMembers) {
-							helper.removeGroupMember(groupId, member);
-						}
+						} else {
 
-						// Add new members.
-						for (String member : newMembers) {
-							helper.insertGroupMember(groupId, member, date);
+							List<String> newMembers = new ArrayList<String>();
+							for (String member : groupMembers) {
+								if (!storedMembers.remove(member)) {
+									newMembers.add(member);
+								}
+							}
+
+							// Remaining members in the list are to be deleted.
+							for (String member : storedMembers) {
+								helper.removeGroupMember(groupId, member);
+							}
+
+							// Add new members.
+							for (String member : newMembers) {
+								helper.insertGroupMember(groupId, member, date);
+							}
 						}
 					}
 
 					// Success
 					status = mode == Mode.ADD ? "success" : "updated";
-				}
-			} else {
-				// Invalid group name.
-				status = "invgroup";
-			}
-
-			if (invMembers) {
-				// Invalid members.
-				status += status.isEmpty() ? "invmembers" : "+invmembers";
-			}
-
-			if (mode == Mode.EDIT) {
-				encodedHeader += "&id=" + groupId;
-			}
-
-			// Set the status.
-			encodedHeader += "&status=" + status;
-
-			if (!status.equals("success")) {
-
-				if (!members.isEmpty()) {
-					String membersCondensed = this.getCondensedList(members);
-					encodedHeader += "&members="
-							+ URLEncoder.encode(membersCondensed, "UTF-8");
+				} else {
+					// Invalid group name.
+					status = "invgroup";
 				}
 
-				if (!splitMembers[1].isEmpty()) {
-					encodedHeader += "&invalid_members="
-							+ URLEncoder.encode(splitMembers[1], "UTF-8");
+				if (!hasMembers) {
+					// Invalid members.
+					status += status.isEmpty() ? "invmembers" : "+invmembers";
 				}
+
+				if (mode == Mode.EDIT) {
+					encodedHeader += "&id=" + groupId;
+				}
+
+				// Set the status.
+				encodedHeader += "&status=" + status;
+
+			} catch (SQLException e) {
+				e.printStackTrace();
 			}
-			adapter.closeConnection();
-		} catch (SQLException e) {
-			e.printStackTrace();
+		}
+		else
+		{
+			encodedHeader += "&status=deleted";
 		}
 
 		response.setHeader("Refresh", encodedHeader);
@@ -202,47 +175,6 @@ public class Groups extends HttpServlet implements SingleThreadModel {
 		ResultSet rset = adapter
 				.executeFetch("select group_sequence.nextVal from dual");
 		return rset.next() ? rset.getInt(1) : -1;
-	}
-
-	private String getCondensedList(List<String> items) {
-		String prefix = "";
-		String list = "";
-		for (String item : items) {
-			list += prefix + item;
-			prefix = ",";
-		}
-
-		return list;
-	}
-
-	private String[] splitMembers(SQLAdapter adapter, List<String> members,
-			String user) throws SQLException {
-		List<String> valid = new ArrayList<String>();
-		List<String> invalid = new ArrayList<String>();
-
-		for (String member : members) {
-			if (!member.equals(user) && !member.equals("admin")
-					&& this.isValidUser(adapter, member)) {
-				valid.add(member);
-			} else {
-				invalid.add(member);
-			}
-		}
-
-		// Set the string of valid members.
-		String validMembers = this.getCondensedList(valid);
-		String invalidMembers = this.getCondensedList(invalid);
-
-		return new String[] { validMembers, invalidMembers };
-	}
-
-	private boolean isValidUser(SQLAdapter adapter, String username)
-			throws SQLException {
-		PreparedStatement stmt = adapter
-				.prepareStatement("select * from users where user_name=?");
-		stmt.setString(1, username);
-		ResultSet rset = adapter.executeQuery(stmt);
-		return rset.next();
 	}
 
 	private boolean isValidGroup(SQLAdapter adapter, String groupname,
