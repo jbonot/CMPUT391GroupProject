@@ -146,6 +146,10 @@ public class HtmlPrinter {
 	}
 	
 	public static String toAttributeString(String value){
+		if (value == null){
+			return "";
+		}
+		
 		return value.replaceAll("\"", "&quot;");
 	}
 

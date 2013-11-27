@@ -15,7 +15,7 @@
 		//Get the values from the login and registration page
 		String newPassword = 	request.getParameter("NEWPASSWD");
 		String firstName = 	request.getParameter("FRSTNAME");
-		String lastName = 	request.getParameter("FRSTNAME");
+		String lastName = 	request.getParameter("LASTNAME");
 		String address = 	request.getParameter("ADDRESS");
 		String email = 	request.getParameter("EMAIL");
 		String phonenumber = 	request.getParameter("PHONENUMBER");
@@ -45,11 +45,6 @@
 		Integer rows_updated_person = 0;
 				
 		boolean uPassword = (newPassword.isEmpty()) ? false : true;
-		boolean uLastName = (lastName.isEmpty()) ? false : true;
-		boolean uFirstName = (firstName.isEmpty()) ? false : true;
-		boolean uAddress= (address.isEmpty()) ? false : true;
-		boolean uEmail = (email.isEmpty()) ? false : true;
-		boolean uPhone = (phonenumber.isEmpty()) ? false : true;
 		
 		String preparePassword = "UPDATE users SET password = ? WHERE user_name = ?";
 		Integer rows_updated_password = 0;
@@ -69,53 +64,17 @@
 		}
 		
 		
-		String prepareString = "UPDATE persons SET ";
-		if (uLastName){
-			prepareString = prepareString + " last_name = ?,";
-		}
-		if (uFirstName){
-			prepareString = prepareString + " first_name = ?,";
-		}
-		if (uAddress){
-			prepareString = prepareString + " address = ?,";
-		}
-		if (uEmail){
-			prepareString = prepareString + " email = ?,";
-		}
-		if (uPhone){
-			prepareString = prepareString + " phone = ?,";
-		}
-		if (prepareString.length() > 0 && prepareString.charAt(prepareString.length()-1)==',') {
-			prepareString = prepareString.substring(0, prepareString.length()-1);
-		 }
-		prepareString = prepareString + " WHERE user_name = ?";
-		PreparedStatement updatePerson = db.prepareStatement(prepareString);
+		String prepareString = "UPDATE persons SET first_name=?, last_name=?, address=?, email=?, phone=? where user_name=?";
+		PreparedStatement stmt = db.prepareStatement(prepareString);
+		stmt.setString(1, firstName);
+		stmt.setString(2, lastName);
+		stmt.setString(3, address);
+		stmt.setString(4, email);
+		stmt.setString(5, phonenumber);
+		stmt.setString(6, username);
 		
-		//Set the variable depending on what is set to be updated
-		Integer count = 1;
-		if (uLastName){
-			updatePerson.setString(count,lastName);
-			count++;
-		}
-		if (uFirstName){
-			updatePerson.setString(count,firstName);
-			count++;
-		}
-		if (uAddress){
-			updatePerson.setString(count,address);
-			count++;
-		}
-		if (uEmail){
-			updatePerson.setString(count,email);
-			count++;
-		}
-		if (uPhone){
-			updatePerson.setString(count,phonenumber);
-			count++;
-		}
-		updatePerson.setString(count,username);
-		rows_updated_person = db.executeUpdate(updatePerson);
-		updatePerson.close();
+		rows_updated_person = db.executeUpdate(stmt);
+		stmt.close();
 		if (rows_updated_person == 1){
 			out.print("Update successfull! You will be redirected in 5 seconds...");
 			db.closeConnection();
