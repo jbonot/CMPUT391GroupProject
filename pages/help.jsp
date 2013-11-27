@@ -115,13 +115,16 @@
         <h3>Display Module</h3>
         <p>
         <blockquote>
-                <!-- TODO -->
+                Once you have logged in, the photofeed will show the newest to oldest photos from the groups that you are a part of.
+                By clicking "Explore" in the top menu it will allow you to view the top ranked 5 photos that are public and a group of 
+                random photos. In your user profile ("Profile" button) you can view all the photos that you have uploaded. 
         </blockquote>
         </p>
         <h3>Search Module</h3>
         <p>
         <blockquote>
-                <!-- TODO -->
+                To use the search functionality you must be logged in. The search bar in the top right hand corner of the homepage will search
+                for all images relating to the given search term(s) and To and From dates.
         </blockquote>
         </p>
         <h3>Data Analysis Module</h3>
