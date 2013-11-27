@@ -43,7 +43,7 @@ public class Groups extends HttpServlet implements SingleThreadModel {
 
 		String[] groupMembers = request.getParameterValues("GROUPMEMBERS");
 		String editGroup = request.getParameter("Update");
-		if (editGroup != null) {
+		if (editGroup != null || delete) {
 			try {
 				groupId = Integer.parseInt(editGroup);
 
@@ -116,10 +116,11 @@ public class Groups extends HttpServlet implements SingleThreadModel {
 								helper.insertGroupMember(groupId, member, date);
 							}
 						}
+						
+						// Success
+						status = mode == Mode.ADD ? "success" : "updated";
 					}
 
-					// Success
-					status = mode == Mode.ADD ? "success" : "updated";
 				} else {
 					// Invalid group name.
 					status = "invgroup";

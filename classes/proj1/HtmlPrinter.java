@@ -59,7 +59,8 @@ public class HtmlPrinter {
 
 	private static void printNavigationButtons(Writer out, String user)
 			throws IOException {
-		out.write("<table border=1><tr>");
+		out.write("<table><tr>");
+		out.write("<td><table><tr>");
 		out.write("<td><input type=\"button\" value=\"Home\" onClick=\"javascript:window.location='home.jsp';\"></td>");
 		out.write("<td><input type=\"button\" value=\"Profile\" onClick=\"javascript:window.location='userProfile.jsp';\"></td>");
 		out.write("<td><input type=\"button\" value=\"Upload\" onClick=\"javascript:window.location='upload_image.jsp';\"></td>");
@@ -71,6 +72,8 @@ public class HtmlPrinter {
 		
 		out.write("<td><input type=\"button\" value=\"Help Docs\" onClick=\"javascript:window.location='help.jsp';\"></td>");
 		out.write("<td><input type=\"button\" value=\"Logout\" onClick=\"javascript:window.location='logout.jsp';\"></td>");
+		out.write("</tr></table></td></tr>");
+		out.write("<tr><td><table><tr><td>Logged in as " + user + "</td></tr></table></td></tr>");
 		out.write("</tr></table>");
 		out.flush();
 	}
@@ -78,6 +81,7 @@ public class HtmlPrinter {
 	private static void printNavigationButtons(ServletOutputStream out, String user)
 			throws IOException {
 		out.println("<table><tr>");
+		out.println("<td><table><tr>");
 		out.println("<td><input type=\"button\" value=\"Home\" onClick=\"javascript:window.location='home.jsp';\"></td>");
 		out.println("<td><input type=\"button\" value=\"Profile\" onClick=\"javascript:window.location='userProfile.jsp';\"></td>");
 		out.println("<td><input type=\"button\" value=\"Upload\" onClick=\"javascript:window.location='upload_image.jsp';\"></td>");
@@ -87,8 +91,9 @@ public class HtmlPrinter {
 			out.println("<td><input type=\"button\" value=\"Analysis\"onClick=\"javascript:window.location='DataAnalysis.jsp';\"></td>");
 		}
 
+		out.println("<td><input type=\"button\" value=\"Help Docs\" onClick=\"javascript:window.location='help.jsp';\"></td>");
 		out.println("<td><input type=\"button\" value=\"Logout\" onClick=\"javascript:window.location='logout.jsp';\"></td>");
-		out.println("</tr>");
+		out.println("</tr></table></td></tr>");
 		out.println("<tr><td><table><tr><td>Logged in as " + user + "</td></tr></table></td></tr>");
 		out.println("</tr></table>");
 		out.flush();
