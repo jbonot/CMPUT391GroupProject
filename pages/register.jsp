@@ -25,10 +25,11 @@
 		//Create the adapter
 		SQLAdapter db = new SQLAdapter();//Create a new instance of the SQL Adapter to use 
 		
-		//Setup the prepared statement to check if the email is in use
+		//Setup the prepared statement to check if the email or username is in use
 				PreparedStatement checkEmail = db
-						.prepareStatement("SELECT * FROM persons where email = ?");
+						.prepareStatement("SELECT * FROM persons p, users u where p.email = ? or u.user_name = ?");
 				checkEmail.setString(1, email);
+				checkEmail.setString(2, newName);
 				ResultSet rset = db.executeQuery(checkEmail);
 				boolean empty = true;
 				if (rset.next()) {
@@ -36,7 +37,7 @@
 				}
 				rset.close();
 				
-		//If the email is not in use		
+		//If the email and username are not in use		
 		if (empty == true){
 			
 			//Some variables for counting the rows updated
@@ -84,10 +85,10 @@
 				db.closeConnection();
 				response.setHeader("Refresh", "5; URL=index.jsp");
 				}
-		}
-		out.print("Registration Failed! That username is already in use! You will be redirected in 5 seconds...");
+		}else{
+		out.print("Registration Failed! That username or email address is already in use! You will be redirected in 5 seconds...");
 		db.closeConnection();
-		response.setHeader("Refresh", "5; URL=index.jsp");
+		response.setHeader("Refresh", "5; URL=index.jsp");}
 	%>
 </body>
 </html>
