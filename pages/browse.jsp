@@ -71,47 +71,42 @@
 			</TD>
 		</TR>
 		<TR align="center">
-			<TD align="center"><H3>Public Photos</H3>
-				<I>Chosen at random.</I></TD>
+			<TD align="center"><H3>Public Photos</H3> <I>Chosen at
+					random.</I></TD>
 		</TR>
 		<TR align="center">
 			<TD align="center">
 				<%
+					done = false;
 					// Get at most 35 public images.
-					rset = helper.fetchGroupImages(1);
-				
-					if (rset != null) {
-						try {
-							int row = 0;
-							out.println("<table style=\"align:center;\">");
-							while (!done) {
-								out.println("<tr>");
-								for (int j = 0; j < 7; j++) {
+					rset = helper.fetchGroupImagesRandom(1, 35);
 
-									if (!rset.next()) {
-										done = true;
-										System.out.println("browse.jsp Break");
-										break;
-									}
-
-									p_id = rset.getString("photo_id");
-									out.println("<td style='width:150px;height:150px;max-width:150px;max-height:150px;min-width:150px;min-height:150px;overflow:hidden;'>");
-									out.println("<a href=\"/proj1/GetBigPic?big" + p_id
-											+ "\">");
-									out.println("<img src=\"/proj1/GetOnePic?" + p_id
-											+ "\">");
-									out.println("</a>");
-									out.println("</td>");
+					try {
+						int row = 0;
+						out.println("<table style=\"align:center;\">");
+						while (!done) {
+							out.println("<tr>");
+							for (int j = 0; j < 7; j++) {
+								if (!rset.next()) {
+									done = true;
+									break;
 								}
-								out.println("</tr>");
-							}
 
-							out.println("</table>");
-						} catch (SQLException e) {
-							e.printStackTrace();
+								p_id = rset.getString("photo_id");
+								out.println("<td style='width:150px;height:150px;max-width:150px;max-height:150px;min-width:150px;min-height:150px;overflow:hidden;'>");
+								out.println("<a href=\"/proj1/GetBigPic?big" + p_id
+										+ "\">");
+								out.println("<img src=\"/proj1/GetOnePic?" + p_id
+										+ "\">");
+								out.println("</a>");
+								out.println("</td>");
+							}
+							out.println("</tr>");
 						}
-					} else {
-						System.out.println("browse.jsp null rset");
+
+						out.println("</table>");
+					} catch (SQLException e) {
+						e.printStackTrace();
 					}
 				%>
 			</TD>

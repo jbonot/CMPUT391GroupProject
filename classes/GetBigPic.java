@@ -36,8 +36,7 @@ public class GetBigPic extends HttpServlet implements SingleThreadModel {
 		}
 
 		PrintWriter out = response.getWriter();
-		try
-		{
+		try {
 			response.setContentType("text/html");
 
 			int photoId;
@@ -55,25 +54,29 @@ public class GetBigPic extends HttpServlet implements SingleThreadModel {
 			SQLAdapter adapter = new SQLAdapter();
 			QueryHelper helper = new QueryHelper(adapter, user);
 			ImageInfo info = helper.getImageInfo(photoId);
-			
-			//update distinct image view count
-			PreparedStatement viewCount = adapter.prepareStatement("INSERT INTO image_count VALUES(?, ?)");
-			viewCount.setInt(1, photoId);
-			viewCount.setString(2, user);
-		    adapter.executeUpdate(viewCount);
-	
+
+			try {
+				// update distinct image view count
+				PreparedStatement viewCount = adapter
+						.prepareStatement("INSERT INTO image_count VALUES(?, ?)");
+				viewCount.setInt(1, photoId);
+				viewCount.setString(2, user);
+				adapter.executeUpdate(viewCount);
+			} catch (SQLException ignore) {
+
+			}
+
 			adapter.closeConnection();
 
-			if (info != null)
-			{
+			if (info != null) {
 
 				out.println("<html><head><title>" + info.subject + "</title>");
 				HtmlPrinter.printHeader(out, user, null, null, null);
 				out.println("</head>");
 				out.println("<body>");
 				out.println("<TABLE>");
-				out.println("<TR><TD align=center><img src = \"/proj1/GetOnePic?big" + picid
-						+ "\"></TD><TR>");
+				out.println("<TR><TD align=center><img src = \"/proj1/GetOnePic?big"
+						+ picid + "\"></TD><TR>");
 				out.println("<TR><TD><TABLE border=1><TR><TD><B><I>Owner:</I></B></TD>");
 				out.println("<TD>" + info.owner + "</TD></TR>");
 				out.println("<TR><TD><B><I>Visible to:</I></B></TD>");
@@ -88,8 +91,7 @@ public class GetBigPic extends HttpServlet implements SingleThreadModel {
 				out.println("<TD>" + info.description + "</TD></TR>");
 				out.println("</TABLE></TD></TR></TABLE>");
 
-				if (user.equals(info.owner) || user.equals("admin"))
-				{
+				if (user.equals(info.owner) || user.equals("admin")) {
 					out.println("<BR><input type=\"button\" "
 							+ "value=\"Edit Image\" name=\"Home\" "
 							+ "onclick=\"javascript:window.location='edit_image.jsp?"
@@ -98,21 +100,15 @@ public class GetBigPic extends HttpServlet implements SingleThreadModel {
 							+ "value=\"Delete Image\" name=\"Home\" "
 							+ "onclick=\"javascript:window.location='DeletePic?"
 							+ photoId + "';\" /><BR>");
-					
+
+					out.println("</body></html>");
+				} else {
 					out.println("</body></html>");
 				}
-				else
-				{
-				    out.println("</body></html>");
-				}
-			}
-			else
-			{
+			} else {
 				HtmlPrinter.accessDenied(out);
 			}
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}

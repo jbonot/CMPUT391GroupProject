@@ -240,7 +240,7 @@ public class QueryHelper {
 	public ResultSet fetchGroupImages(int groupId) throws SQLException {
 		PreparedStatement stmt;
 		stmt = adapter
-				.prepareStatement("select photo_id from images where permitted=?");
+				.prepareStatement("select photo_id from images where permitted=? order by timing desc ");
 		stmt.setInt(1, groupId);
 		return adapter.executeQuery(stmt);
 	}
