@@ -16,7 +16,7 @@ import javax.servlet.http.*;
  */
 public class QueryHelper {
 	public static String SECURITY_CONDITION = "((owner_name=?) "
-			+ "or (permitted=group_id and friend_id=?)) ";
+			+ "or (permitted=group_id and friend_id=?) or permitted=1) ";
 
 	private static String FETCH_USER_ADMIN = "SELECT distinct photo_id, subject from images ";
 	private static String FETCH_USER_THUMBNAILS = "SELECT distinct photo_id, subject FROM images, group_lists ";
@@ -269,6 +269,12 @@ public class QueryHelper {
 			e.printStackTrace();
 		}
 		return null;
+	}
+	
+	public ResultSet fetchUserImages(String user) throws SQLException{
+		PreparedStatement stmt = adapter.prepareStatement("select * from images where owner_name=?");
+		stmt.setString(1, user);
+		return adapter.executeQuery(stmt);
 	}
 	
 	public ResultSet fetchUserInfo(String user) throws SQLException{
