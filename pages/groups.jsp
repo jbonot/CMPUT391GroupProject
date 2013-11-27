@@ -81,7 +81,7 @@
 %>
 
 <TITLE><%=title%></TITLE>
-<table width="100%">
+<table style="width: 100%;">
 	<tr>
 		<td>
 			<%
@@ -91,7 +91,11 @@
 	</tr>
 	<tr>
 		<td><input type="button" name="create" value="Create a New Group"
-			onClick="javascript:window.location='groups.jsp';" /><BR> <%
+			onClick="javascript:window.location='groups.jsp';" /><BR>
+			<Table style="margin-top: 20px;">
+				<tr>
+					<td>
+						<H3><%=title%></H3> <%
  	if (status != null) {
  		groupName = request.getParameter("group");
 
@@ -99,14 +103,17 @@
  			// Successful add.
  			out.println("Successfully added '" + groupName + "'");
  			groupName = "";
-
  		} else if (status.equals("updated")) {
  			// Successful updated.
  			out.println("Successfully updated '" + groupName + "'");
  			groupName = "";
+ 		} else if (status.equals("deleted")) {
+ 			// Successful updated.
+ 			out.println("Successfully deleted '" + groupName + "'");
+ 			groupName = "";
  		} else {
  			String id = request.getParameter("id");
-
+ 			String newline = "";
  			if (id != null) {
  				try {
  					// We are editing a group.
@@ -118,27 +125,29 @@
 
  			if (status.contains("invgroup")) {
  				// Invalid group name.
- 				out.println("'" + groupName + "' is already taken.<BR>");
+ 				out.println("'" + groupName + "' is already taken.");
+ 				newline = "<BR>";
  			}
 
  			if (status.contains("invmembers")) {
  				// Invalid list of members.
-
- 				if (members == null) {
- 					out.println("A group needs a list of members.<BR>");
- 				}
+ 				out.println(newline
+ 						+ "A group needs a list of members.");
  			}
  		}
  	}
-	
  %>
-			<Table width="%100">
+
+					</td>
+					<td><h3>Existing Groups</h3></td>
+				</tr>
 				<tr>
 					<td valign="top" style="padding: 0px 100px 0px 0px;">
+
 						<FORM NAME="GroupForm"
-							ACTION="Groups?<%=(mode == Mode.EDIT ? "Add" : "Update=" + groupId)%>"
+							ACTION="Groups?<%=(mode == Mode.ADD ? "Add" : "Update=" + groupId)%>"
 							METHOD="post">
-							<H3><%=title%></H3>
+
 							<TABLE>
 								<TR VALIGN=TOP ALIGN=LEFT>
 									<TD><B><I>Group Name:</I></B></TD>
@@ -203,15 +212,13 @@
 
 										out.println("<TR><TD></TD>");
 										out.println("<TD align=\"right\">");
-										if (mode == Mode.EDIT){
+										if (mode == Mode.EDIT) {
 											out.println("<input type=\"submit\" name=\"SUBMIT\" value=\"Update Group\">");
 											out.println("<input type=\"submit\" name=\"DELETE\" value=\"Delete Group\">");
-										}
-										else
-										{
+										} else {
 											out.println("<input type=\"submit\" name=\"SUBMIT\" value=\"Add Group\">");
 										}
-										
+
 										out.println("</TD>");
 										out.println("</TR>");
 									}
@@ -223,7 +230,7 @@
 						<table>
 							<tr>
 								<td valign="top">
-									<h3>Existing Groups</h3> <%
+									<%
  	rset = adapter
  			.executeFetch("select * from groups where group_id<>1 and group_id<>2");
  	out.println("<table border=1>");

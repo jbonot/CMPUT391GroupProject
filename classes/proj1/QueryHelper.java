@@ -157,8 +157,14 @@ public class QueryHelper {
 		return adapter.executeQuery(stmt);
 	}
 	
-	private ResultSet setImagesPrivate(List<Integer> photoIds) throws SQLException{
-		String query = "update images permitted=2 where ";
+	private int setImagesPrivate(List<Integer> photoIds) throws SQLException{
+		
+		if (photoIds.isEmpty())
+		{
+			return 0;
+		}
+		
+		String query = "update images set permitted=2 where ";
 		String conjunction = "";
 		
 		for (int i = 0; i < photoIds.size(); i++){
@@ -173,10 +179,10 @@ public class QueryHelper {
 			stmt.setInt(i++, id);
 		}
 		
-		return adapter.executeQuery(stmt);
+		return adapter.executeUpdate(stmt);
 	}
 	
-	public void deleteGroup(int groupId) throws SQLException{
+	public int deleteGroup(int groupId) throws SQLException{
 		PreparedStatement stmt;
 		ResultSet rset;
 		List<Integer> photoIds = new ArrayList<Integer>();
@@ -194,14 +200,19 @@ public class QueryHelper {
 		
 		this.setImagesPrivate(photoIds);
 		
+		stmt = adapter.prepareStatement("delete from group_lists where group_id=?");
+		stmt.setInt(1, groupId);
+		adapter.executeUpdate(stmt);
+		stmt.close();
+		
 		stmt = adapter.prepareStatement("delete from groups where group_id=?");
 		stmt.setInt(1, groupId);
-		adapter.executeQuery(stmt);
+		return adapter.executeUpdate(stmt);
 	}
 	
 	public void updateGroup(int groupId, String groupName) throws SQLException{
 		PreparedStatement stmt = adapter
-				.prepareStatement("update groups group_name=? where group_id=?");
+				.prepareStatement("update groups set group_name=? where group_id=?");
 		stmt.setString(1, groupName);
 		stmt.setInt(2, groupId);
 		adapter.executeUpdate(stmt);
