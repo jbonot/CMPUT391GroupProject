@@ -65,7 +65,7 @@ public class GetBigPic extends HttpServlet implements SingleThreadModel {
 				out.println("</head>");
 				out.println("<body>");
 				out.println("<TABLE>");
-				out.println("<TR><TD align=center><img src = \"/proj1/GetOnePic?" + picid
+				out.println("<TR><TD align=center><img src = \"/proj1/GetOnePic?big" + picid
 						+ "\"></TD><TR>");
 				out.println("<TR><TD><TABLE border=1><TR><TD><B><I>Owner:</I></B></TD>");
 				out.println("<TD>" + info.owner + "</TD></TR>");

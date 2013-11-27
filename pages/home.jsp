@@ -11,10 +11,10 @@
 <%
 	String dateFormat = "yyyy-mm-dd";
 	String query = request.getParameter("query");
-	
+
 	java.sql.Date dateStart = null;
 	java.sql.Date dateEnd = null;
-	
+
 	// Validate Start Date
 	try {
 		dateStart = java.sql.Date.valueOf(request
@@ -28,7 +28,7 @@
 		dateStart = new java.sql.Date(c.getTimeInMillis());
 	} catch (IllegalArgumentException e) {
 	}
-	
+
 	// Validate End Date
 	try {
 		dateEnd = java.sql.Date.valueOf(request
@@ -42,15 +42,15 @@
 		dateEnd = new java.sql.Date(c.getTimeInMillis());
 	} catch (IllegalArgumentException e) {
 	}
-	
+
 	query = query == null || query.equals("") ? null : query;
-	
+
 	String user = HtmlPrinter.getUserCookie(request.getCookies());
 	if (user == null) {
 		response.setHeader("Refresh", "0; URL=index.jsp");
 		return;
 	}
-	
+
 	HtmlPrinter.printHeader(out, user, query, dateStart, dateEnd);
 	SQLAdapter adapter = new SQLAdapter();
 	QueryHelper helper = new QueryHelper(adapter, user);
@@ -58,7 +58,10 @@
 %>
 </head>
 <H1>
-<CENTER>Welcome, <%=firstName == null ? user : firstName%>!</CENTER>
+	<CENTER>
+		Welcome,
+		<%=firstName == null ? user : firstName%>!
+	</CENTER>
 </H1>
 <body>
 	<%
@@ -89,7 +92,6 @@
 								+ "\">");
 						out.println("<img src=\"/proj1/GetOnePic?" + p_id
 								+ "\">");
-						out.println(p_id + " " + rset.getString("subject"));
 						out.println("</a>");
 						out.println("</td>");
 					}
