@@ -16,7 +16,7 @@ import javax.servlet.http.*;
  */
 public class QueryHelper {
 	public static String SECURITY_CONDITION = "((owner_name=?) "
-			+ "or (permitted=group_id and friend_id=?)) ";
+			+ "or (permitted=group_id and friend_id=?) or permitted=1) ";
 
 	private static String FETCH_USER_ADMIN = "SELECT distinct photo_id, subject from images ";
 	private static String FETCH_USER_THUMBNAILS = "SELECT distinct photo_id, subject FROM images, group_lists ";
@@ -114,8 +114,9 @@ public class QueryHelper {
 
 		return false;
 	}
-	
-	public void insertGroupMember(int groupId, String member, Date date) throws SQLException{
+
+	public void insertGroupMember(int groupId, String member, Date date)
+			throws SQLException {
 		PreparedStatement stmt;
 		stmt = adapter
 				.prepareStatement("insert into group_lists values(?,?,?,?)");
@@ -126,8 +127,9 @@ public class QueryHelper {
 		adapter.executeUpdate(stmt);
 		stmt.close();
 	}
-	
-	public void insertGroup(int groupId, String groupName, Date date) throws SQLException{
+
+	public void insertGroup(int groupId, String groupName, Date date)
+			throws SQLException {
 		PreparedStatement stmt = adapter
 				.prepareStatement("insert into groups values(?,?,?,?)");
 		stmt.setInt(1, groupId);
@@ -137,67 +139,45 @@ public class QueryHelper {
 		adapter.executeUpdate(stmt);
 		stmt.close();
 	}
-	
-	public ResultSet fetchGroupImages(int groupId) throws SQLException{
-		PreparedStatement stmt = adapter.prepareStatement("select * from images where permitted=?");
+
+	public ResultSet fetchGroupImages(int groupId) throws SQLException {
+		PreparedStatement stmt = adapter
+				.prepareStatement("select * from images where permitted=?");
 		stmt.setInt(1, groupId);
 		return adapter.executeQuery(stmt);
 	}
-	
-	private int setImagesPrivate(List<Integer> photoIds) throws SQLException{
-		
-		if (photoIds.isEmpty())
-		{
-			return 0;
-		}
-		
-		String query = "update images set permitted=2 where ";
-		String conjunction = "";
-		
-		for (int i = 0; i < photoIds.size(); i++){
-			query += conjunction + "photo_id=? ";
-			conjunction = "or ";
-		}
-		
-		PreparedStatement stmt = adapter.prepareStatement(query);
-		
-		int i = 1;
-		for (int id : photoIds){
-			stmt.setInt(i++, id);
-		}
-		
-		return adapter.executeUpdate(stmt);
-	}
-	
-	public int deleteGroup(int groupId) throws SQLException{
+
+	public int deleteGroup(int groupId) throws SQLException {
 		PreparedStatement stmt;
 		ResultSet rset;
 		List<Integer> photoIds = new ArrayList<Integer>();
-		
-		stmt = adapter.prepareStatement("select * from images where permitted=?");
+
+		stmt = adapter
+				.prepareStatement("select * from images where permitted=?");
 		stmt.setInt(1, groupId);
 		rset = adapter.executeQuery(stmt);
-		
-		while (rset.next()){
+
+		while (rset.next()) {
 			photoIds.add(rset.getInt("photo_id"));
 		}
-		
+
 		rset.close();
 		stmt.close();
-		
+
 		this.setImagesPrivate(photoIds);
-		
-		stmt = adapter.prepareStatement("delete from group_lists where group_id=?");
+
+		stmt = adapter
+				.prepareStatement("delete from group_lists where group_id=?");
 		stmt.setInt(1, groupId);
 		adapter.executeUpdate(stmt);
 		stmt.close();
-		
+
 		stmt = adapter.prepareStatement("delete from groups where group_id=?");
 		stmt.setInt(1, groupId);
 		return adapter.executeUpdate(stmt);
 	}
-	
-	public void updateGroup(int groupId, String groupName) throws SQLException{
+
+	public void updateGroup(int groupId, String groupName) throws SQLException {
 		PreparedStatement stmt = adapter
 				.prepareStatement("update groups set group_name=? where group_id=?");
 		stmt.setString(1, groupName);
@@ -205,8 +185,9 @@ public class QueryHelper {
 		adapter.executeUpdate(stmt);
 		stmt.close();
 	}
-	
-	public void removeGroupMember(int groupId, String member) throws SQLException{
+
+	public void removeGroupMember(int groupId, String member)
+			throws SQLException {
 		PreparedStatement stmt;
 		stmt = adapter
 				.prepareStatement("delete from group_lists where group_id=? and friend_id=?");
@@ -276,6 +257,19 @@ public class QueryHelper {
 		}
 		return null;
 	}
+	
+	public ResultSet fetchUserImages(String user) throws SQLException{
+		PreparedStatement stmt = adapter.prepareStatement("select * from images where owner_name=?");
+		stmt.setString(1, user);
+		return adapter.executeQuery(stmt);
+	}
+	
+	public ResultSet fetchUserInfo(String user) throws SQLException{
+		PreparedStatement stmt;
+		stmt = adapter.prepareStatement("select * from persons where user_name=?");
+		stmt.setString(1, user);
+		return adapter.executeQuery(stmt);
+	}
 
 	public ImageInfo getImageInfo(int photoId) {
 		int groupId = -1;
@@ -341,7 +335,8 @@ public class QueryHelper {
 
 		try {
 			if (this.isAdmin) {
-				stmt = adapter.prepareStatement("select " + format + " from images where photo_id=?");
+				stmt = adapter.prepareStatement("select " + format
+						+ " from images where photo_id=?");
 				stmt.setInt(1, photoId);
 
 			} else {
@@ -353,13 +348,13 @@ public class QueryHelper {
 				stmt.setInt(1, photoId);
 				this.setSecurityParameters(stmt, 2);
 			}
-			
+
 			return adapter.executeQuery(stmt);
 
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		
+
 		return null;
 	}
 
@@ -395,6 +390,30 @@ public class QueryHelper {
 		}
 
 		return this.firstName;
+	}
+
+	private int setImagesPrivate(List<Integer> photoIds) throws SQLException {
+
+		if (photoIds.isEmpty()) {
+			return 0;
+		}
+
+		String query = "update images set permitted=2 where ";
+		String conjunction = "";
+
+		for (int i = 0; i < photoIds.size(); i++) {
+			query += conjunction + "photo_id=? ";
+			conjunction = "or ";
+		}
+
+		PreparedStatement stmt = adapter.prepareStatement(query);
+
+		int i = 1;
+		for (int id : photoIds) {
+			stmt.setInt(i++, id);
+		}
+
+		return adapter.executeUpdate(stmt);
 	}
 
 	private int setSecurityParameters(PreparedStatement stmt, int startIndex)
