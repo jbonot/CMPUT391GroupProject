@@ -294,9 +294,9 @@ public class QueryHelper {
 
 		try {
 			if (this.isAdmin) {
-				stmt = adapter.prepareStatement("select " + format
-						+ " from images where photo_id=?");
-				stmt.setInt(1, photoId);
+				stmt = adapter.prepareStatement("select ? from images where photo_id=?");
+				stmt.setString(1, format);
+				stmt.setInt(2, photoId);
 
 			} else {
 				String query = "select " + format
@@ -307,10 +307,9 @@ public class QueryHelper {
 				stmt.setInt(1, photoId);
 				this.setSecurityParameters(stmt, 2);
 			}
-
 			rset = adapter.executeQuery(stmt);
 			if (rset.next()) {
-				return rset.getBinaryStream(1);
+			    return rset.getBinaryStream(1);
 			}
 
 		} catch (SQLException e) {

@@ -44,7 +44,7 @@ public class GetOnePic extends HttpServlet implements SingleThreadModel {
 			if (big) {
 				photoId = Integer.parseInt(picid.substring(3));
 			} else {
-				Integer.parseInt(picid);
+				photoId = Integer.parseInt(picid);
 			}
 		} catch (NumberFormatException e) {
 			out.println("no picture available");
@@ -57,12 +57,12 @@ public class GetOnePic extends HttpServlet implements SingleThreadModel {
 		adapter.closeConnection();
 
 		if (input != null) {
-			response.setContentType("image/gif");
+			response.setContentType("text/html");
 			int imageByte;
 			while ((imageByte = input.read()) != -1) {
 				out.write(imageByte);
 			}
-
+			
 			input.close();
 		} else {
 			out.println("no picture available");
