@@ -25,6 +25,7 @@
 		
 		//Do some string cleanup
 		phonenumber = phonenumber.replaceAll("[^a-zA-Z0-9\\s]", "");
+		phonenumber = phonenumber.substring(0, Math.min(phonenumber.length(), 10));
 		
 		//Create the adapter
 		SQLAdapter db = new SQLAdapter();//Create a new instance of the SQL Adapter to use 

@@ -20,6 +20,10 @@
 		String email = 	request.getParameter("EMAIL");
 		String phonenumber = 	request.getParameter("PHONENUMBER");
 		
+		//Do some string cleanup
+		phonenumber = phonenumber.replaceAll("[^a-zA-Z0-9\\s]", "");
+		phonenumber = phonenumber.substring(0, Math.min(phonenumber.length(), 10));
+				
 		//Create the adapter
 		SQLAdapter db = new SQLAdapter();//Create a new instance of the SQL Adapter to use 
 		
@@ -121,7 +125,7 @@
 		else{
 			out.print("Update Failed. You will be redirected in 5 seconds...");
 			db.closeConnection();
-			response.setHeader("Refresh", "5; URL=userProfile.html");
+			response.setHeader("Refresh", "5; URL=userProfile.jsp");
 		}
 		db.closeConnection();
 
