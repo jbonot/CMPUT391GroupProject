@@ -62,7 +62,7 @@ public class HtmlPrinter {
 		out.write("<table><tr>");
 		out.write("<td><table><tr>");
 		out.write("<td><input type=\"button\" value=\"Home\" onClick=\"javascript:window.location='home.jsp';\"></td>");
-		out.write("<td><input type=\"button\" value=\"Browse\" onClick=\"javascript:window.location='browse.jsp';\"></td>");
+		out.write("<td><input type=\"button\" value=\"Explore\" onClick=\"javascript:window.location='explore.jsp';\"></td>");
 		out.write("<td><input type=\"button\" value=\"Profile\" onClick=\"javascript:window.location='userProfile.jsp';\"></td>");
 		out.write("<td><input type=\"button\" value=\"Upload\" onClick=\"javascript:window.location='upload_image.jsp';\"></td>");
 		out.write("<td><input type=\"button\" value=\"Groups\" onClick=\"javascript:window.location='groups.jsp';\"></td>");
@@ -84,7 +84,7 @@ public class HtmlPrinter {
 		out.println("<table><tr>");
 		out.println("<td><table><tr>");
 		out.println("<td><input type=\"button\" value=\"Home\" onClick=\"javascript:window.location='home.jsp';\"></td>");
-		out.println("<td><input type=\"button\" value=\"Browse\" onClick=\"javascript:window.location='browse.jsp';\"></td>");
+		out.println("<td><input type=\"button\" value=\"Explore\" onClick=\"javascript:window.location='explore.jsp';\"></td>");
 		out.println("<td><input type=\"button\" value=\"Profile\" onClick=\"javascript:window.location='userProfile.jsp';\"></td>");
 		out.println("<td><input type=\"button\" value=\"Upload\" onClick=\"javascript:window.location='upload_image.jsp';\"></td>");
 		out.println("<td><input type=\"button\" value=\"Groups\" onClick=\"javascript:window.location='groups.jsp';\"></td>");

@@ -25,7 +25,6 @@
 	boolean done = false;
 %>
 </head>
-<H1 align="center">Browse Images</H1>
 <body>
 	<TABLE align="center">
 		<TR align="center">
@@ -71,7 +70,7 @@
 			</TD>
 		</TR>
 		<TR align="center">
-			<TD align="center"><H3>Public Photos</H3> <I>Chosen at
+			<TD align="center"><H3>Explore</H3> <I>Chosen at
 					random.</I></TD>
 		</TR>
 		<TR align="center">

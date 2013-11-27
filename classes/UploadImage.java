@@ -255,10 +255,11 @@ public class UploadImage extends HttpServlet
     // shrink image so that it is 150px in one direction, and return the shrinked image
     public static BufferedImage shrink(BufferedImage image)
     {
+    	int scale;
     	if((image.getWidth() <= 150) || (image.getHeight() <= 150))
-    		int scale = 1;
+    		scale = 1;
     	else
-    		int scale = image.getWidth() / 150;
+    		scale = image.getWidth() / 150;
     	
         int w = image.getWidth() / scale;
         int h = image.getHeight() / scale;

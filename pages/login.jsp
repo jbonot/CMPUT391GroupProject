@@ -16,7 +16,6 @@
 		String fUsername = request.getParameter("USERNAME");
 		String fPassword = request.getParameter("PASSWD");
 
-		System.out.println("login.jsp");
 		//Get the current date and get the user and maxage if there is a cookie
 		java.util.Date today = new java.util.Date();
 		
