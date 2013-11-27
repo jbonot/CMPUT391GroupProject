@@ -69,35 +69,3 @@ CREATE TABLE images (
    FOREIGN KEY(permitted) REFERENCES groups
 );
 
-/* End of original code. */
-DROP SEQUENCE photo_id_sequence;
-DROP SEQUENCE group_sequence;
-DROP INDEX descriptionindex;
-DROP INDEX subjectindex;
-DROP INDEX placeindex;
-DROP VIEW sum_cube;
-
-/* Use this for generating photo_id sequence */
-CREATE SEQUENCE photo_id_sequence;
-CREATE SEQUENCE group_sequence MINVALUE 3;
-
-CREATE INDEX descriptionindex
-ON images(description)
-INDEXTYPE IS CTXSYS.CONTEXT;
-
-CREATE INDEX subjectindex
-ON images(subject)
-INDEXTYPE IS CTXSYS.CONTEXT;
-
-CREATE INDEX placeindex
-ON images(place)
-INDEXTYPE IS CTXSYS.CONTEXT;
-
-@drjobdml descriptionindex 1
-@drjobdml subjectindex 1
-@drjobdml placeindex 1
-
-create view sum_cube as 
-select owner_name, subject, timing,TO_CHAR(timing, 'WW') as week,TO_CHAR(timing,'MM') as month,TO_CHAR(timing,'YYYY') as year, count(*) as count from images group by cube(owner_name,subject,timing);
-
-
