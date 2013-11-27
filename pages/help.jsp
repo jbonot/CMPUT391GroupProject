@@ -104,14 +104,20 @@
         <blockquote>
                 Once you have logged in, the photofeed will show the newest to oldest photos from the groups that you are a part of.
                 By clicking "Explore" in the top menu it will allow you to view the top ranked 5 photos that are public and a group of 
-                random photos. In your user profile ("Profile" button) you can view all the photos that you have uploaded. 
+                random photos. In your user profile ("Profile" button) you can view all the photos that you have uploaded.
+                <br><br>
+                To edit or delete a photo (you have to be owner of said image), simply click the image, then click the edit or delete
+                button to perform those actions.
         </blockquote>
         </p>
         <h3>Search Module</h3>
         <p>
         <blockquote>
                 To use the search functionality you must be logged in. The search bar in the top right hand corner of the homepage will search
-                for all images relating to the given search term(s) and To and From dates.
+                for all images relating to the given search term(s) and To and From dates. Entering a term (and optional dates), then clicking
+                'Search' will bring the user to a new page, displaying all results from the query. Clicking on an image will allow the user
+                to explore further, showing it's descriptive information. Search will not show results that are beyond the users current
+                access, they must either be a public image, or an image that is in the same group as the user.
         </blockquote>
         </p>
         <h3>Data Analysis Module</h3>
