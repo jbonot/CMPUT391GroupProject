@@ -62,6 +62,7 @@ public class HtmlPrinter {
 		out.write("<table><tr>");
 		out.write("<td><table><tr>");
 		out.write("<td><input type=\"button\" value=\"Home\" onClick=\"javascript:window.location='home.jsp';\"></td>");
+		out.write("<td><input type=\"button\" value=\"Browse\" onClick=\"javascript:window.location='browse.jsp';\"></td>");
 		out.write("<td><input type=\"button\" value=\"Profile\" onClick=\"javascript:window.location='userProfile.jsp';\"></td>");
 		out.write("<td><input type=\"button\" value=\"Upload\" onClick=\"javascript:window.location='upload_image.jsp';\"></td>");
 		out.write("<td><input type=\"button\" value=\"Groups\" onClick=\"javascript:window.location='groups.jsp';\"></td>");
@@ -83,6 +84,7 @@ public class HtmlPrinter {
 		out.println("<table><tr>");
 		out.println("<td><table><tr>");
 		out.println("<td><input type=\"button\" value=\"Home\" onClick=\"javascript:window.location='home.jsp';\"></td>");
+		out.println("<td><input type=\"button\" value=\"Browse\" onClick=\"javascript:window.location='browse.jsp';\"></td>");
 		out.println("<td><input type=\"button\" value=\"Profile\" onClick=\"javascript:window.location='userProfile.jsp';\"></td>");
 		out.println("<td><input type=\"button\" value=\"Upload\" onClick=\"javascript:window.location='upload_image.jsp';\"></td>");
 		out.println("<td><input type=\"button\" value=\"Groups\" onClick=\"javascript:window.location='groups.jsp';\"></td>");
@@ -102,7 +104,7 @@ public class HtmlPrinter {
 	private static void printSearchBar(Writer out, String query,
 			Date dateStart, Date dateEnd) throws IOException {
 		String dateFormat = "yyyy-mm-dd";
-		out.write("<FORM NAME=\"SearchForm\" ACTION=\"home.jsp\" METHOD=\"get\"><TABLE border=1><TR VALIGN=TOP>");
+		out.write("<FORM NAME=\"SearchForm\" ACTION=\"search.jsp\" METHOD=\"get\"><TABLE border=1><TR VALIGN=TOP>");
 		out.write("<TD><I>Search:</I></TD>");
 		out.write("<TD><INPUT TYPE=\"text\" NAME=\"query\" value=\""
 				+ (query != null ? query : "") + "\"></TD>");

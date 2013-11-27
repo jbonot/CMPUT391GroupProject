@@ -31,9 +31,26 @@ public class QueryHelper {
 		this.isAdmin = user.equals("admin");
 	}
 
-	public ResultSet getHomeItems()
-	{
-	    return adapter.executeFetch("SELECT * FROM image_view WHERE rnk <= 5");
+	public ResultSet getTopFive() {
+		return adapter.executeFetch("SELECT * FROM image_view WHERE rnk <= 5");
+	}
+
+	public ResultSet getHomeItems() {
+		if (this.isAdmin) {
+
+			return adapter.executeFetch(FETCH_USER_ADMIN);
+
+		} else {
+			try {
+				String query = FETCH_USER_THUMBNAILS + "where "
+						+ SECURITY_CONDITION;
+				PreparedStatement stmt = adapter.prepareStatement(query);
+				this.setSecurityParameters(stmt, 1);
+				return adapter.executeQuery(stmt);
+			} catch (SQLException e) {
+				return null;
+			}
+		}
 	}
 
 	public ResultSet getSearchItems(String query, Date dateStart, Date dateEnd) {
@@ -140,13 +157,6 @@ public class QueryHelper {
 		stmt.close();
 	}
 
-	public ResultSet fetchGroupImages(int groupId) throws SQLException {
-		PreparedStatement stmt = adapter
-				.prepareStatement("select * from images where permitted=?");
-		stmt.setInt(1, groupId);
-		return adapter.executeQuery(stmt);
-	}
-
 	public int deleteGroup(int groupId) throws SQLException {
 		PreparedStatement stmt;
 		ResultSet rset;
@@ -227,6 +237,25 @@ public class QueryHelper {
 		return null;
 	}
 
+	public ResultSet fetchGroupImages(int groupId) throws SQLException {
+		PreparedStatement stmt;
+		stmt = adapter
+				.prepareStatement("select photo_id from images where permitted=?");
+		stmt.setInt(1, groupId);
+		return adapter.executeQuery(stmt);
+	}
+
+	public ResultSet fetchGroupImagesRandom(int groupId, int limit)
+			throws SQLException {
+		PreparedStatement stmt;
+		String query = "select photo_id from (select photo_id from images where permitted=? order by dbms_random.value) ";
+			query += (limit > 0) ? "where rownum <= " + limit : "where rownum <= 100";
+			
+		stmt = adapter.prepareStatement(query);
+		stmt.setInt(1, groupId);
+		return adapter.executeQuery(stmt);
+	}
+
 	public ResultSet fetchGroupMembers(int groupId) {
 		PreparedStatement stmt;
 
@@ -257,16 +286,18 @@ public class QueryHelper {
 		}
 		return null;
 	}
-	
-	public ResultSet fetchUserImages(String user) throws SQLException{
-		PreparedStatement stmt = adapter.prepareStatement("select * from images where owner_name=?");
+
+	public ResultSet fetchUserImages(String user) throws SQLException {
+		PreparedStatement stmt = adapter
+				.prepareStatement("select * from images where owner_name=?");
 		stmt.setString(1, user);
 		return adapter.executeQuery(stmt);
 	}
-	
-	public ResultSet fetchUserInfo(String user) throws SQLException{
+
+	public ResultSet fetchUserInfo(String user) throws SQLException {
 		PreparedStatement stmt;
-		stmt = adapter.prepareStatement("select * from persons where user_name=?");
+		stmt = adapter
+				.prepareStatement("select * from persons where user_name=?");
 		stmt.setString(1, user);
 		return adapter.executeQuery(stmt);
 	}
