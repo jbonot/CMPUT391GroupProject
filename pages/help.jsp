@@ -95,12 +95,6 @@
 		This will show your current profile information. Changing any of the information and pressing "Update" will change your profile information.         
         </blockquote>
         </p>
-        <h3>Security Module</h3>
-        <p>
-        <blockquote>
-                <!-- TODO -->
-        </blockquote>
-        </p>
         <h3>Uploading Module</h3>
         <p>
         <blockquote>
@@ -133,7 +127,12 @@
         <h3>Data Analysis Module</h3>
         <p>
         <blockquote>
-                <!-- TODO -->
+                To navigate to the Data Analysis you must first be the administrator and the choose "Analysis" from the top menu.
+                <br>
+                By default the data analysis is showing the cube of the three columns: owner, subject, and date. You have the option
+                to drill down or roll up on three additional time hierarchies which are: Week, Month, and Year. Each of them represented as an integer. 
+                Performing a drill down operation will specialize the cubed data base on the supplied information. Doing a roll up operation will generalize
+                the data for the given time interval.
         </blockquote>
         </p>
         
