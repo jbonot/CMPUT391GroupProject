@@ -310,7 +310,7 @@ public class QueryHelper {
 		try {
 			if (this.isAdmin) {
 				String permissionQuery = "select subject, place, description, owner_name, timing, permitted "
-						+ "from images, group_lists where photo_id=?";
+						+ "from images where photo_id=?";
 				stmt = this.adapter.prepareStatement(permissionQuery);
 				stmt.setInt(1, photoId);
 			} else {
@@ -324,6 +324,7 @@ public class QueryHelper {
 			}
 
 			rset = adapter.executeQuery(stmt);
+
 			if (rset.next()) {
 				String title = rset.getString("subject");
 				String place = rset.getString("place");
