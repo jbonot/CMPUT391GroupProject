@@ -69,10 +69,51 @@
 		Using the actual website is pretty straight-forward, and is broken down into several different modules that are essential
 		for the website to function as intended. Below is a description of each module, and how to use them.
 	</p>
-	<h3>Login/Registration Module</h3>
+	<h3>User Management Module</h3>
 	<p>
 	<blockquote>
-	
+		
+	</blockquote>
+	</p>
+	<h3>Security Module</h3>
+	<p>
+	<blockquote>
+		
+	</blockquote>
+	</p>
+	<h3>Uploading Module</h3>
+	<p>
+	<blockquote>
+		This module is used simply to upload images to the database. It is accessed by clicking <b>Upload</b>
+		at the top of the page. Here, the user can choose a file (or multiple picture files if they want), and
+		set descriptive information for the picture(s) (a subject, place, date, description, and security level).
+		Once all information and pictures are chosen, the user clicks upload at the bottom to save the picture(s)
+		and relative information to the database. Once the operation is complete, the user will get a message indicating
+		if the upload was a success, or if there was a problem.
+		<br><br>
+		Possible error messages: Invalid file type, Invalid date, or no pictures selected. Note that the user can upload images
+		without adding descriptive info for subject, place, or description.
+		<br><br>
+		If the upload was a success, then the user is taken back to home page, where they can see the image. If the user wants to either
+		edit the picture info, or delete the picture entirely, they can do so by clicking on the picture (Leads to display module).
+	</blockquote>
+	</p>
+	<h3>Display Module</h3>
+	<p>
+	<blockquote>
+		
+	</blockquote>
+	</p>
+	<h3>Search Module</h3>
+	<p>
+	<blockquote>
+		
+	</blockquote>
+	</p>
+	<h3>Data Analysis Module</h3>
+	<p>
+	<blockquote>
+		
 	</blockquote>
 	</p>
 	
