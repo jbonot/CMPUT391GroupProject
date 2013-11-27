@@ -314,8 +314,8 @@ public class QueryHelper {
 				stmt = this.adapter.prepareStatement(permissionQuery);
 				stmt.setInt(1, photoId);
 			} else {
-				String permissionQuery = "select subject, place, description, owner_name, timing, permitted "
-						+ "from images, group_lists "
+				String permissionQuery = "select * "
+						+ "from (select photo_id, subject, place, description, owner_name, timing, permitted, group_id, friend_id from images outer left join group_lists on permitted=group_id) "
 						+ "where photo_id=? and "
 						+ SECURITY_CONDITION;
 				stmt = this.adapter.prepareStatement(permissionQuery);
