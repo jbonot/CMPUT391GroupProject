@@ -68,7 +68,8 @@ public class HtmlPrinter {
 		if (user.equals("admin")) {
 			out.write("<td><input type=\"button\" value=\"Analysis\"onClick=\"javascript:window.location='DataAnalysis.jsp';\"></td>");
 		}
-
+		
+		out.write("<td><input type=\"button\" value=\"Help Docs\" onClick=\"javascript:window.location='help.jsp';\"></td>");
 		out.write("<td><input type=\"button\" value=\"Logout\" onClick=\"javascript:window.location='logout.jsp';\"></td>");
 		out.write("</tr></table>");
 		out.flush();
