@@ -64,47 +64,49 @@
 	</CENTER>
 </H1>
 <body>
-	<%
-		ResultSet rset = null;
-		String p_id;
-		boolean done = false;
+	<CENTER>
+		<%
+			ResultSet rset = null;
+			String p_id;
+			boolean done = false;
 
-		if (request.getParameter("SEARCH") != null
-				&& (dateStart != null || dateEnd != null || query != null)) {
-			rset = helper.getSearchItems(query, dateStart, dateEnd);
-		} else {
-			rset = helper.getHomeItems();
-		}
-
-		if (rset != null) {
-			try {
-				out.println("<table border=1>");
-				while (!done) {
-					out.println("<tr>");
-					for (int j = 0; j < 4; j++) {
-						if (!rset.next()) {
-							done = true;
-							break;
-						}
-						p_id = rset.getString("photo_id");
-						out.println("<td>");
-						out.println("<a href=\"/proj1/GetBigPic?big" + p_id
-								+ "\">");
-						out.println("<img src=\"/proj1/GetOnePic?" + p_id
-								+ "\">");
-						out.println("</a>");
-						out.println("</td>");
-					}
-					out.println("</tr>");
-				}
-
-				out.println("</table>");
-			} catch (SQLException e) {
-				e.printStackTrace();
+			if (request.getParameter("SEARCH") != null
+					&& (dateStart != null || dateEnd != null || query != null)) {
+				rset = helper.getSearchItems(query, dateStart, dateEnd);
+			} else {
+				rset = helper.getHomeItems();
 			}
-		}
 
-		adapter.closeConnection();
-	%>
+			if (rset != null) {
+				try {
+					out.println("<table>");
+					while (!done) {
+						out.println("<tr>");
+						for (int j = 0; j < 7; j++) {
+							if (!rset.next()) {
+								done = true;
+								break;
+							}
+							p_id = rset.getString("photo_id");
+							out.println("<td style='width:150px;height:150px;max-width:150px;max-height:150px;min-width:150px;min-height:150px;overflow:hidden;'>");
+							out.println("<a href=\"/proj1/GetBigPic?big" + p_id
+									+ "\">");
+							out.println("<img src=\"/proj1/GetOnePic?" + p_id
+									+ "\">");
+							out.println("</a>");
+							out.println("</td>");
+						}
+						out.println("</tr>");
+					}
+
+					out.println("</table>");
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+
+			adapter.closeConnection();
+		%>
+	</CENTER>
 </body>
 </html>
