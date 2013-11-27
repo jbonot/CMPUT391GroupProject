@@ -33,10 +33,16 @@ INDEXTYPE IS CTXSYS.CONTEXT;
 DROP TABLE image_count;
 CREATE TABLE image_count (
     photo_id    int,
-    view_count  int,
-    PRIMARY KEY(photo_id),
-    FOREIGN KEY(photo_id) REFERENCES images
+    user_name   varchar(24),
+    PRIMARY KEY(photo_id, user_name),
+    FOREIGN KEY(photo_id) REFERENCES images,
+    FOREIGN KEY(user_name) REFERENCES users
 );
+
+--Add image view table, counting distinct users for each photo_id
+DROP VIEW image_view;
+CREATE VIEW image_view AS
+SELECT photo_id, COUNT(*) AS head_count, DENSE_RANK() OVER (ORDER BY COUNT(*) DESC) AS rnk FROM image_count GROUP BY photo_id;
 
 --Add the default 
 insert into users values('admin','adminpassword',sysdate);

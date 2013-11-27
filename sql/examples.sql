@@ -45,3 +45,9 @@ insert into images values(8, 'matwood', 3, 'where the wild books are', 'the stor
 
 select photo_id_sequence.nextVal from dual;
 insert into images values(9, 'bob123', 1, 'furniture', 'my room', sysdate, 'I placed my books on the shelf', EMPTY_BLOB(), EMPTY_BLOB());
+
+insert into image_count values(4, 'matwood');
+insert into image_count values(4, 'bob123');
+insert into image_count values(3, 'bob123');
+insert into image_count values(3, 'matwood');
+insert into image_count values(1, 'alice456');
