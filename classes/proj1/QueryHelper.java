@@ -31,22 +31,9 @@ public class QueryHelper {
 		this.isAdmin = user.equals("admin");
 	}
 
-	public ResultSet getHomeItems() {
-		if (this.isAdmin) {
-
-			return adapter.executeFetch(FETCH_USER_ADMIN);
-
-		} else {
-			try {
-				String query = FETCH_USER_THUMBNAILS + "where "
-						+ SECURITY_CONDITION;
-				PreparedStatement stmt = adapter.prepareStatement(query);
-				this.setSecurityParameters(stmt, 1);
-				return adapter.executeQuery(stmt);
-			} catch (SQLException e) {
-				return null;
-			}
-		}
+	public ResultSet getHomeItems()
+	{
+	    return adapter.executeFetch("SELECT * FROM image_view WHERE rnk <= 5");
 	}
 
 	public ResultSet getSearchItems(String query, Date dateStart, Date dateEnd) {

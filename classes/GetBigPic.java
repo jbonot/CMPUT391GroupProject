@@ -55,6 +55,13 @@ public class GetBigPic extends HttpServlet implements SingleThreadModel {
 			SQLAdapter adapter = new SQLAdapter();
 			QueryHelper helper = new QueryHelper(adapter, user);
 			ImageInfo info = helper.getImageInfo(photoId);
+			
+			//update distinct image view count
+			PreparedStatement viewCount = adapter.prepareStatement("INSERT INTO image_count VALUES(?, ?)");
+			viewCount.setInt(1, photoId);
+			viewCount.setString(2, user);
+		    adapter.executeUpdate(viewCount);
+	
 			adapter.closeConnection();
 
 			if (info != null)
