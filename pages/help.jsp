@@ -7,7 +7,7 @@
 <title>User Documentation</title>
 </head>
 <body>
-
+	<% //USER DOCUMENTATION PAGE (in html) %>
 	<%@ page import="proj1.*"%>
 	<%
 		/* COOKIE RETRIEVAL */
@@ -31,7 +31,19 @@
 	<h3>SQL Server and Tables</h3>
 	<p>
 	<blockquote>
-	
+		1. Navigate (in a terminal) to <i>project/sql/</i> to be in the same directory as the sql script files.
+		<br><br>
+		2. Type sqlplus, and enter the username and password, assuming that a database has been set up, and that there
+		are no tables in said database.
+		<br><br>
+		3. Type <b>@setup</b> to run the setup script and fill the database with the default tables needed.
+		<br><br>
+		4. Type <b>@initial_script</b> to load the additional table, views, and sequences needed for the database.
+		<br><br>
+		5. (Optional) Type <b>@examples</b> to load the tables with sample information. These include users, groups,
+		images, as well as image view counts.
+		<br><br>
+		The database setup is now complete. The next step below is setting up the website and servlets.
 	</blockquote>
 	</p>
 	<h3>Web Pages and Servlets</h3>
@@ -72,13 +84,13 @@
 	<h3>User Management Module</h3>
 	<p>
 	<blockquote>
-		
+		<!-- TODO -->	
 	</blockquote>
 	</p>
 	<h3>Security Module</h3>
 	<p>
 	<blockquote>
-		
+		<!-- TODO -->
 	</blockquote>
 	</p>
 	<h3>Uploading Module</h3>
@@ -101,19 +113,19 @@
 	<h3>Display Module</h3>
 	<p>
 	<blockquote>
-		
+		<!-- TODO -->
 	</blockquote>
 	</p>
 	<h3>Search Module</h3>
 	<p>
 	<blockquote>
-		
+		<!-- TODO -->
 	</blockquote>
 	</p>
 	<h3>Data Analysis Module</h3>
 	<p>
 	<blockquote>
-		
+		<!-- TODO -->
 	</blockquote>
 	</p>
 	
