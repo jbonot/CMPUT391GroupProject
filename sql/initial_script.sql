@@ -42,7 +42,7 @@ CREATE TABLE image_count (
 --Add image view table, counting distinct users for each photo_id
 DROP VIEW image_view;
 CREATE VIEW image_view AS
-SELECT photo_id, COUNT(*) AS head_count, DENSE_RANK() OVER (ORDER BY COUNT(*) DESC) AS rnk FROM image_count GROUP BY photo_id;
+SELECT ic.photo_id, COUNT(*) AS head_count, DENSE_RANK() OVER (ORDER BY COUNT(*) DESC) AS rnk FROM image_count ic, images i where ic.photo_id = i.photo_id and i.permitted = 1 GROUP BY ic.photo_id;
 
 --Add the default 
 insert into users values('admin','adminpassword',sysdate);
